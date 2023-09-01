@@ -1,0 +1,20 @@
+{
+    "roi": {
+        "background": "lightBlue",
+        "aura": null,
+        "back": "cape",
+        "body": "basic",
+        "hair": null,
+        "tattoo": null,
+        "eyes": "kawaii",
+        "mouth": "bottomLipUp",
+        "fur": null,
+        "hat": "couronne",
+        "top": null,
+        "pants": null,
+        "gloves": null,
+        "shoes": null,
+        "accessory": null,
+        "fellow": null
+    }
+}
