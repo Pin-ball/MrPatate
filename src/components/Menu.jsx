@@ -35,7 +35,7 @@ export default function Menu() {
         <Customisation/>
       </Accordion.Panel>
 
-      <Accordion.Panel title='Ensembles & favoris'>
+      <Accordion.Panel title='Ensembles'>
         <Presets/>
       </Accordion.Panel>
     </Accordion>

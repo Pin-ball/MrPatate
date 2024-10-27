@@ -4,7 +4,7 @@ import {useEffect, useRef, useState} from 'react';
 import {getActiveElements} from '@src/components/svg'
 
 export default function Viewer() {
-  const {ref, setRef} = useStore()
+  const {setRef} = useStore()
   const svgRef = useRef()
   const [hasHoverShift, setHasHoverShift] = useState(true)
   const [hover, setHover] = useState(null)
@@ -14,10 +14,16 @@ export default function Viewer() {
   const elements = getActiveElements()
 
   useEffect(() => {
-    setRef(svgRef)
+    setRef(svgRef.current)
+
+    return () => {
+      setRef(null)
+    }
   }, []);
 
   const handleHover = (e) => {
+    if (!svgRef) return
+
     const {x, y, height, width} = svgRef.current.getBoundingClientRect()
     const [xShift, yShift] = [((e.clientX - x) / (width / 2)) - 1, ((e.clientY - y) / (height / 2)) - 1]
     setMouse({x: -xShift, y: -yShift})

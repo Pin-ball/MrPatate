@@ -19,7 +19,7 @@ const colors = {
 
 const defaultSkins = preset.find(p => p.key === 'default').skins
 const initialState = {
-  ref: null,
+  svgRef: null,
   skins: defaultSkins,
   colors
 }
@@ -30,7 +30,7 @@ const useStore = create()(
 
     setRef: (ref) =>
       set(state => {
-        state.ref = ref
+        state.svgRef = ref
       }),
 
     resetSkins: () =>

@@ -3,14 +3,16 @@ import {saveSvgAsPng} from 'save-svg-as-png';
 import {downloadSvg} from '@src/utils/index.js';
 
 export default function Download() {
-  const { ref } = useStore()
+  const {svgRef} = useStore()
 
   const getSvg = () => {
-    downloadSvg(ref.current, 'Pierre.svg')
+    if (svgRef)
+      downloadSvg(svgRef, 'Pierre.svg')
   }
 
   const getPng = () => {
-    saveSvgAsPng(ref.current, 'Pierre.png')
+    if (svgRef)
+      saveSvgAsPng(svgRef, 'Pierre.png')
   }
 
   return (
