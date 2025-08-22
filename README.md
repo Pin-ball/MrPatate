@@ -1,15 +1,10 @@
-# React + Vite
+# Kayoo - Pierre
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project allows users to create and customize 2D characters with multiple parts (legs, body, arms, etc.), each having multiple variants. The character configuration can be encoded and decoded for storage, sharing, or other purposes.
 
-Currently, two official plugins are available:
+## 🚀 Get started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-
-## Star project locally
+```bash
+npm i
+npm run dev
 ```
-yarn run dev --host
-```
-The --host flag tells Vite to expose your app to the local network.
