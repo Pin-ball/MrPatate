@@ -1,12 +1,16 @@
-import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { resolve } from 'node:path'
+import babel from '@rolldown/plugin-babel'
+import tailwindcss from '@tailwindcss/vite'
+import react, { reactCompilerPreset } from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    babel({ presets: [reactCompilerPreset({ panicThreshold: 'all_errors' })] }),
+  ],
   resolve: {
-    alias: {
-      "@src": "/src",
-    },
+    alias: { '@src': resolve(import.meta.dirname, 'src') },
   },
-});
+})

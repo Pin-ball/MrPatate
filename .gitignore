@@ -15,10 +15,17 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
+*.code-workspace
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Local scratch
+.untracked/
+*.untracked
+*.untracked.*

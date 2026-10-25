@@ -1,24 +1,22 @@
-import Actions from "@src/components/Actions";
-import Menu from "@src/components/Menu";
-import Mobile from "@src/components/Mobile";
-import Viewer from "@src/components/Viewer";
-import useMediaQuery from "@src/hooks/useMediaQuery";
+import { CharacterView } from '@src/components/CharacterView.tsx'
+import { MobileUnsupported } from '@src/components/MobileUnsupported.tsx'
+import { Sidebar } from '@src/components/Sidebar.tsx'
+import { Toolbar } from '@src/components/Toolbar.tsx'
+import { useMediaQuery } from '@src/hooks/useMediaQuery.ts'
 
-function App() {
-  const isMobile = useMediaQuery("(max-width: 800px)");
-  if (isMobile) return <Mobile />;
+export function App() {
+  const isMobile = useMediaQuery('(max-width: 800px)')
+  if (isMobile) return <MobileUnsupported />
 
   return (
     <div className="flex h-screen p-7">
-      <nav className="min-w-[390px] w-1/3">
-        <Menu />
+      <nav className="w-1/3 min-w-[390px]">
+        <Sidebar />
       </nav>
-      <main className="flex flex-col grow">
-        <Actions />
-        <Viewer />
+      <main className="flex grow flex-col">
+        <Toolbar />
+        <CharacterView />
       </main>
     </div>
-  );
+  )
 }
-
-export default App;
