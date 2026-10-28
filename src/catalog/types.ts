@@ -9,14 +9,12 @@ export type Look = Record<PartId, VariantId>
 export type Part = {
   id: PartId
   label: string
-  icon: string
   variants: Variant[]
 }
 
 export type Variant = {
   id: VariantId
   label: string
-  icon: string
   layers: Layer[]
 }
 
@@ -33,6 +31,5 @@ export type ActiveLayer = Layer & {
 export type Preset = {
   id: string
   label: string
-  icon: string
   look: Partial<Look>
 }
