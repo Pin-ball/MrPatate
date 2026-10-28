@@ -13,4 +13,6 @@ export const fr = {
   back_to_parts: 'Parties',
   trial: 'essai',
   toast_favorite_removed: 'Retiré des Favoris',
+  character: 'Pierre',
+  whole_character: 'Pierre entier',
 }

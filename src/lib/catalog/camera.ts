@@ -4,7 +4,7 @@ export const FRAME: Box = [180, 190, 620, 740]
 
 export const FILL = 0.75
 
-export const MAX_ZOOM = 1.9
+export const MAX_ZOOM = 1.6
 
 export function unionBox(boxes: Box[]): Box | null {
   if (!boxes.length) return null
@@ -31,12 +31,35 @@ export function cameraOf(variants: Variant[]): Camera {
   const fit = Math.min((fx1 - fx0) / (x1 - x0), (fy1 - fy0) / (y1 - y0))
   const zoom = Math.round(clamp(FILL * fit, 1, MAX_ZOOM) * 20) / 20
   const halfWidth = (fx1 - fx0) / zoom / 2
-  const halfHeight = (fy1 - fy0) / zoom / 2
   return {
     zoom,
     focus: [
       Math.round(clamp((x0 + x1) / 2, fx0 + halfWidth, fx1 - halfWidth)),
-      Math.round(clamp((y0 + y1) / 2, fy0 + halfHeight, fy1 - halfHeight)),
+      Math.round((y0 + y1) / 2),
     ],
   }
+}
+
+export function viewOf({ zoom, focus: [x, y] }: Camera): Box {
+  const halfWidth = (FRAME[2] - FRAME[0]) / zoom / 2
+  const halfHeight = (FRAME[3] - FRAME[1]) / zoom / 2
+  return [x - halfWidth, y - halfHeight, x + halfWidth, y + halfHeight]
+}
+
+export const THUMBNAIL_MARGIN = 1.3
+export const THUMBNAIL_MIN_WIDTH = 96
+
+export function thumbnailView(variant: Variant): Box {
+  if (!variant.box) return FRAME
+  const [x0, y0, x1, y1] = variant.box
+  const ratio = (FRAME[3] - FRAME[1]) / (FRAME[2] - FRAME[0])
+  const width = Math.max(
+    THUMBNAIL_MIN_WIDTH,
+    (x1 - x0) * THUMBNAIL_MARGIN,
+    ((y1 - y0) * THUMBNAIL_MARGIN) / ratio,
+  )
+  const height = width * ratio
+  const cx = (x0 + x1) / 2
+  const cy = (y0 + y1) / 2
+  return [cx - width / 2, cy - height / 2, cx + width / 2, cy + height / 2]
 }

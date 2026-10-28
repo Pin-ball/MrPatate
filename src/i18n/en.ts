@@ -15,4 +15,6 @@ export const en = {
   back_to_parts: 'Parts',
   trial: 'trying',
   toast_favorite_removed: 'Removed from Favorites',
+  character: 'Pierre',
+  whole_character: 'Whole Pierre',
 } satisfies Record<keyof typeof fr, string>
