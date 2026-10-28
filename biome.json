@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!**/dist", "!**/.untracked", "!public"]
+    "includes": ["**", "!**/dist", "!**/.untracked", "!public", "!**/*.gen.ts"]
   },
   "formatter": {
     "enabled": true,

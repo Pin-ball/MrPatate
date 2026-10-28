@@ -25,6 +25,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Generated
+src/lib/catalog/ids.gen.ts
+
 # Local scratch
 .untracked/
 *.untracked

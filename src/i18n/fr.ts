@@ -1,0 +1,16 @@
+export const fr = {
+  app_title: 'Mr Patate',
+  language: 'Langue',
+  actions: 'Actions',
+  undo: 'Annuler',
+  redo: 'Rétablir',
+  surprise: 'Surprise : un Pierre au hasard',
+  favorite_add: 'Ajouter aux Favoris',
+  share: 'Partager',
+  share_copy_link: 'Copier le lien',
+  share_download_png: 'Télécharger le PNG',
+  random_variant: 'Variante au hasard',
+  back_to_parts: 'Parties',
+  trial: 'essai',
+  toast_favorite_removed: 'Retiré des Favoris',
+}
