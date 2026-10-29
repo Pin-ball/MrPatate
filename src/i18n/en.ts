@@ -11,6 +11,7 @@ export const en = {
   share: 'Share',
   share_copy_link: 'Copy link',
   share_download_png: 'Download PNG',
+  share_download_svg: 'Download SVG',
   random_variant: 'Random variant',
   back_to_parts: 'Parts',
   trial: 'trying',

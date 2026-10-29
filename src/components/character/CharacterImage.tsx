@@ -1,24 +1,34 @@
-import { FRAME } from '@src/lib/catalog/camera.ts'
+import { FRAME, viewBoxOf } from '@src/lib/catalog/camera.ts'
 import { backgroundOf, layersOf, skinOf } from '@src/lib/catalog/layers.ts'
 import type { Box, Look } from '@src/lib/catalog/types.ts'
 import { Backdrop } from './Backdrop.tsx'
-import { viewBoxOf } from './nodes.ts'
 import { PartLayers } from './PartLayers.tsx'
 
 type CharacterImageProps = {
   look: Look
   view?: Box
+  width?: number
+  height?: number
   label?: string
   className?: string
 }
 
-export function CharacterImage({ look, view = FRAME, label, className }: CharacterImageProps) {
+export function CharacterImage({
+  look,
+  view = FRAME,
+  width,
+  height,
+  label,
+  className,
+}: CharacterImageProps) {
   const skin = skinOf(look)
 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox={viewBoxOf(view)}
+      width={width}
+      height={height}
       className={className}
       role={label ? 'img' : undefined}
       aria-label={label}

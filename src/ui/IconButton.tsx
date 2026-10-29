@@ -4,7 +4,7 @@ import { cva } from 'class-variance-authority'
 import type { ComponentProps } from 'react'
 
 const iconButtonVariants = cva(
-  'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-30 motion-reduce:transition-none',
+  'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-30',
   {
     variants: {
       variant: {

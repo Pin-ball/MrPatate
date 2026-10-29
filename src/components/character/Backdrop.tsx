@@ -1,7 +1,7 @@
 import { useSvgId } from '@src/hooks/useSvgId.ts'
 import type { BackgroundPaint } from '@src/lib/catalog/layers.ts'
 import type { Box } from '@src/lib/catalog/types.ts'
-import { renderNodes } from './nodes.ts'
+import { SvgNodes } from './SvgNodes.tsx'
 
 const AREA: Box = [-400, -500, 1200, 1500]
 
@@ -24,7 +24,7 @@ export function Backdrop({ paint }: { paint: BackgroundPaint }) {
               height={pattern.height}
               patternTransform={pattern.transform ?? undefined}
             >
-              {renderNodes(pattern.nodes)}
+              <SvgNodes nodes={pattern.nodes} />
             </pattern>
           </defs>
           <rect {...area} fill={`url(#${patternId})`} />

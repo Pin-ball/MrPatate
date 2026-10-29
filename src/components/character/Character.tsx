@@ -1,12 +1,11 @@
 import { useParallax } from '@src/hooks/useParallax.ts'
-import { FRAME } from '@src/lib/catalog/camera.ts'
+import { FRAME, viewBoxOf } from '@src/lib/catalog/camera.ts'
 import { backgroundOf, layersOf, pivotDepth, skinOf } from '@src/lib/catalog/layers.ts'
 import type { Box, Look } from '@src/lib/catalog/types.ts'
 import { cn } from '@src/lib/utils.ts'
 import type { ReactNode } from 'react'
 import { useRef } from 'react'
 import { Backdrop } from './Backdrop.tsx'
-import { viewBoxOf } from './nodes.ts'
 import { PartLayers } from './PartLayers.tsx'
 import './character.css'
 

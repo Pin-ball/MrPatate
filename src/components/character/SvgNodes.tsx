@@ -1,10 +1,12 @@
 import type { SkinPaint } from '@src/lib/catalog/layers.ts'
-import type { Box, SvgNode } from '@src/lib/catalog/types.ts'
+import type { SvgNode } from '@src/lib/catalog/types.ts'
 import type { ReactElement } from 'react'
 import { createElement, Fragment } from 'react'
 
-export function viewBoxOf([x0, y0, x1, y1]: Box): string {
-  return `${x0} ${y0} ${x1 - x0} ${y1 - y0}`
+type SvgNodesProps = {
+  nodes: SvgNode[]
+  skin?: SkinPaint | undefined
+  shadowClip?: string | undefined
 }
 
 function fillOf({ attrs }: SvgNode, skin?: SkinPaint): string | undefined {
@@ -23,6 +25,6 @@ function renderNode(node: SvgNode, skin?: SkinPaint, shadowClip?: string): React
   return createElement('g', { clipPath: `url(#${shadowClip})` }, element)
 }
 
-export function renderNodes(nodes: SvgNode[], skin?: SkinPaint, shadowClip?: string): ReactElement {
+export function SvgNodes({ nodes, skin, shadowClip }: SvgNodesProps) {
   return createElement(Fragment, null, ...nodes.map((node) => renderNode(node, skin, shadowClip)))
 }

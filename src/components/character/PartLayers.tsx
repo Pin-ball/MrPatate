@@ -1,6 +1,6 @@
 import { useSvgId } from '@src/hooks/useSvgId.ts'
 import type { Layer, SkinPaint } from '@src/lib/catalog/layers.ts'
-import { renderNodes } from './nodes.ts'
+import { SvgNodes } from './SvgNodes.tsx'
 
 const hasRole = (layer: Layer, role: string) =>
   layer.nodes.some((node) => node.attrs['data-role'] === role)
@@ -13,13 +13,13 @@ function PartLayer({ layer, skin }: { layer: Layer; skin: SkinPaint }) {
     <g data-part={layer.part}>
       {shadowClip && (
         <clipPath id={shadowClip}>
-          {renderNodes(
-            layer.nodes.filter((node) => node.attrs['data-role'] === 'skin'),
-            skin,
-          )}
+          <SvgNodes
+            nodes={layer.nodes.filter((node) => node.attrs['data-role'] === 'skin')}
+            skin={skin}
+          />
         </clipPath>
       )}
-      {renderNodes(layer.nodes, skin, shadowClip)}
+      <SvgNodes nodes={layer.nodes} skin={skin} shadowClip={shadowClip} />
     </g>
   )
 }

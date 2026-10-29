@@ -6,6 +6,10 @@ export const FILL = 0.75
 
 export const MAX_ZOOM = 1.6
 
+export function viewBoxOf([x0, y0, x1, y1]: Box): string {
+  return `${x0} ${y0} ${x1 - x0} ${y1 - y0}`
+}
+
 export function unionBox(boxes: Box[]): Box | null {
   if (!boxes.length) return null
   return [

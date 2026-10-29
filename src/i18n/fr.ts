@@ -9,6 +9,7 @@ export const fr = {
   share: 'Partager',
   share_copy_link: 'Copier le lien',
   share_download_png: 'Télécharger le PNG',
+  share_download_svg: 'Télécharger le SVG',
   random_variant: 'Variante au hasard',
   back_to_parts: 'Parties',
   trial: 'essai',
