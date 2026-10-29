@@ -2,6 +2,7 @@
 import { defaultLook } from '@src/lib/catalog/index.ts'
 import {
   HISTORY_LIMIT,
+  LOOK_KEY,
   randomizeLook,
   randomizeVariant,
   redo,
@@ -18,6 +19,7 @@ const state = () => useEditor.getState()
 const history = () => useEditor.temporal.getState()
 
 beforeEach(() => {
+  localStorage.clear()
   useEditor.setState({ look: defaultLook, preview: null, hand: { kind: 'none' } })
   history().clear()
 })
@@ -69,5 +71,23 @@ describe('editor', () => {
   it('randomizes one part only', () => {
     randomizeVariant('arms')
     expect(state().look).toEqual({ ...defaultLook, arms: 'club' })
+  })
+
+  it('keeps only the look in the browser', () => {
+    setVariant('eyes', 'six')
+    setHand({ kind: 'parts' })
+    setPreview({ mouth: 'sad' })
+    const saved = JSON.parse(localStorage.getItem(LOOK_KEY) ?? '{}')
+    expect(saved).toEqual({ state: { look: { ...defaultLook, eyes: 'six' } }, version: 1 })
+  })
+
+  it('reads the saved look tolerantly, outside the history', async () => {
+    localStorage.setItem(
+      LOOK_KEY,
+      JSON.stringify({ state: { look: { eyes: 'six', mouth: 'gone' } }, version: 1 }),
+    )
+    await useEditor.persist.rehydrate()
+    expect(state().look).toEqual({ ...defaultLook, eyes: 'six' })
+    expect(history().pastStates).toHaveLength(0)
   })
 })

@@ -1,8 +1,10 @@
 import { defaultLook } from '@src/lib/catalog/index.ts'
-import { lookEquals, randomLook, withRandomVariant } from '@src/lib/catalog/look.ts'
+import { lookEquals, randomLook, readLook, withRandomVariant } from '@src/lib/catalog/look.ts'
 import type { Look, PartId, VariantId } from '@src/lib/catalog/types.ts'
+import { readField } from '@src/lib/utils.ts'
 import { temporal } from 'zundo'
 import { create, useStore } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 export type Hand =
   | { kind: 'none' }
@@ -18,17 +20,27 @@ type EditorState = {
 
 export const HISTORY_LIMIT = 50
 
+export const LOOK_KEY = 'mr-patate:look'
+
 export const useEditor = create<EditorState>()(
-  temporal(
-    (): EditorState => ({
-      look: defaultLook,
-      preview: null,
-      hand: { kind: 'none' },
-    }),
+  persist(
+    temporal(
+      (): EditorState => ({
+        look: defaultLook,
+        preview: null,
+        hand: { kind: 'none' },
+      }),
+      {
+        partialize: ({ look }) => ({ look }),
+        equality: (past, current) => lookEquals(past.look, current.look),
+        limit: HISTORY_LIMIT,
+      },
+    ),
     {
+      name: LOOK_KEY,
+      version: 1,
       partialize: ({ look }) => ({ look }),
-      equality: (past, current) => lookEquals(past.look, current.look),
-      limit: HISTORY_LIMIT,
+      merge: (persisted, current) => ({ ...current, look: readLook(readField(persisted, 'look')) }),
     },
   ),
 )

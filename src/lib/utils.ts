@@ -17,3 +17,7 @@ const twMerge = extendTailwindMerge({
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+export function readField(source: unknown, key: string): unknown {
+  return typeof source === 'object' && source !== null ? Reflect.get(source, key) : undefined
+}

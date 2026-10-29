@@ -2,6 +2,7 @@ import { presets } from '@src/catalog/presets.ts'
 import { defaultLook } from '@src/lib/catalog/index.ts'
 import { lookEquals, readLook } from '@src/lib/catalog/look.ts'
 import type { Look } from '@src/lib/catalog/types.ts'
+import { readField } from '@src/lib/utils.ts'
 
 export type Favorite = {
   id: string
@@ -20,8 +21,7 @@ export function findFavorite(favorites: Favorite[], look: Look): Favorite | unde
 }
 
 export function readFavorites(persisted: unknown): Favorite[] {
-  const stored: unknown =
-    typeof persisted === 'object' && persisted !== null ? Reflect.get(persisted, 'favorites') : null
+  const stored = readField(persisted, 'favorites')
   if (!Array.isArray(stored)) return []
   return stored.flatMap((item: unknown) => {
     if (typeof item !== 'object' || item === null) return []

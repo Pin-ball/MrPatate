@@ -1,13 +1,14 @@
 import { Character } from '@src/components/character/Character.tsx'
 import { CharacterImage } from '@src/components/character/CharacterImage.tsx'
 import { LocaleSwitcher } from '@src/components/LocaleSwitcher.tsx'
+import { ShareMenu } from '@src/components/ShareMenu.tsx'
+import { Toaster } from '@src/components/Toaster.tsx'
 import { useLabel } from '@src/hooks/useLocale.ts'
+import { useSharedLink } from '@src/hooks/useSharedLink.ts'
 import { FRAME, thumbnailView, viewOf } from '@src/lib/catalog/camera.ts'
 import { partById, partsPile, visibleVariants } from '@src/lib/catalog/index.ts'
 import { lookEquals } from '@src/lib/catalog/look.ts'
 import type { PartId, VariantId } from '@src/lib/catalog/types.ts'
-import { download } from '@src/lib/download.ts'
-import { characterPng, characterSvg } from '@src/lib/export.ts'
 import type { Favorite } from '@src/lib/favorites.ts'
 import { builtInFavorites, findFavorite } from '@src/lib/favorites.ts'
 import { cn } from '@src/lib/utils.ts'
@@ -28,6 +29,7 @@ import { Button } from '@src/ui/Button.tsx'
 import { useTranslation } from 'react-i18next'
 
 export function App() {
+  useSharedLink()
   const { t } = useTranslation()
   const label = useLabel()
   const shownLook = useShownLook()
@@ -43,19 +45,14 @@ export function App() {
   const focus = (id: PartId | null) =>
     setHand(id ? { kind: 'variants', part: id } : { kind: 'none' })
 
-  const downloadSvg = async () => {
-    const svg = await characterSvg(look, t('character'))
-    download(new Blob([svg], { type: 'image/svg+xml' }), 'mr-patate.svg')
-  }
-
-  const downloadPng = async () =>
-    download(await characterPng(look, t('character')), 'mr-patate.png')
-
   return (
     <main className="flex min-h-dvh flex-col gap-6 p-8">
       <header className="flex items-center justify-between gap-4">
         <h1 className="font-display text-[26px]">{t('app_title')}</h1>
-        <LocaleSwitcher />
+        <div className="flex items-center gap-3">
+          <LocaleSwitcher />
+          <ShareMenu />
+        </div>
       </header>
 
       <div className="flex flex-wrap items-start gap-8">
@@ -76,12 +73,6 @@ export function App() {
             <Button onClick={randomizeLook}>{t('surprise')}</Button>
             <Button disabled={isFavorite} onClick={() => addFavorite(look)}>
               {t('favorite_add')}
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={downloadSvg}>{t('share_download_svg')}</Button>
-            <Button variant="primary" onClick={downloadPng}>
-              {t('share_download_png')}
             </Button>
           </div>
         </div>
@@ -161,6 +152,8 @@ export function App() {
           ))}
         </section>
       )}
+
+      <Toaster />
     </main>
   )
 }

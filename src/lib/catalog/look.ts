@@ -1,3 +1,4 @@
+import { readField } from '@src/lib/utils.ts'
 import { defaultLook, findVariant, partById, partIds, visibleVariants } from './index.ts'
 import type { Look, Part, PartId } from './types.ts'
 
@@ -30,10 +31,9 @@ export function withRandomVariant(look: Look, id: PartId, random: Random = Math.
 }
 
 export function readLook(source: unknown): Look {
-  const values = typeof source === 'object' && source !== null ? source : {}
   return Object.fromEntries(
     partIds.map((id) => {
-      const value: unknown = Reflect.get(values, id)
+      const value = readField(source, id)
       const variant = typeof value === 'string' ? findVariant(partById[id], value) : undefined
       return [id, variant?.id ?? defaultLook[id]]
     }),
