@@ -7,7 +7,7 @@ const [x0, y0, x1, y1] = FRAME
 const FRAME_WIDTH = x1 - x0
 const FRAME_HEIGHT = y1 - y0
 
-export const PNG_WIDTH = 1080
+const PNG_WIDTH = 1080
 
 export async function characterSvg(look: Look, label: string): Promise<string> {
   const { renderToStaticMarkup } = await import('react-dom/server')

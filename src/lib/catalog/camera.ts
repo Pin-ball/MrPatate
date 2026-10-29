@@ -2,7 +2,7 @@ import type { Box, Camera, Variant } from './types.ts'
 
 export const FRAME: Box = [180, 190, 620, 740]
 
-export const FILL = 0.75
+const FILL = 0.75
 
 export const MAX_ZOOM = 1.6
 
@@ -10,7 +10,7 @@ export function viewBoxOf([x0, y0, x1, y1]: Box): string {
   return `${x0} ${y0} ${x1 - x0} ${y1 - y0}`
 }
 
-export function unionBox(boxes: Box[]): Box | null {
+function unionBox(boxes: Box[]): Box | null {
   if (!boxes.length) return null
   return [
     Math.min(...boxes.map((box) => box[0])),
@@ -50,8 +50,8 @@ export function viewOf({ zoom, focus: [x, y] }: Camera): Box {
   return [x - halfWidth, y - halfHeight, x + halfWidth, y + halfHeight]
 }
 
-export const THUMBNAIL_MARGIN = 1.3
-export const THUMBNAIL_MIN_WIDTH = 96
+const THUMBNAIL_MARGIN = 1.3
+const THUMBNAIL_MIN_WIDTH = 96
 
 export function thumbnailView(variant: Variant): Box {
   if (!variant.box) return FRAME

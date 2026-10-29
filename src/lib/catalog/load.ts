@@ -90,7 +90,7 @@ function buildVariants(
   }
 
   const codedFile = `${partId}/variants.ts`
-  const painted = coded.map((variant): Variant => {
+  const codedVariants = coded.map((variant): Variant => {
     checkId(variant.id, codedFile)
     const drawing = drawings.get(variant.id)
     drawings.delete(variant.id)
@@ -105,11 +105,11 @@ function buildVariants(
     }
   })
 
-  const drawn = [...drawings]
+  const drawnVariants = [...drawings]
     .map(([id, drawing]): Variant => ({ id, ...drawing, paint: null }))
     .sort((a, b) => a.id.localeCompare(b.id))
 
-  const variants = [...painted, ...drawn]
+  const variants = [...codedVariants, ...drawnVariants]
   const fallback = variants.find((variant) => variant.id === config.default)
   if (!fallback) throw new CatalogError(file, `default variant "${config.default}" does not exist`)
   if (fallback.hidden) throw new CatalogError(file, `default variant "${config.default}" is hidden`)
