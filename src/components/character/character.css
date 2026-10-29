@@ -1,13 +1,11 @@
 @layer components {
   .character-stage {
     --perspective: 1000;
-    --depth-step: 40;
     --tilt-x: 10deg;
     --tilt-y: 6deg;
     --shade: 1.5;
     --gaze: 3;
     position: relative;
-    overflow: hidden;
     perspective: calc(var(--perspective) * 1px);
   }
 
@@ -21,14 +19,13 @@
   }
 
   .character-plane {
-    --z: calc(var(--depth) * var(--depth-step));
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     overflow: visible;
-    transform: translateZ(calc(var(--z) * 1px))
-      scale(calc((var(--perspective) - var(--z)) / var(--perspective)));
+    transform: translateZ(calc(var(--depth) * 1px))
+      scale(calc((var(--perspective) - var(--depth)) / var(--perspective)));
   }
 
   .character-plane [data-role="shadow"] {

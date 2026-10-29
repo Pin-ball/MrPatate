@@ -6,6 +6,11 @@ const FILL = 0.75
 
 export const MAX_ZOOM = 1.6
 
+export const FRAME_CAMERA: Camera = {
+  zoom: 1,
+  focus: [(FRAME[0] + FRAME[2]) / 2, (FRAME[1] + FRAME[3]) / 2],
+}
+
 export function viewBoxOf([x0, y0, x1, y1]: Box): string {
   return `${x0} ${y0} ${x1 - x0} ${y1 - y0}`
 }
@@ -29,7 +34,7 @@ export function cameraOf(variants: Variant[]): Camera {
       .filter((variant) => !variant.hidden)
       .flatMap((variant) => (variant.box ? [variant.box] : [])),
   )
-  if (!box) return { zoom: 1, focus: [(fx0 + fx1) / 2, (fy0 + fy1) / 2] }
+  if (!box) return FRAME_CAMERA
 
   const [x0, y0, x1, y1] = box
   const fit = Math.min((fx1 - fx0) / (x1 - x0), (fy1 - fy0) / (y1 - y0))
@@ -44,10 +49,14 @@ export function cameraOf(variants: Variant[]): Camera {
   }
 }
 
-export function viewOf({ zoom, focus: [x, y] }: Camera): Box {
-  const halfWidth = (FRAME[2] - FRAME[0]) / zoom / 2
-  const halfHeight = (FRAME[3] - FRAME[1]) / zoom / 2
-  return [x - halfWidth, y - halfHeight, x + halfWidth, y + halfHeight]
+export function cameraTransform({ zoom, focus: [x, y] }: Camera, shiftY = 0) {
+  const [x0, y0, x1, y1] = FRAME
+  const originX = ((x - x0) / (x1 - x0)) * 100
+  const originY = ((y - y0) / (y1 - y0)) * 100
+  return {
+    transform: `translate(${50 - originX}%, calc(${shiftY}px + ${50 - originY}%)) scale(${zoom})`,
+    transformOrigin: `${originX}% ${originY}%`,
+  }
 }
 
 const THUMBNAIL_MARGIN = 1.3

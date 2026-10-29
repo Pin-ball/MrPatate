@@ -11,24 +11,24 @@ describe('Character', () => {
     expect(markup).toMatch(/^<div role="img" aria-label="Pierre" class="character-stage"/)
   })
 
-  it('stacks the backdrop and one svg per plane', () => {
-    expect(markup.match(/<svg/g)).toHaveLength(6)
-    expect(markup).toContain('data-plane="backdrop"')
+  it('stacks one svg per plane, without a backdrop', () => {
+    expect(markup.match(/<svg/g)).toHaveLength(5)
+    expect(markup).not.toContain('data-plane="backdrop"')
   })
 
   it('keeps the pupil role so the gaze can follow the pointer', () => {
     expect(markup.match(/data-role="eye-pupil"/g)).toHaveLength(2)
   })
 
-  it('gives each plane its depth relative to the body', () => {
+  it('gives each plane its depth relative to the pivot', () => {
     expect(markup).toContain(
-      'data-plane="scene" viewBox="180 190 440 550" class="character-plane" style="--depth:-2"',
+      'data-plane="scene" viewBox="180 190 440 550" class="character-plane" style="--depth:-40"',
     )
     expect(markup).toContain(
-      'data-plane="body" viewBox="180 190 440 550" class="character-plane" style="--depth:0"',
+      'data-plane="back" viewBox="180 190 440 550" class="character-plane" style="--depth:40"',
     )
     expect(markup).toContain(
-      'data-plane="front" viewBox="180 190 440 550" class="character-plane" style="--depth:2"',
+      'data-plane="front" viewBox="180 190 440 550" class="character-plane" style="--depth:100"',
     )
   })
 })

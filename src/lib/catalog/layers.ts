@@ -16,10 +16,6 @@ export type PlaneLayers = {
   layers: Layer[]
 }
 
-const PIVOT_PLANE = 'body'
-
-export const pivotDepth = planes.find((plane) => plane.id === PIVOT_PLANE)?.depth ?? 0
-
 function variantOf(look: Look, part: PartId): Variant {
   const { variants } = partById[part]
   const variant = findVariant(partById[part], look[part]) ?? variants[0]

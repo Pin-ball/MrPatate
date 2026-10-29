@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { defaultLook } from '@src/lib/catalog/index.ts'
-import { backgroundOf, layersOf, pivotDepth, skinOf } from '@src/lib/catalog/layers.ts'
+import { backgroundOf, layersOf, skinOf } from '@src/lib/catalog/layers.ts'
 import type { Look } from '@src/lib/catalog/types.ts'
 import { describe, expect, it } from 'vitest'
 
@@ -32,10 +32,6 @@ describe('layersOf', () => {
       .flatMap(({ layers }) => layers)
       .find(({ part }) => part === 'eyes')
     expect(eyes?.variant.id).toBe(defaultLook.eyes)
-  })
-
-  it('pivots the parallax on the body plane', () => {
-    expect(pivotDepth).toBe(3)
   })
 })
 

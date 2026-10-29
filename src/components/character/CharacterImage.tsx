@@ -22,6 +22,7 @@ export function CharacterImage({
   className,
 }: CharacterImageProps) {
   const skin = skinOf(look)
+  const [x0, y0, x1, y1] = view
 
   return (
     <svg
@@ -34,7 +35,10 @@ export function CharacterImage({
       aria-label={label}
       aria-hidden={label ? undefined : true}
     >
-      <Backdrop paint={backgroundOf(look)} />
+      <Backdrop
+        paint={backgroundOf(look)}
+        area={{ x: x0, y: y0, width: x1 - x0, height: y1 - y0 }}
+      />
       {layersOf(look).map(({ plane, layers }) => (
         <g key={plane.id} data-plane={plane.id}>
           <PartLayers layers={layers} skin={skin} />

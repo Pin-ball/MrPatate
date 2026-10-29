@@ -68,7 +68,13 @@ export function ShareMenu() {
 
   return (
     <div ref={root} className="relative">
-      <Button ref={trigger} variant="primary" aria-expanded={open} onClick={() => setOpen(!open)}>
+      <Button
+        ref={trigger}
+        className="h-12"
+        variant="primary"
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+      >
         <Share2 size={18} strokeWidth={2.5} />
         {t('share')}
       </Button>
