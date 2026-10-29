@@ -30,6 +30,14 @@ function build(sources: Partial<CatalogSources> & Pick<CatalogSources, 'configs'
 }
 
 describe('buildCatalog', () => {
+  it('orders the drawings as listed, then the others alphabetically', () => {
+    const { parts } = build({
+      configs: { eyes: config({ default: 'c', order: ['d', 'b'] }) },
+      drawings: { eyes: { d: svg('D'), a: svg('A'), c: svg('C'), b: svg('B'), e: svg('E') } },
+    })
+    expect(parts[0]?.variants.map((variant) => variant.id)).toEqual(['c', 'd', 'b', 'a', 'e'])
+  })
+
   it('puts the default first, then drawings in alphabetical order', () => {
     const { parts } = build({
       configs: { eyes: config({ default: 'c' }) },
@@ -166,6 +174,12 @@ describe('buildCatalog', () => {
   })
 
   it.each([
+    [
+      'an ordered variant that is not a drawing',
+      { default: 'a', order: ['ghost'] },
+      { a: svg('A') },
+      /ordered variant "ghost" is not a drawing/,
+    ],
     [
       'a missing default',
       { default: 'ghost' },

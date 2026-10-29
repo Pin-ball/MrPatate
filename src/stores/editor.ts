@@ -62,7 +62,12 @@ export const redo = () => useEditor.temporal.getState().redo()
 
 export const setPreview = (preview: Partial<Look> | null) => setState({ preview })
 
-export const setHand = (hand: Hand) => setState({ hand })
+export const setHand = (hand: Hand) => setState({ hand, preview: null })
+
+export function closeHand() {
+  const { kind } = getState().hand
+  if (kind !== 'none') setHand(kind === 'variants' ? { kind: 'parts' } : { kind: 'none' })
+}
 
 export function useShownLook(): Look {
   const look = useEditor((state) => state.look)

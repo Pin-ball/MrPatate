@@ -13,6 +13,6 @@ export function useSharedLink() {
 
     setLook(shared.look)
     history.replaceState(history.state, '', withoutLook(location.href))
-    if (!shared.complete) showToast(t('toast_link_incomplete'))
+    if (!shared.complete) showToast(t('toast.link_incomplete'))
   }, [t])
 }

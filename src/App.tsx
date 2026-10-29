@@ -1,24 +1,31 @@
 import { Background } from '@src/components/Background.tsx'
 import { Header } from '@src/components/Header.tsx'
-import { LabPanel } from '@src/components/LabPanel.tsx'
+import { FavoritesHand } from '@src/components/hand/FavoritesHand.tsx'
+import { PartsHand } from '@src/components/hand/PartsHand.tsx'
+import { VariantsHand } from '@src/components/hand/VariantsHand.tsx'
 import { Scene } from '@src/components/Scene.tsx'
 import { Toaster } from '@src/components/Toaster.tsx'
-import { useParallax } from '@src/hooks/useParallax.ts'
+import { useCloseHandOnEscape } from '@src/hooks/useCloseHandOnEscape.ts'
 import { useSharedLink } from '@src/hooks/useSharedLink.ts'
 import { backgroundOf } from '@src/lib/catalog/layers.ts'
 import { useShownLook } from '@src/stores/editor.ts'
 
 export function App() {
   useSharedLink()
-  useParallax()
+  useCloseHandOnEscape()
   const background = backgroundOf(useShownLook())
 
   return (
-    <main className="relative flex h-dvh flex-col overflow-hidden pb-[90px]">
+    <main
+      data-backdrop={background.dark ? 'dark' : 'light'}
+      className="relative flex h-dvh flex-col overflow-hidden pb-[90px]"
+    >
       <Background paint={background} />
-      <Header dark={background.dark} />
+      <Header />
       <Scene />
-      <LabPanel />
+      <PartsHand />
+      <VariantsHand />
+      <FavoritesHand />
       <Toaster />
     </main>
   )

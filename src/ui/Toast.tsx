@@ -20,7 +20,7 @@ export function Toast({ message, action, className }: ToastProps) {
         <button
           type="button"
           onClick={action.onClick}
-          className="min-h-8 cursor-pointer px-1 font-bold underline underline-offset-3"
+          className="-my-2 min-h-8 cursor-pointer px-1 font-bold underline underline-offset-3"
         >
           {action.label}
         </button>

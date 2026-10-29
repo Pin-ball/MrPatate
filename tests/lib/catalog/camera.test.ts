@@ -1,4 +1,4 @@
-import { cameraOf, FRAME, MAX_ZOOM } from '@src/lib/catalog/camera.ts'
+import { cameraOf, FRAME, frameView, MAX_ZOOM, thumbnailView } from '@src/lib/catalog/camera.ts'
 import type { Box, Variant } from '@src/lib/catalog/types.ts'
 import { describe, expect, it } from 'vitest'
 
@@ -37,5 +37,29 @@ describe('cameraOf', () => {
     expect(focus[0] + (fx1 - fx0) / zoom / 2).toBeLessThanOrEqual(fx1 + 0.5)
     expect(focus[0] - (fx1 - fx0) / zoom / 2).toBeGreaterThanOrEqual(fx0 - 0.5)
     expect(focus[1]).toBe(720)
+  })
+})
+
+describe('frameView', () => {
+  it('zooms the frame around its center, cropped to a ratio', () => {
+    expect(frameView(1, 550 / 440)).toEqual(FRAME)
+    const [x0, y0, x1, y1] = frameView(1.1, 1)
+    expect([(x0 + x1) / 2, (y0 + y1) / 2]).toEqual([400, 465])
+    expect(x1 - x0).toBeCloseTo(400)
+    expect(y1 - y0).toBeCloseTo(400)
+  })
+})
+
+describe('thumbnailView', () => {
+  it('crops a square around the variant, with a margin', () => {
+    expect(thumbnailView(variant([300, 400, 500, 500]))).toEqual([270, 320, 530, 580])
+  })
+
+  it('keeps a minimum size for tiny variants', () => {
+    expect(thumbnailView(variant([395, 495, 405, 505]))).toEqual([352, 452, 448, 548])
+  })
+
+  it('crops the whole character to a square when nothing is drawn', () => {
+    expect(thumbnailView(variant(null))).toEqual(frameView(1, 1))
   })
 })

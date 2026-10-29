@@ -1,6 +1,7 @@
 import { Character } from '@src/components/character/Character.tsx'
 import { cameraTransform, FRAME_CAMERA } from '@src/lib/catalog/camera.ts'
 import { partById } from '@src/lib/catalog/index.ts'
+import { MOVE_DURATION } from '@src/lib/hand.ts'
 import type { Hand } from '@src/stores/editor.ts'
 import { useEditor, useShownLook } from '@src/stores/editor.ts'
 import { Badge } from '@src/ui/Badge.tsx'
@@ -25,12 +26,15 @@ export function Scene() {
 
   return (
     <div className="relative flex min-h-0 flex-1 items-center justify-center">
-      <div className="ease-soft transition-transform duration-550" style={handCamera(hand)}>
-        <Character look={look} label={t('character')} className="aspect-4/5 w-90" />
+      <div
+        className="ease-out-strong transition-transform"
+        style={{ ...handCamera(hand), transitionDuration: `${MOVE_DURATION}ms` }}
+      >
+        <Character look={look} label={t('app.character')} className="aspect-4/5 w-90" />
       </div>
       {previewing && (
         <Badge className="animate-fade-in absolute top-1.5 left-1/2 -translate-x-1/2">
-          {t('preview')}
+          {t('scene.preview')}
         </Badge>
       )}
     </div>

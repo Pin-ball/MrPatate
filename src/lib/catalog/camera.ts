@@ -49,6 +49,13 @@ export function cameraOf(variants: Variant[]): Camera {
   }
 }
 
+export function frameView(zoom: number, ratio: number): Box {
+  const [x, y] = FRAME_CAMERA.focus
+  const width = (FRAME[2] - FRAME[0]) / zoom
+  const height = width * ratio
+  return [x - width / 2, y - height / 2, x + width / 2, y + height / 2]
+}
+
 export function cameraTransform({ zoom, focus: [x, y] }: Camera, shiftY = 0) {
   const [x0, y0, x1, y1] = FRAME
   const originX = ((x - x0) / (x1 - x0)) * 100
@@ -63,16 +70,14 @@ const THUMBNAIL_MARGIN = 1.3
 const THUMBNAIL_MIN_WIDTH = 96
 
 export function thumbnailView(variant: Variant): Box {
-  if (!variant.box) return FRAME
+  if (!variant.box) return frameView(1, 1)
   const [x0, y0, x1, y1] = variant.box
-  const ratio = (FRAME[3] - FRAME[1]) / (FRAME[2] - FRAME[0])
-  const width = Math.max(
+  const size = Math.max(
     THUMBNAIL_MIN_WIDTH,
     (x1 - x0) * THUMBNAIL_MARGIN,
-    ((y1 - y0) * THUMBNAIL_MARGIN) / ratio,
+    (y1 - y0) * THUMBNAIL_MARGIN,
   )
-  const height = width * ratio
   const cx = (x0 + x1) / 2
   const cy = (y0 + y1) / 2
-  return [cx - width / 2, cy - height / 2, cx + width / 2, cy + height / 2]
+  return [cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2]
 }

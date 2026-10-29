@@ -1,4 +1,7 @@
 import { cn } from '@src/lib/utils.ts'
+import { Tooltip } from '@src/ui/Tooltip.tsx'
+import type { HotkeyChord } from '@tanstack/react-hotkeys'
+import { formatForDisplay, formatHotkey, parseHotkey } from '@tanstack/react-hotkeys'
 import type { VariantProps } from 'class-variance-authority'
 import { cva } from 'class-variance-authority'
 import type { ComponentProps } from 'react'
@@ -19,22 +22,25 @@ const iconButtonVariants = cva(
 )
 
 type IconButtonProps = Omit<ComponentProps<'button'>, 'aria-label' | 'title'> &
-  VariantProps<typeof iconButtonVariants> & { label: string }
+  VariantProps<typeof iconButtonVariants> & { label: string; hotkey?: HotkeyChord }
 
 export function IconButton({
   label,
+  hotkey,
   variant,
   className,
   type = 'button',
   ...props
 }: IconButtonProps) {
   return (
-    <button
-      type={type}
-      aria-label={label}
-      title={label}
-      className={cn(iconButtonVariants({ variant }), className)}
-      {...props}
-    />
+    <Tooltip label={label} keys={hotkey && formatForDisplay(hotkey, { parts: true })}>
+      <button
+        type={type}
+        aria-label={label}
+        aria-keyshortcuts={hotkey && formatHotkey(parseHotkey(hotkey))}
+        className={cn(iconButtonVariants({ variant }), className)}
+        {...props}
+      />
+    </Tooltip>
   )
 }

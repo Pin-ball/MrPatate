@@ -53,6 +53,7 @@ export type VariantConfig = {
 export type PartConfig = {
   label: Label
   default: string
+  order?: readonly string[]
   camera?: Camera
 }
 

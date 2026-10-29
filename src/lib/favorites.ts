@@ -11,13 +11,19 @@ export type Favorite = {
   look: Look
 }
 
+export const DEFAULT_FAVORITE_ID = 'default'
+
 export const builtInFavorites: Favorite[] = [
   ...presets.map(({ id, look }) => ({ id, createdAt: 0, look: { ...defaultLook, ...look } })),
-  { id: 'default', createdAt: 0, look: defaultLook },
+  { id: DEFAULT_FAVORITE_ID, createdAt: 0, look: defaultLook },
 ]
 
+export function allFavorites(favorites: Favorite[]): Favorite[] {
+  return [...favorites, ...builtInFavorites]
+}
+
 export function findFavorite(favorites: Favorite[], look: Look): Favorite | undefined {
-  return [...favorites, ...builtInFavorites].find((favorite) => lookEquals(favorite.look, look))
+  return allFavorites(favorites).find((favorite) => lookEquals(favorite.look, look))
 }
 
 export function readFavorites(persisted: unknown): Favorite[] {

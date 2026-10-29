@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { defaultLook } from '@src/lib/catalog/index.ts'
 import {
+  closeHand,
   HISTORY_LIMIT,
   LOOK_KEY,
   randomizeLook,
@@ -89,5 +90,23 @@ describe('editor', () => {
     await useEditor.persist.rehydrate()
     expect(state().look).toEqual({ ...defaultLook, eyes: 'six' })
     expect(history().pastStates).toHaveLength(0)
+  })
+
+  it('drops the preview when the hand changes', () => {
+    setHand({ kind: 'variants', part: 'eyes' })
+    setPreview({ eyes: 'six' })
+    closeHand()
+    expect(state().preview).toBeNull()
+  })
+
+  it('closes a hand of variants back to the parts, any other hand entirely', () => {
+    setHand({ kind: 'variants', part: 'eyes' })
+    closeHand()
+    expect(state().hand).toEqual({ kind: 'parts' })
+    closeHand()
+    expect(state().hand).toEqual({ kind: 'none' })
+    setHand({ kind: 'favorites' })
+    closeHand()
+    expect(state().hand).toEqual({ kind: 'none' })
   })
 })

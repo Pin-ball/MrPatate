@@ -1,9 +1,11 @@
 import { pivotDepth } from '@src/catalog/planes.ts'
+import { useParallax } from '@src/hooks/useParallax.ts'
 import { FRAME, viewBoxOf } from '@src/lib/catalog/camera.ts'
 import { layersOf, skinOf } from '@src/lib/catalog/layers.ts'
 import type { Look } from '@src/lib/catalog/types.ts'
 import { cn } from '@src/lib/utils.ts'
 import type { ReactNode } from 'react'
+import { useRef } from 'react'
 import { PartLayers } from './PartLayers.tsx'
 import './character.css'
 
@@ -34,11 +36,13 @@ type CharacterProps = {
 }
 
 export function Character({ look, label, className }: CharacterProps) {
+  const ref = useRef<HTMLDivElement>(null)
+  useParallax(ref)
   const skin = skinOf(look)
   const planes = layersOf(look)
 
   return (
-    <div role="img" aria-label={label} className={cn('character-stage', className)}>
+    <div ref={ref} role="img" aria-label={label} className={cn('character-stage', className)}>
       <div className="character-scene">
         {planes.map(({ plane, layers }) => (
           <ScenePlane key={plane.id} id={plane.id} depth={plane.depth}>

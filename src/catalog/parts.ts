@@ -37,11 +37,11 @@ export const partConfigs = {
 } satisfies Record<string, PartConfig>
 
 export const partsPile = [
+  'skin',
   'eyes',
   'mouth',
-  'background',
-  'skin',
   'arms',
   'back',
   'legs',
+  'background',
 ] satisfies (keyof typeof partConfigs)[]

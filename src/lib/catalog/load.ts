@@ -105,9 +105,14 @@ function buildVariants(
     }
   })
 
+  const order = config.order ?? []
+  for (const id of order) {
+    if (!drawings.has(id)) throw new CatalogError(file, `ordered variant "${id}" is not a drawing`)
+  }
+  const rank = (id: string) => (order.includes(id) ? order.indexOf(id) : order.length)
   const drawnVariants = [...drawings]
     .map(([id, drawing]): Variant => ({ id, ...drawing, paint: null }))
-    .sort((a, b) => a.id.localeCompare(b.id))
+    .sort((a, b) => rank(a.id) - rank(b.id) || a.id.localeCompare(b.id))
 
   const variants = [...codedVariants, ...drawnVariants]
   const fallback = variants.find((variant) => variant.id === config.default)
