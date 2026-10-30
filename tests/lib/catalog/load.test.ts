@@ -13,7 +13,6 @@ const svg = (label: string, attrs = '') =>
 const config = (extra: Partial<PartConfig> = {}): PartConfig => ({
   label: { fr: 'Partie', en: 'Part' },
   default: 'a',
-  camera: { zoom: 1, focus: [400, 500] },
   ...extra,
 })
 

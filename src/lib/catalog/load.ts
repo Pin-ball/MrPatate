@@ -166,7 +166,7 @@ export function buildCatalog({
     const part: Part = {
       id: id as PartId,
       label: config.label,
-      camera: config.camera ?? cameraOf(variants),
+      camera: cameraOf(variants),
       variants,
     }
     checkVariants(part, file)

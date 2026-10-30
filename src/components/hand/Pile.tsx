@@ -1,5 +1,5 @@
 import type { usePile } from '@src/hooks/usePile.ts'
-import { HAND_ARC, PILE_ANCHORS } from '@src/lib/hand.ts'
+import { PILE_ANCHORS } from '@src/lib/hand.ts'
 import { setHand } from '@src/stores/editor.ts'
 import type { LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -37,9 +37,7 @@ export function Pile({
       {!unfolded && <PileLabel anchor={anchor}>{pileLabel}</PileLabel>}
       <nav aria-label={label} className="isolate" {...handlers}>
         {children}
-        {unfolded && (
-          <HiddenCards offset={state.offset} count={count} slots={state.slots} arc={HAND_ARC} />
-        )}
+        {unfolded && <HiddenCards offset={state.offset} count={count} slots={state.slots} />}
       </nav>
     </>
   )

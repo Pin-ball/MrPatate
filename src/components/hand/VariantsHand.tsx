@@ -4,12 +4,13 @@ import { partById, visibleVariants } from '@src/lib/catalog/index.ts'
 import type { VariantId } from '@src/lib/catalog/types.ts'
 import {
   arcCardLayout,
-  ENTER_DURATION,
   enterStyle,
-  isRendered,
-  VARIANTS_ARC,
+  isInWindow,
+  MOVE_DURATION,
+  SHORT_MOVE_DURATION,
 } from '@src/lib/hand.ts'
 import { setPreview, setVariant, useEditor } from '@src/stores/editor.ts'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { HiddenCards } from './HiddenCards.tsx'
 import { VariantCard } from './VariantCard.tsx'
@@ -19,28 +20,34 @@ export function VariantsHand() {
   const label = useLabel()
   const hand = useEditor((state) => state.hand)
   const look = useEditor((state) => state.look)
-  const part = hand.kind === 'variants' ? partById[hand.part] : null
+  const openPart = hand.kind === 'variants' ? partById[hand.part] : null
+  const [lastPart, setLastPart] = useState(openPart)
+  if (openPart && openPart !== lastPart) setLastPart(openPart)
+  const part = openPart ?? lastPart
   const variants = part ? visibleVariants(part) : []
   const selectedIndex = part ? variants.findIndex((variant) => variant.id === look[part.id]) : 0
   const { state, start, reveal, handlers } = useHand({
     count: variants.length,
-    arc: VARIANTS_ARC,
-    open: part !== null,
-    resetKey: part?.id,
+    open: openPart !== null,
+    resetKey: openPart?.id,
     startIndex: selectedIndex,
-    duration: ENTER_DURATION,
+    unfoldDuration: MOVE_DURATION,
+    foldDuration: SHORT_MOVE_DURATION,
   })
-  if (!part) return null
+  const { offset, slots, unfolded, moving } = state
+  if (!part || !(unfolded || moving)) return null
 
-  const { offset, slots } = state
+  const layoutOf = (index: number) => {
+    const layout = arcCardLayout(index, state)
+    return unfolded && moving ? { ...layout, enter: enterStyle(index, start, slots) } : layout
+  }
 
   return (
     <fieldset className="isolate" {...handlers}>
       <legend className="sr-only">{t('variants.label', { part: label(part) })}</legend>
       {variants.map((variant, index) => {
-        if (!isRendered(index, { ...state, moving: false })) return null
+        if (!isInWindow(index, state)) return null
         const selected = look[part.id] === variant.id
-        const layout = arcCardLayout(index, VARIANTS_ARC, state)
         const preview = () => setPreview(selected ? null : { [part.id]: variant.id })
         return (
           <VariantCard
@@ -49,10 +56,7 @@ export function VariantsHand() {
             part={part}
             variant={variant}
             selected={selected}
-            layout={{
-              ...layout,
-              place: { ...layout.place, ...enterStyle(index, start, slots, VARIANTS_ARC) },
-            }}
+            layout={layoutOf(index)}
             onPointerEnter={preview}
             onFocus={() => {
               reveal(index)
@@ -62,7 +66,7 @@ export function VariantsHand() {
           />
         )
       })}
-      <HiddenCards offset={offset} count={variants.length} slots={slots} arc={VARIANTS_ARC} />
+      {unfolded && <HiddenCards offset={offset} count={variants.length} slots={slots} />}
     </fieldset>
   )
 }

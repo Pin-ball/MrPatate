@@ -1,12 +1,25 @@
+import type { CSSProperties } from 'react'
+
 type Place = { x: number; y: number; rotate: number }
 
-export type Arc = { radius: number; centerBelow: number; step: number }
+type Arc = { radius: number; centerBelow: number; step: number }
 
 export type Anchor = { left: string; bottom: number }
 
 type PileOptions = { mirror?: boolean; spread?: boolean; top?: boolean; tilted?: boolean }
 
-type OpenOrder = 'nearest-first' | 'farthest-first'
+type MoveEase = 'overshoot' | 'out'
+
+export type CardLayout = {
+  place: CSSProperties
+  folded?: boolean
+  ignorePointer: boolean
+  moveDuration?: number
+  moveDelay?: number
+  ease?: MoveEase
+  hidden?: boolean
+  enter?: CSSProperties
+}
 
 export type HandState = {
   offset: number
@@ -30,9 +43,8 @@ export const PILE_ANCHORS: Record<PileKind, Anchor> = {
   favorites: { left: `calc(100% - ${PILE_INSET}px)`, bottom: 155 },
 }
 
-export const ARC_ANCHOR: Anchor = { left: '50%', bottom: 0 }
-export const HAND_ARC: Arc = { radius: 700, centerBelow: 440, step: 6.2 }
-export const VARIANTS_ARC: Arc = { radius: 640, centerBelow: 370, step: 7 }
+const ARC_ANCHOR: Anchor = { left: '50%', bottom: 0 }
+const ARC: Arc = { radius: 700, centerBelow: 440, step: 6.2 }
 const REFERENCE_SLOTS = 9
 const MAX_SLOTS = 12
 const BELOW_SCREEN = 140
@@ -43,22 +55,20 @@ const HIDDEN_COUNT_BEYOND = 1.45
 const HIDDEN_COUNT_HALF_WIDTH = 17
 
 export const MOVE_DURATION = 550
-export const ENTER_DURATION = 500
-export const ENTER_STAGGER = 45
-export const SCROLL_DURATION = 300
-const OPEN_ORDER: OpenOrder = 'farthest-first'
+const ENTER_STAGGER = 45
+export const SHORT_MOVE_DURATION = 300
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
-function sizedArc(arc: Arc, slots: number): Arc {
-  if (slots <= REFERENCE_SLOTS) return arc
-  const step = (arc.step * (REFERENCE_SLOTS - 1)) / (slots - 1)
-  const radius = (arc.radius * arc.step) / step
-  return { radius, centerBelow: arc.centerBelow + radius - arc.radius, step }
+function sizedArc(slots: number): Arc {
+  if (slots <= REFERENCE_SLOTS) return ARC
+  const step = (ARC.step * (REFERENCE_SLOTS - 1)) / (slots - 1)
+  const radius = (ARC.radius * ARC.step) / step
+  return { radius, centerBelow: ARC.centerBelow + radius - ARC.radius, step }
 }
 
-export function arcPlace(slot: number, slots: number, baseArc: Arc): Place {
-  const arc = sizedArc(baseArc, slots)
+export function arcPlace(slot: number, slots: number): Place {
+  const arc = sizedArc(slots)
   const rotate = (slot - (slots - 1) / 2) * arc.step
   const radians = (rotate * Math.PI) / 180
   return {
@@ -68,23 +78,27 @@ export function arcPlace(slot: number, slots: number, baseArc: Arc): Place {
   }
 }
 
-export function hiddenCountPlace(side: 'before' | 'after', slots: number, arc: Arc): Place {
+function hiddenCountPlace(side: 'before' | 'after', slots: number): Place {
   const slot = side === 'before' ? -HIDDEN_COUNT_BEYOND : slots - 1 + HIDDEN_COUNT_BEYOND
-  return { ...arcPlace(slot, slots, arc), rotate: 0 }
+  return { ...arcPlace(slot, slots), rotate: 0 }
 }
 
-function outerReach(slots: number, arc: Arc, withCounts: boolean): number {
-  const { x, rotate } = arcPlace(slots - 1, slots, arc)
+export function hiddenCountStyle(side: 'before' | 'after', slots: number) {
+  return placeStyle(ARC_ANCHOR, hiddenCountPlace(side, slots))
+}
+
+function outerReach(slots: number, withCounts: boolean): number {
+  const { x, rotate } = arcPlace(slots - 1, slots)
   const radians = (rotate * Math.PI) / 180
   const card = x + (CARD_WIDTH / 2) * Math.cos(radians) + CARD_HEIGHT * Math.sin(radians)
   if (!withCounts) return card
-  return Math.max(card, hiddenCountPlace('after', slots, arc).x + HIDDEN_COUNT_HALF_WIDTH)
+  return Math.max(card, hiddenCountPlace('after', slots).x + HIDDEN_COUNT_HALF_WIDTH)
 }
 
-export function visibleSlots(count: number, width: number, arc: Arc): number {
+export function visibleSlots(count: number, width: number): number {
   const room = width / 2 - PILE_INSET - CARD_WIDTH / 2 - PILE_GAP
   let slots = Math.min(count, MAX_SLOTS)
-  while (slots > 1 && outerReach(slots, arc, slots < count) > room) slots--
+  while (slots > 1 && outerReach(slots, slots < count) > room) slots--
   return slots
 }
 
@@ -111,11 +125,19 @@ function nearestSlot(slot: number, slots: number): number {
   return clamp(Math.round(slot), 0, slots - 1)
 }
 
-export function isRendered(index: number, { offset, slots, unfolded, moving }: HandState) {
-  const margin = moving ? 0 : RENDERED_MARGIN
+export function isInWindow(
+  index: number,
+  { offset, slots }: HandState,
+  margin = RENDERED_MARGIN,
+): boolean {
+  const first = Math.round(offset) - margin
+  return index >= first && index < first + slots + 2 * margin
+}
+
+export function isRendered(index: number, state: HandState) {
+  const { slots, unfolded, moving } = state
   const inPile = index < slots
-  const inWindow =
-    index >= Math.round(offset) - margin && index < Math.round(offset) + slots + margin
+  const inWindow = isInWindow(index, state, moving ? 0 : RENDERED_MARGIN)
   return unfolded ? inWindow || (moving && inPile) : inPile || (moving && inWindow)
 }
 
@@ -123,39 +145,43 @@ function isShown(slot: number, slots: number): boolean {
   return Math.round(slot) === nearestSlot(slot, slots)
 }
 
-export function openDelay(
-  slot: number,
-  slots: number,
-  pileSide: 'left' | 'right',
-  order: OpenOrder = OPEN_ORDER,
-): number {
+function openDelay(slot: number, slots: number, pileSide: 'left' | 'right'): number {
   const fromLeft = nearestSlot(slot, slots)
-  const distance = pileSide === 'left' ? fromLeft : slots - 1 - fromLeft
-  const rank = order === 'nearest-first' ? distance : slots - 1 - distance
-  return rank * ENTER_STAGGER
+  return (pileSide === 'left' ? slots - 1 - fromLeft : fromLeft) * ENTER_STAGGER
 }
 
 function cardMoveDuration(shown: boolean, moving: boolean, scrolling: boolean): number {
   if (moving && !shown) return 0
-  return scrolling ? SCROLL_DURATION : MOVE_DURATION
+  return scrolling ? SHORT_MOVE_DURATION : MOVE_DURATION
 }
 
 export function arcCardLayout(
   index: number,
-  arc: Arc,
-  { offset, slots, moving, scrolling }: HandState,
+  { offset, slots, unfolded, moving, scrolling }: HandState,
   pileSide?: 'left' | 'right',
-) {
+): CardLayout {
   const slot = index - offset
   const shown = isShown(slot, slots)
+  const place = {
+    ...(shown ? arcStyle(slot, slots) : beyondArcStyle(slot, slots)),
+    zIndex: index + 1,
+  }
+  if (!unfolded) {
+    return {
+      place,
+      hidden: true,
+      ignorePointer: true,
+      moveDuration: SHORT_MOVE_DURATION,
+      ease: 'out',
+    }
+  }
   return {
-    place: {
-      ...(shown ? arcStyle(slot, slots, arc) : belowArcStyle(slot, slots, arc)),
-      zIndex: index + 1,
-    },
+    place,
+    hidden: !shown,
     ignorePointer: moving || !shown,
     moveDelay: moving && shown && pileSide ? openDelay(slot, slots, pileSide) : 0,
     moveDuration: cardMoveDuration(shown, moving, scrolling),
+    ease: !shown || scrolling ? 'out' : 'overshoot',
   }
 }
 
@@ -163,12 +189,11 @@ export function pileMoveDuration(index: number, { offset, slots, moving }: HandS
   return cardMoveDuration(isShown(index - offset, slots), moving, false)
 }
 
-export function enterStyle(index: number, start: number, slots: number, arc: Arc) {
-  const { left, top } = belowArcStyle(index - start, slots, arc)
+export function enterStyle(index: number, start: number, slots: number) {
+  const { left, top } = belowArcStyle(index - start, slots)
   return {
     '--from-left': left,
     '--from-top': top,
-    animationDuration: `${ENTER_DURATION}ms`,
     animationDelay: `${nearestSlot(index - start, slots) * ENTER_STAGGER}ms`,
   }
 }
@@ -199,11 +224,15 @@ export function placeStyle({ left, bottom }: Anchor, { x, y, rotate }: Place = C
   }
 }
 
-function arcStyle(slot: number, slots: number, arc: Arc) {
-  return placeStyle(ARC_ANCHOR, arcPlace(slot, slots, arc))
+function arcStyle(slot: number, slots: number) {
+  return placeStyle(ARC_ANCHOR, arcPlace(slot, slots))
 }
 
-export function belowArcStyle(slot: number, slots: number, arc: Arc) {
-  const { x, rotate } = arcPlace(nearestSlot(slot, slots), slots, arc)
+function beyondArcStyle(slot: number, slots: number) {
+  return arcStyle(slot < 0 ? -1 : slots, slots)
+}
+
+function belowArcStyle(slot: number, slots: number) {
+  const { x, rotate } = arcPlace(nearestSlot(slot, slots), slots)
   return placeStyle(ARC_ANCHOR, { x, y: BELOW_SCREEN, rotate })
 }

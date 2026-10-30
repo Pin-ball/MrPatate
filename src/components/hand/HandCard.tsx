@@ -1,14 +1,7 @@
+import type { CardLayout } from '@src/lib/hand.ts'
 import { CARD_HEIGHT, CARD_WIDTH, MOVE_DURATION } from '@src/lib/hand.ts'
 import { cn } from '@src/lib/utils.ts'
-import type { ComponentProps, CSSProperties, ReactNode } from 'react'
-
-export type CardLayout = {
-  place: CSSProperties
-  folded?: boolean
-  ignorePointer: boolean
-  moveDuration?: number
-  moveDelay?: number
-}
+import type { ComponentProps, ReactNode } from 'react'
 
 type HandCardProps = Omit<ComponentProps<'button'>, 'style' | 'className'> & {
   layout: CardLayout
@@ -17,7 +10,16 @@ type HandCardProps = Omit<ComponentProps<'button'>, 'style' | 'className'> & {
 }
 
 export function HandCard({
-  layout: { place, folded = false, ignorePointer, moveDuration = MOVE_DURATION, moveDelay = 0 },
+  layout: {
+    place,
+    folded = false,
+    ignorePointer,
+    moveDuration = MOVE_DURATION,
+    moveDelay = 0,
+    ease = 'overshoot',
+    hidden = false,
+    enter,
+  },
   corner,
   className,
   type = 'button',
@@ -27,15 +29,19 @@ export function HandCard({
     <div
       style={{
         ...place,
+        ...enter,
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
         '--move-duration': `${moveDuration}ms`,
-        transitionDelay: `${moveDelay}ms`,
+        '--move-delay': `${moveDelay}ms`,
       }}
+      data-ease={ease}
+      data-hidden={hidden || undefined}
       className={cn(
-        'border-stroke bg-card group absolute origin-bottom -translate-1/2 rounded-[18px] [transition:left_var(--move-duration)_var(--ease-overshoot-sm),top_var(--move-duration)_var(--ease-overshoot-sm),rotate_var(--move-duration)_var(--ease-overshoot-sm),margin-top_0.2s_var(--ease-overshoot-lg),background-color_0.15s_ease]',
+        'border-stroke bg-card card-motion group absolute origin-bottom -translate-1/2 rounded-[18px]',
         folded ? 'shadow-hard-sm' : 'shadow-hard hover:-mt-6 has-focus-visible:-mt-6',
         ignorePointer && 'pointer-events-none',
+        enter && 'animate-enter',
         className,
       )}
     >

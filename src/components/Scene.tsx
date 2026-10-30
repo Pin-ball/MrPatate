@@ -7,15 +7,14 @@ import { useEditor, useShownLook } from '@src/stores/editor.ts'
 import { Badge } from '@src/ui/Badge.tsx'
 import { useTranslation } from 'react-i18next'
 
+const CAMERA_WITHOUT_HAND = { ...FRAME_CAMERA, zoom: 1.3 }
+const SHIFT_WITHOUT_HAND = -25
+const SHIFT_WITH_HAND = -90
+
 function handCamera(hand: Hand) {
-  switch (hand.kind) {
-    case 'none':
-      return cameraTransform({ ...FRAME_CAMERA, zoom: 1.3 }, -25)
-    case 'variants':
-      return cameraTransform(partById[hand.part].camera, -125)
-    default:
-      return cameraTransform(FRAME_CAMERA, -90)
-  }
+  if (hand.kind === 'none') return cameraTransform(CAMERA_WITHOUT_HAND, SHIFT_WITHOUT_HAND)
+  const partCamera = hand.kind === 'variants' ? partById[hand.part].camera : null
+  return cameraTransform(partCamera ?? FRAME_CAMERA, SHIFT_WITH_HAND)
 }
 
 export function Scene() {

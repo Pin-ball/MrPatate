@@ -83,10 +83,18 @@
   --ease-in-strong: cubic-bezier(0.5, 0, 0.75, 0);
 
   --animate-fade-in: fade-in 0.2s ease;
-  --animate-enter: enter 0.5s var(--ease-overshoot-md) backwards;
+  --animate-enter: enter 0.55s var(--ease-overshoot-md) backwards;
+  --animate-scale-in: scale-in 0.35s var(--ease-overshoot-lg) backwards;
 
   @keyframes fade-in {
     from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      scale: 0;
       opacity: 0;
     }
   }
@@ -96,6 +104,31 @@
       left: var(--from-left);
       top: var(--from-top);
     }
+  }
+}
+
+@utility card-motion {
+  --move-ease: var(--ease-overshoot-sm);
+  --fade-duration: calc(var(--move-duration) * 0.5);
+  --fade-delay: var(--move-delay);
+  transition:
+    left var(--move-duration) var(--move-ease) var(--move-delay),
+    top var(--move-duration) var(--move-ease) var(--move-delay),
+    rotate var(--move-duration) var(--move-ease) var(--move-delay),
+    scale var(--move-duration) var(--move-ease) var(--move-delay),
+    opacity var(--fade-duration) linear var(--fade-delay),
+    margin-top 0.2s var(--ease-overshoot-lg),
+    background-color 0.15s ease;
+
+  &[data-ease="out"] {
+    --move-ease: var(--ease-out-strong);
+  }
+
+  &[data-hidden] {
+    --fade-duration: calc(var(--move-duration) * 0.25);
+    --fade-delay: calc(var(--move-delay) + var(--move-duration) * 0.3);
+    opacity: 0;
+    scale: 0.85;
   }
 }
 

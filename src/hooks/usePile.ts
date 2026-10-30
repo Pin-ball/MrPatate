@@ -1,9 +1,7 @@
-import type { CardLayout } from '@src/components/hand/HandCard.tsx'
 import { useHand } from '@src/hooks/useHand.ts'
-import type { PileKind } from '@src/lib/hand.ts'
+import type { CardLayout, PileKind } from '@src/lib/hand.ts'
 import {
   arcCardLayout,
-  HAND_ARC,
   isRendered,
   MOVE_DURATION,
   PILE_ANCHORS,
@@ -21,16 +19,15 @@ export function usePile(kind: PileKind, count: number, startIndex: number) {
   const unfolded = useEditor((state) => state.hand.kind === kind)
   const { state, reveal, spread, spreadPile, handlers } = useHand({
     count,
-    arc: HAND_ARC,
     open: unfolded,
     resetKey: unfolded,
     startIndex,
-    duration: MOVE_DURATION,
+    unfoldDuration: MOVE_DURATION,
   })
   const pileSize = Math.min(count, state.slots)
 
   const layoutOf = (index: number, { zIndex, top, tilted = false }: PileCard): CardLayout => {
-    if (unfolded) return arcCardLayout(index, HAND_ARC, state, SIDES[kind])
+    if (unfolded) return arcCardLayout(index, state, SIDES[kind])
     const place = pilePlace(Math.min(index, pileSize - 1), pileSize, {
       mirror: kind === 'favorites',
       spread,

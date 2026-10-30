@@ -27,14 +27,14 @@ function unionBox(boxes: Box[]): Box | null {
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
-export function cameraOf(variants: Variant[]): Camera {
+export function cameraOf(variants: Variant[]): Camera | null {
   const [fx0, fy0, fx1, fy1] = FRAME
   const box = unionBox(
     variants
       .filter((variant) => !variant.hidden)
       .flatMap((variant) => (variant.box ? [variant.box] : [])),
   )
-  if (!box) return FRAME_CAMERA
+  if (!box) return null
 
   const [x0, y0, x1, y1] = box
   const fit = Math.min((fx1 - fx0) / (x1 - x0), (fy1 - fy0) / (y1 - y0))

@@ -6,27 +6,32 @@ const WHEEL_PER_CARD = 100
 const DRAG_PER_CARD = 80
 const DRAG_THRESHOLD = 8
 const SNAP_DELAY = 140
-const WHEEL_MAX_CARDS_PER_MS = 0.012
-const WHEEL_MAX_ELAPSED = 100
+const MAX_CARDS_PER_MS = 0.012
+const MAX_ELAPSED = 100
 
 type Scroll = { key: unknown; start: number; offset: number; scrolling: boolean }
 
-type Drag = { x: number; offset: number; moved: boolean }
+type SpeedLimit = (delta: number, time: number) => number
+
+type Drag = { x: number; moved: boolean; limit: SpeedLimit }
 
 const opened = (key: unknown, startIndex: number, count: number, slots: number): Scroll => {
   const start = centeredOffset(startIndex, count, slots)
   return { key, start, offset: start, scrolling: false }
 }
 
-const wheelDelta = (event: WheelEvent, elapsed: number) => {
-  const delta = (event.deltaY || event.deltaX) / WHEEL_PER_CARD
-  const max = Math.min(elapsed, WHEEL_MAX_ELAPSED) * WHEEL_MAX_CARDS_PER_MS
-  return Math.max(-max, Math.min(max, delta))
+function createSpeedLimit(): SpeedLimit {
+  let last = Number.NEGATIVE_INFINITY
+  return (delta, time) => {
+    const max = Math.min(time - last, MAX_ELAPSED) * MAX_CARDS_PER_MS
+    last = time
+    return Math.max(-max, Math.min(max, delta))
+  }
 }
 
-const moved = (scroll: Scroll, offset: number, count: number, slots: number): Scroll => ({
+const movedBy = (scroll: Scroll, delta: number, count: number, slots: number): Scroll => ({
   ...scroll,
-  offset: clampOffset(offset, count, slots),
+  offset: clampOffset(scroll.offset + delta, count, slots),
   scrolling: true,
 })
 
@@ -56,11 +61,10 @@ export function useHandScroll(
   useEffect(() => {
     if (!scrollable) return
     let snapTimer: ReturnType<typeof setTimeout> | undefined
-    let lastWheel = Number.NEGATIVE_INFINITY
+    const limit = createSpeedLimit()
     const onWheel = (event: WheelEvent) => {
-      const delta = wheelDelta(event, event.timeStamp - lastWheel)
-      lastWheel = event.timeStamp
-      setScroll((current) => moved(current, current.offset + delta, count, slots))
+      const delta = limit((event.deltaY || event.deltaX) / WHEEL_PER_CARD, event.timeStamp)
+      setScroll((current) => movedBy(current, delta, count, slots))
       clearTimeout(snapTimer)
       snapTimer = setTimeout(
         () => setScroll((current) => snapped(current, count, slots)),
@@ -87,7 +91,7 @@ export function useHandScroll(
 
   const onPointerDown = (event: PointerEvent) => {
     dragged.current = false
-    if (scrollable) drag.current = { x: event.clientX, offset, moved: false }
+    if (scrollable) drag.current = { x: event.clientX, moved: false, limit: createSpeedLimit() }
   }
 
   const onPointerMove = (event: PointerEvent<HTMLElement>) => {
@@ -100,7 +104,9 @@ export function useHandScroll(
       current.moved = true
       event.currentTarget.setPointerCapture(event.pointerId)
     }
-    setScroll((scroll) => moved(scroll, current.offset - dx / DRAG_PER_CARD, count, slots))
+    const delta = current.limit(-dx / DRAG_PER_CARD, event.timeStamp)
+    current.x = event.clientX
+    setScroll((scroll) => movedBy(scroll, delta, count, slots))
   }
 
   const onClickCapture = (event: MouseEvent) => {

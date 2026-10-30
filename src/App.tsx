@@ -23,8 +23,8 @@ export function App() {
       <Background paint={background} />
       <Header />
       <Scene />
-      <PartsHand />
       <VariantsHand />
+      <PartsHand />
       <FavoritesHand />
       <Toaster />
     </main>

@@ -17,10 +17,16 @@ export function PartsHand() {
   const pile = usePile('parts', COUNT, (COUNT - 1) / 2)
   const { unfolded, state, layoutOf, rendered, reveal, spreadPile } = pile
 
+  const onTop = (index: number, id: PartId) =>
+    openPart ? id === openPart : index === Math.min(COUNT, state.slots) - 1
+
   const layoutAt = (index: number, id: PartId) => {
     const isOpen = id === openPart
-    const top = openPart ? isOpen : index === Math.min(COUNT, state.slots) - 1
-    return layoutOf(index, { zIndex: isOpen ? COUNT + 1 : index + 1, top, tilted: isOpen })
+    return layoutOf(index, {
+      zIndex: isOpen ? COUNT + 1 : index + 1,
+      top: onTop(index, id),
+      tilted: isOpen,
+    })
   }
 
   const open = (id: PartId) => {
@@ -44,6 +50,7 @@ export function PartsHand() {
               look={look}
               layout={layoutAt(index, part.id)}
               open={part.id === openPart}
+              showCount={unfolded || onTop(index, part.id)}
               onClick={() => open(part.id)}
               onPointerEnter={unfolded ? undefined : spreadPile}
               onFocus={() => reveal(index)}

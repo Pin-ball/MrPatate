@@ -16,7 +16,6 @@ export const partConfigs = {
   background: {
     label: { fr: 'Fond', en: 'Background' },
     default: 'cream',
-    camera: { zoom: 0.85, focus: [400, 465] },
   },
   skin: {
     label: { fr: 'Couleur', en: 'Color' },

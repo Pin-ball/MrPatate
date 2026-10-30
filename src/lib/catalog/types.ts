@@ -54,7 +54,6 @@ export type PartConfig = {
   label: Label
   default: string
   order?: readonly string[]
-  camera?: Camera
 }
 
 export type Variant = {
@@ -70,7 +69,7 @@ export type Variant = {
 export type Part = {
   id: PartId
   label: Label
-  camera: Camera
+  camera: Camera | null
   variants: Variant[]
 }
 

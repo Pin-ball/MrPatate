@@ -1,17 +1,14 @@
 import {
   arcCardLayout,
   arcPlace,
-  belowArcStyle,
   centeredOffset,
   clampOffset,
-  HAND_ARC,
+  enterStyle,
   hiddenCounts,
   isRendered,
   offsetShowing,
-  openDelay,
   pileMoveDuration,
   pilePlace,
-  VARIANTS_ARC,
   visibleSlots,
 } from '@src/lib/hand.ts'
 import { describe, expect, it } from 'vitest'
@@ -24,53 +21,49 @@ const rounded = ({ x, y, rotate }: { x: number; y: number; rotate: number }) => 
 
 describe('arcPlace', () => {
   it('puts the middle slot upright at the top of the arc', () => {
-    expect(rounded(arcPlace(4, 9, HAND_ARC))).toEqual({ x: 0, y: -260, rotate: 0 })
+    expect(rounded(arcPlace(4, 9))).toEqual({ x: 0, y: -260, rotate: 0 })
   })
 
   it('spreads the slots symmetrically along the arc', () => {
-    expect(rounded(arcPlace(0, 9, HAND_ARC))).toEqual({ x: -294, y: -195, rotate: -24.8 })
-    expect(rounded(arcPlace(8, 9, HAND_ARC))).toEqual({ x: 294, y: -195, rotate: 24.8 })
-  })
-
-  it('places the variants on their own arc', () => {
-    expect(rounded(arcPlace(0, 9, VARIANTS_ARC))).toEqual({ x: -300, y: -195, rotate: -28 })
+    expect(rounded(arcPlace(0, 9))).toEqual({ x: -294, y: -195, rotate: -24.8 })
+    expect(rounded(arcPlace(8, 9))).toEqual({ x: 294, y: -195, rotate: 24.8 })
   })
 
   it('widens the arc for more cards, keeping its top, spacing and opening', () => {
-    const nine = arcPlace(8, 9, VARIANTS_ARC)
-    const thirteen = arcPlace(12, 13, VARIANTS_ARC)
+    const nine = arcPlace(8, 9)
+    const thirteen = arcPlace(12, 13)
     expect(thirteen.rotate).toBeCloseTo(nine.rotate)
-    expect(arcPlace(6, 13, VARIANTS_ARC).y).toBeCloseTo(arcPlace(4, 9, VARIANTS_ARC).y)
-    expect(arcPlace(7, 13, VARIANTS_ARC).x).toBeCloseTo(arcPlace(5, 9, VARIANTS_ARC).x, 0)
+    expect(arcPlace(6, 13).y).toBeCloseTo(arcPlace(4, 9).y)
+    expect(arcPlace(7, 13).x).toBeCloseTo(arcPlace(5, 9).x, 0)
     expect(thirteen.x).toBeGreaterThan(nine.x)
   })
 
   it('keeps the same step between cards, beyond the visible slots too', () => {
-    expect(arcPlace(9, 9, VARIANTS_ARC).rotate).toBe(35)
-    expect(arcPlace(-1, 9, VARIANTS_ARC).rotate).toBe(-35)
+    expect(arcPlace(9, 9).rotate).toBeCloseTo(31)
+    expect(arcPlace(-1, 9).rotate).toBeCloseTo(-31)
   })
 })
 
 describe('visibleSlots', () => {
   it('fits as many cards as the room between the piles allows', () => {
-    expect(visibleSlots(24, 1280, VARIANTS_ARC)).toBe(8)
-    expect(visibleSlots(24, 1280, HAND_ARC)).toBe(8)
-    expect(visibleSlots(24, 1600, VARIANTS_ARC)).toBe(12)
-    expect(visibleSlots(24, 1000, VARIANTS_ARC)).toBe(4)
-    expect(visibleSlots(7, 1000, HAND_ARC)).toBe(4)
+    expect(visibleSlots(24, 1280)).toBe(8)
+    expect(visibleSlots(24, 1280)).toBe(8)
+    expect(visibleSlots(24, 1600)).toBe(12)
+    expect(visibleSlots(24, 1000)).toBe(4)
+    expect(visibleSlots(7, 1000)).toBe(4)
   })
 
   it('never shows more cards than the hand holds', () => {
-    expect(visibleSlots(7, 1280, HAND_ARC)).toBe(7)
+    expect(visibleSlots(7, 1280)).toBe(7)
   })
 
   it('stops at twelve cards on wide screens', () => {
-    expect(visibleSlots(24, 2560, VARIANTS_ARC)).toBe(12)
-    expect(visibleSlots(24, 2560, HAND_ARC)).toBe(12)
+    expect(visibleSlots(24, 2560)).toBe(12)
+    expect(visibleSlots(24, 2560)).toBe(12)
   })
 
   it('keeps one card on very narrow screens', () => {
-    expect(visibleSlots(24, 400, VARIANTS_ARC)).toBe(1)
+    expect(visibleSlots(24, 400)).toBe(1)
   })
 })
 
@@ -93,19 +86,33 @@ describe('hand scrolling', () => {
     expect(offsetShowing(6, 5, 9)).toBe(5)
   })
 
-  it('sends hidden variants below the screen, at the end of the arc they leave by', () => {
+  it('waits hidden cards one slot past the end of the arc they leave by', () => {
     const state = { offset: 0, slots: 9, unfolded: true, moving: false, scrolling: false }
-    const first = arcCardLayout(0, VARIANTS_ARC, state).place
-    const last = arcCardLayout(8, VARIANTS_ARC, state).place
-    expect(belowArcStyle(-3, 9, VARIANTS_ARC)).toMatchObject({
-      left: first.left,
-      rotate: first.rotate,
-      top: 'calc(100% - 0px + 140px)',
+    const spot = (index: number, offset: number) => {
+      const { left, top, rotate } = arcCardLayout(index, { ...state, offset }).place
+      return { left, top, rotate }
+    }
+    expect(arcCardLayout(0, { ...state, offset: 3 }).hidden).toBe(true)
+    expect(spot(0, 3)).toEqual(spot(0, 1))
+    expect(spot(12, 0)).toEqual(spot(9, 0))
+    expect(spot(9, 0)).not.toEqual(spot(8, 0))
+  })
+
+  it('raises variants from below the screen, under their slot', () => {
+    const state = { offset: 0, slots: 9, unfolded: true, moving: false, scrolling: false }
+    const first = arcCardLayout(0, state).place
+    expect(enterStyle(0, 3, 9)).toMatchObject({
+      '--from-left': first.left,
+      '--from-top': 'calc(100% - 0px + 140px)',
     })
-    expect(belowArcStyle(12, 9, VARIANTS_ARC)).toMatchObject({
-      left: last.left,
-      rotate: last.rotate,
-    })
+  })
+
+  it('folds every card in place, hidden', () => {
+    const state = { offset: 0, slots: 9, unfolded: false, moving: true, scrolling: false }
+    expect(arcCardLayout(4, state)).toMatchObject({ hidden: true, ignorePointer: true })
+    expect(arcCardLayout(4, state).place).toEqual(
+      arcCardLayout(4, { ...state, unfolded: true }).place,
+    )
   })
 
   it('counts the cards hidden on each side', () => {
@@ -123,10 +130,10 @@ describe('hand scrolling', () => {
       moving: false,
       scrolling: false,
     })
-    expect(arcCardLayout(0, VARIANTS_ARC, at(0.4)).ignorePointer).toBe(false)
-    expect(arcCardLayout(0, VARIANTS_ARC, at(0.6)).ignorePointer).toBe(true)
-    expect(arcCardLayout(8, VARIANTS_ARC, at(-0.4)).ignorePointer).toBe(false)
-    expect(arcCardLayout(8, VARIANTS_ARC, at(-0.6)).ignorePointer).toBe(true)
+    expect(arcCardLayout(0, at(0.4)).ignorePointer).toBe(false)
+    expect(arcCardLayout(0, at(0.6)).ignorePointer).toBe(true)
+    expect(arcCardLayout(8, at(-0.4)).ignorePointer).toBe(false)
+    expect(arcCardLayout(8, at(-0.6)).ignorePointer).toBe(true)
   })
 })
 
@@ -147,20 +154,6 @@ describe('pilePlace', () => {
   it('tilts a card at a fixed angle', () => {
     expect(pilePlace(1, 7, { tilted: true })).toEqual({ x: 0, y: -2, rotate: -3 })
     expect(pilePlace(1, 7, { spread: true, tilted: true })).toEqual({ x: 0, y: -2, rotate: -6 })
-  })
-})
-
-describe('openDelay', () => {
-  it('opens the farthest card from the pile first', () => {
-    expect(openDelay(6, 7, 'left')).toBe(0)
-    expect(openDelay(0, 7, 'left')).toBe(270)
-    expect(openDelay(0, 7, 'right')).toBe(0)
-    expect(openDelay(6, 7, 'right')).toBe(270)
-  })
-
-  it('can open the nearest card first instead', () => {
-    expect(openDelay(0, 7, 'left', 'nearest-first')).toBe(0)
-    expect(openDelay(0, 7, 'right', 'nearest-first')).toBe(270)
   })
 })
 
@@ -192,22 +185,25 @@ describe('card move durations', () => {
   const state = { offset: 0, slots: 8, unfolded: true, moving: true, scrolling: false }
 
   it('moves the hidden cards instantly while the hand opens or folds', () => {
-    expect(arcCardLayout(9, HAND_ARC, state).moveDuration).toBe(0)
-    expect(arcCardLayout(3, HAND_ARC, state).moveDuration).toBe(550)
+    expect(arcCardLayout(9, state).moveDuration).toBe(0)
+    expect(arcCardLayout(3, state).moveDuration).toBe(550)
     expect(pileMoveDuration(9, { ...state, unfolded: false })).toBe(0)
     expect(pileMoveDuration(3, { ...state, unfolded: false })).toBe(550)
   })
 
   it('moves faster while scrolling', () => {
-    expect(
-      arcCardLayout(9, HAND_ARC, { ...state, moving: false, scrolling: true }).moveDuration,
-    ).toBe(300)
+    expect(arcCardLayout(9, { ...state, moving: false, scrolling: true }).moveDuration).toBe(300)
   })
 
   it('staggers the opening from the pile side only for visible cards', () => {
-    expect(arcCardLayout(0, HAND_ARC, state, 'right').moveDelay).toBe(0)
-    expect(arcCardLayout(7, HAND_ARC, state, 'right').moveDelay).toBe(315)
-    expect(arcCardLayout(9, HAND_ARC, state, 'right').moveDelay).toBe(0)
-    expect(arcCardLayout(7, HAND_ARC, state).moveDelay).toBe(0)
+    expect(arcCardLayout(0, state, 'right').moveDelay).toBe(0)
+    expect(arcCardLayout(7, state, 'right').moveDelay).toBe(315)
+    expect(arcCardLayout(9, state, 'right').moveDelay).toBe(0)
+    expect(arcCardLayout(7, state).moveDelay).toBe(0)
+  })
+
+  it('moves without overshoot while scrolling, so cards never cross', () => {
+    expect(arcCardLayout(3, state).ease).toBe('overshoot')
+    expect(arcCardLayout(3, { ...state, moving: false, scrolling: true }).ease).toBe('out')
   })
 })

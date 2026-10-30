@@ -1,9 +1,9 @@
 import { CharacterImage } from '@src/components/character/CharacterImage.tsx'
 import { frameView } from '@src/lib/catalog/camera.ts'
 import type { Favorite } from '@src/lib/favorites.ts'
+import type { CardLayout } from '@src/lib/hand.ts'
 import { cn } from '@src/lib/utils.ts'
 import { useTranslation } from 'react-i18next'
-import type { CardLayout } from './HandCard.tsx'
 import { HandCard } from './HandCard.tsx'
 
 const PORTRAIT_WIDTH = 72

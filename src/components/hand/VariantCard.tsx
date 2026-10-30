@@ -1,8 +1,8 @@
 import { VariantThumbnail } from '@src/components/character/VariantThumbnail.tsx'
 import { useLabel } from '@src/hooks/useLocale.ts'
 import type { Look, Part, Variant } from '@src/lib/catalog/types.ts'
+import type { CardLayout } from '@src/lib/hand.ts'
 import { cn } from '@src/lib/utils.ts'
-import type { CardLayout } from './HandCard.tsx'
 import { HandCard } from './HandCard.tsx'
 
 type VariantCardProps = {
@@ -31,7 +31,7 @@ export function VariantCard({
   return (
     <HandCard
       layout={layout}
-      className={cn('animate-enter', selected && 'bg-accent')}
+      className={cn(selected && 'bg-accent')}
       aria-pressed={selected}
       onPointerEnter={onPointerEnter}
       onFocus={onFocus}
