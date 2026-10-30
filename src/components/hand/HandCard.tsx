@@ -18,6 +18,7 @@ export function HandCard({
     moveDelay = 0,
     ease = 'overshoot',
     hidden = false,
+    scrolling = false,
     enter,
   },
   corner,
@@ -37,9 +38,12 @@ export function HandCard({
       }}
       data-ease={ease}
       data-hidden={hidden || undefined}
+      data-scrolling={scrolling || undefined}
       className={cn(
         'border-stroke bg-card card-motion group absolute origin-bottom -translate-1/2 rounded-[18px]',
-        folded ? 'shadow-hard-sm' : 'shadow-hard hover:-mt-6 has-focus-visible:-mt-6',
+        folded
+          ? 'shadow-hard-sm'
+          : 'shadow-hard hover:-mt-6 hover:after:absolute hover:after:inset-x-0 hover:after:top-full hover:after:h-8 has-focus-visible:-mt-6',
         ignorePointer && 'pointer-events-none',
         enter && 'animate-enter',
         className,

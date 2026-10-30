@@ -31,7 +31,10 @@ export const en = {
   variants: {
     label: 'Variants: {{part}}',
     random: 'Random variant',
-    back_to_parts: 'Parts',
+    random_card: {
+      title: 'Random',
+      other: 'another one',
+    },
   },
   favorites: {
     label: 'Favorites',

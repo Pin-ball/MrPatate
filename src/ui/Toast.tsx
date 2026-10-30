@@ -1,19 +1,13 @@
-import { cn } from '@src/lib/utils.ts'
-
 type ToastProps = {
   message: string
   action?: { label: string; onClick: () => void }
-  className?: string
 }
 
-export function Toast({ message, action, className }: ToastProps) {
+export function Toast({ message, action }: ToastProps) {
   return (
     <div
       role="status"
-      className={cn(
-        'animate-fade-in bg-foreground text-background flex items-center justify-between gap-2 rounded-md px-3 py-2 text-[13px] font-medium',
-        className,
-      )}
+      className="bg-foreground text-background flex items-center justify-between gap-2 rounded-md px-3 py-2 text-[13px] font-medium"
     >
       <span>{message}</span>
       {action && (

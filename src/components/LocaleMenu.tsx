@@ -15,7 +15,7 @@ export function LocaleMenu() {
   return (
     <Menu
       aria-label={t('app.language', { language: localeNames[current] })}
-      className="shadow-hard h-12 uppercase"
+      className="h-12 uppercase"
       trigger={
         <>
           <Languages size={18} strokeWidth={2.25} />

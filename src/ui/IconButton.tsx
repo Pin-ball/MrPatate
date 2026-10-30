@@ -11,8 +11,8 @@ const iconButtonVariants = cva(
   {
     variants: {
       variant: {
-        outline: 'border-stroke bg-secondary text-secondary-foreground size-11',
-        primary: 'border-stroke bg-primary text-primary-foreground size-11',
+        outline: 'border-stroke bg-secondary text-secondary-foreground pressable size-11',
+        primary: 'border-stroke bg-primary text-primary-foreground pressable size-11',
         ghost:
           'hover:bg-background relative size-[34px] transition-[background-color,scale] duration-150 before:absolute before:-inset-[5px] focus-visible:outline-offset-2 active:scale-92 disabled:bg-transparent disabled:active:scale-100',
       },

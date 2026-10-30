@@ -18,6 +18,7 @@ export type CardLayout = {
   moveDelay?: number
   ease?: MoveEase
   hidden?: boolean
+  scrolling?: boolean
   enter?: CSSProperties
 }
 
@@ -151,8 +152,8 @@ function openDelay(slot: number, slots: number, pileSide: 'left' | 'right'): num
 }
 
 function cardMoveDuration(shown: boolean, moving: boolean, scrolling: boolean): number {
-  if (moving && !shown) return 0
-  return scrolling ? SHORT_MOVE_DURATION : MOVE_DURATION
+  if (scrolling || (moving && !shown)) return 0
+  return MOVE_DURATION
 }
 
 export function arcCardLayout(
@@ -181,7 +182,8 @@ export function arcCardLayout(
     ignorePointer: moving || !shown,
     moveDelay: moving && shown && pileSide ? openDelay(slot, slots, pileSide) : 0,
     moveDuration: cardMoveDuration(shown, moving, scrolling),
-    ease: !shown || scrolling ? 'out' : 'overshoot',
+    ease: shown ? 'overshoot' : 'out',
+    scrolling,
   }
 }
 
@@ -229,7 +231,7 @@ function arcStyle(slot: number, slots: number) {
 }
 
 function beyondArcStyle(slot: number, slots: number) {
-  return arcStyle(slot < 0 ? -1 : slots, slots)
+  return arcStyle(clamp(slot, -1, slots), slots)
 }
 
 function belowArcStyle(slot: number, slots: number) {

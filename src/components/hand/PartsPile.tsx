@@ -9,7 +9,7 @@ import { Pile } from './Pile.tsx'
 
 const COUNT = partsPile.length
 
-export function PartsHand() {
+export function PartsPile() {
   const { t } = useTranslation()
   const hand = useEditor((state) => state.hand)
   const look = useEditor((state) => state.look)

@@ -98,6 +98,13 @@ describe('hand scrolling', () => {
     expect(spot(9, 0)).not.toEqual(spot(8, 0))
   })
 
+  it('slides hidden cards along the arc while the offset moves between two cards', () => {
+    const state = { offset: 0, slots: 9, unfolded: true, moving: false, scrolling: true }
+    const spot = (offset: number) => arcCardLayout(0, { ...state, offset }).place.left
+    expect(spot(0.75)).not.toEqual(spot(0.5))
+    expect(spot(0.75)).not.toEqual(spot(1))
+  })
+
   it('raises variants from below the screen, under their slot', () => {
     const state = { offset: 0, slots: 9, unfolded: true, moving: false, scrolling: false }
     const first = arcCardLayout(0, state).place
@@ -191,8 +198,8 @@ describe('card move durations', () => {
     expect(pileMoveDuration(3, { ...state, unfolded: false })).toBe(550)
   })
 
-  it('moves faster while scrolling', () => {
-    expect(arcCardLayout(9, { ...state, moving: false, scrolling: true }).moveDuration).toBe(300)
+  it('follows the scroll without a transition', () => {
+    expect(arcCardLayout(3, { ...state, moving: false, scrolling: true }).moveDuration).toBe(0)
   })
 
   it('staggers the opening from the pile side only for visible cards', () => {
@@ -202,8 +209,8 @@ describe('card move durations', () => {
     expect(arcCardLayout(7, state).moveDelay).toBe(0)
   })
 
-  it('moves without overshoot while scrolling, so cards never cross', () => {
+  it('moves hidden cards without overshoot', () => {
     expect(arcCardLayout(3, state).ease).toBe('overshoot')
-    expect(arcCardLayout(3, { ...state, moving: false, scrolling: true }).ease).toBe('out')
+    expect(arcCardLayout(9, state).ease).toBe('out')
   })
 })

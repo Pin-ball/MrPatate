@@ -1,5 +1,7 @@
+import { Appear } from '@src/ui/Appear.tsx'
 import { Button } from '@src/ui/Button.tsx'
 import { MenuContext } from '@src/ui/MenuContext.ts'
+import { AnimatePresence } from 'motion/react'
 import type { ComponentProps, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -40,11 +42,13 @@ export function Menu({ trigger, children, ...buttonProps }: MenuProps) {
       <Button ref={button} aria-expanded={open} onClick={() => setOpen(!open)} {...buttonProps}>
         {trigger}
       </Button>
-      {open && (
-        <div className="border-stroke bg-popover text-popover-foreground shadow-hard-lg animate-fade-in absolute top-[calc(100%+10px)] right-0 z-40 flex min-w-[220px] flex-col rounded-xl p-1.5">
-          <MenuContext value={close}>{children}</MenuContext>
-        </div>
-      )}
+      <AnimatePresence>
+        {open && (
+          <Appear className="border-stroke bg-popover text-popover-foreground shadow-hard-lg absolute top-[calc(100%+10px)] right-0 z-40 flex min-w-[220px] origin-top-right flex-col rounded-xl p-1.5">
+            <MenuContext value={close}>{children}</MenuContext>
+          </Appear>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

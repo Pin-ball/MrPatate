@@ -9,7 +9,7 @@ import { AddCard } from './AddCard.tsx'
 import { FavoriteCard } from './FavoriteCard.tsx'
 import { Pile } from './Pile.tsx'
 
-export function FavoritesHand() {
+export function FavoritesPile() {
   const { t } = useTranslation()
   const favorites = allFavorites(useFavorites((state) => state.favorites))
   const { currentFavorite, add, remove, apply } = useFavoriteActions()

@@ -28,7 +28,11 @@ export function useHand({
   if (open && spread) setSpread(false)
 
   const slots = visibleSlots(count, useWindowWidth())
-  const moving = useMoving(resetKey, open ? openDuration(unfoldDuration, slots) : foldDuration)
+  const moving = useMoving(
+    resetKey,
+    open ? openDuration(unfoldDuration, slots) : foldDuration,
+    open,
+  )
   const { offset, start, scrolling, reveal, handlers } = useHandScroll(count, slots, startIndex, {
     open,
     resetKey,

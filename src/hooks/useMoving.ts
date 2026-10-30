@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
-export function useMoving(key: unknown, duration: number): boolean {
-  const [state, setState] = useState({ key, settled: true })
+export function useMoving(key: unknown, duration: number, initiallyMoving = false): boolean {
+  const [state, setState] = useState({ key, settled: !initiallyMoving })
 
   if (state.key !== key) setState({ key, settled: false })
 

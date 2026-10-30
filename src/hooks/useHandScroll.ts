@@ -1,4 +1,5 @@
 import { centeredOffset, clampOffset, offsetShowing } from '@src/lib/hand.ts'
+import { useMotionValueEvent, useSpring } from 'motion/react'
 import type { MouseEvent, PointerEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -8,8 +9,15 @@ const DRAG_THRESHOLD = 8
 const SNAP_DELAY = 140
 const MAX_CARDS_PER_MS = 0.012
 const MAX_ELAPSED = 100
+const SPRING = { stiffness: 260, damping: 30 }
 
-type Scroll = { key: unknown; start: number; offset: number; scrolling: boolean }
+type Scroll = {
+  key: unknown
+  start: number
+  offset: number
+  scrolling: boolean
+  instant: boolean
+}
 
 type SpeedLimit = (delta: number, time: number) => number
 
@@ -17,7 +25,7 @@ type Drag = { x: number; moved: boolean; limit: SpeedLimit }
 
 const opened = (key: unknown, startIndex: number, count: number, slots: number): Scroll => {
   const start = centeredOffset(startIndex, count, slots)
-  return { key, start, offset: start, scrolling: false }
+  return { key, start, offset: start, scrolling: false, instant: true }
 }
 
 function createSpeedLimit(): SpeedLimit {
@@ -29,16 +37,24 @@ function createSpeedLimit(): SpeedLimit {
   }
 }
 
-const movedBy = (scroll: Scroll, delta: number, count: number, slots: number): Scroll => ({
+const movedBy = (
+  scroll: Scroll,
+  delta: number,
+  count: number,
+  slots: number,
+  instant: boolean,
+): Scroll => ({
   ...scroll,
   offset: clampOffset(scroll.offset + delta, count, slots),
   scrolling: true,
+  instant,
 })
 
 const snapped = (scroll: Scroll, count: number, slots: number): Scroll => ({
   ...scroll,
   offset: Math.round(clampOffset(scroll.offset, count, slots)),
   scrolling: false,
+  instant: false,
 })
 
 export function useHandScroll(
@@ -55,7 +71,17 @@ export function useHandScroll(
     setScroll(open ? opened(resetKey, startIndex, count, slots) : { ...scroll, key: resetKey })
   }
 
-  const offset = clampOffset(scroll.offset, count, slots)
+  const target = clampOffset(scroll.offset, count, slots)
+  const spring = useSpring(target, SPRING)
+  const [springOffset, setSpringOffset] = useState(target)
+  useMotionValueEvent(spring, 'change', setSpringOffset)
+
+  useEffect(() => {
+    if (scroll.instant) spring.jump(target)
+    else spring.set(target)
+  }, [spring, target, scroll.instant])
+
+  const offset = scroll.instant ? target : springOffset
   const scrollable = open && count > slots
 
   useEffect(() => {
@@ -64,7 +90,7 @@ export function useHandScroll(
     const limit = createSpeedLimit()
     const onWheel = (event: WheelEvent) => {
       const delta = limit((event.deltaY || event.deltaX) / WHEEL_PER_CARD, event.timeStamp)
-      setScroll((current) => movedBy(current, delta, count, slots))
+      setScroll((current) => movedBy(current, delta, count, slots, false))
       clearTimeout(snapTimer)
       snapTimer = setTimeout(
         () => setScroll((current) => snapped(current, count, slots)),
@@ -106,7 +132,7 @@ export function useHandScroll(
     }
     const delta = current.limit(-dx / DRAG_PER_CARD, event.timeStamp)
     current.x = event.clientX
-    setScroll((scroll) => movedBy(scroll, delta, count, slots))
+    setScroll((scroll) => movedBy(scroll, delta, count, slots, true))
   }
 
   const onClickCapture = (event: MouseEvent) => {
@@ -118,13 +144,14 @@ export function useHandScroll(
   const reveal = (index: number) =>
     setScroll((current) => ({
       ...current,
+      instant: false,
       offset: offsetShowing(index, Math.round(clampOffset(current.offset, count, slots)), slots),
     }))
 
   return {
     offset,
     start: scroll.start,
-    scrolling: scroll.scrolling,
+    scrolling: scroll.scrolling || offset !== target,
     reveal,
     handlers: {
       onPointerDown,

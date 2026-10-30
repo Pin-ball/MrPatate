@@ -1,7 +1,7 @@
 import { Background } from '@src/components/Background.tsx'
 import { Header } from '@src/components/Header.tsx'
-import { FavoritesHand } from '@src/components/hand/FavoritesHand.tsx'
-import { PartsHand } from '@src/components/hand/PartsHand.tsx'
+import { FavoritesPile } from '@src/components/hand/FavoritesPile.tsx'
+import { PartsPile } from '@src/components/hand/PartsPile.tsx'
 import { VariantsHand } from '@src/components/hand/VariantsHand.tsx'
 import { Scene } from '@src/components/Scene.tsx'
 import { Toaster } from '@src/components/Toaster.tsx'
@@ -24,8 +24,8 @@ export function App() {
       <Header />
       <Scene />
       <VariantsHand />
-      <PartsHand />
-      <FavoritesHand />
+      <PartsPile />
+      <FavoritesPile />
       <Toaster />
     </main>
   )

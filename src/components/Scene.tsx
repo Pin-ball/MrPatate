@@ -4,7 +4,9 @@ import { partById } from '@src/lib/catalog/index.ts'
 import { MOVE_DURATION } from '@src/lib/hand.ts'
 import type { Hand } from '@src/stores/editor.ts'
 import { useEditor, useShownLook } from '@src/stores/editor.ts'
+import { Appear } from '@src/ui/Appear.tsx'
 import { Badge } from '@src/ui/Badge.tsx'
+import { AnimatePresence } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
 const CAMERA_WITHOUT_HAND = { ...FRAME_CAMERA, zoom: 1.3 }
@@ -31,11 +33,13 @@ export function Scene() {
       >
         <Character look={look} label={t('app.character')} className="aspect-4/5 w-90" />
       </div>
-      {previewing && (
-        <Badge className="animate-fade-in absolute top-1.5 left-1/2 -translate-x-1/2">
-          {t('scene.preview')}
-        </Badge>
-      )}
+      <AnimatePresence>
+        {previewing && (
+          <Appear className="absolute top-1.5 left-1/2 -translate-x-1/2">
+            <Badge>{t('scene.preview')}</Badge>
+          </Appear>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

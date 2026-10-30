@@ -2,6 +2,7 @@ import type { usePile } from '@src/hooks/usePile.ts'
 import { PILE_ANCHORS } from '@src/lib/hand.ts'
 import { setHand } from '@src/stores/editor.ts'
 import type { LucideIcon } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import type { ReactNode } from 'react'
 import { HiddenCards } from './HiddenCards.tsx'
 import { PileLabel } from './PileLabel.tsx'
@@ -34,10 +35,18 @@ export function Pile({
         label={label}
         onClick={() => setHand(unfolded ? { kind: 'none' } : { kind })}
       />
-      {!unfolded && <PileLabel anchor={anchor}>{pileLabel}</PileLabel>}
+      <AnimatePresence>
+        {!unfolded && <PileLabel anchor={anchor}>{pileLabel}</PileLabel>}
+      </AnimatePresence>
       <nav aria-label={label} className="isolate" {...handlers}>
         {children}
-        {unfolded && <HiddenCards offset={state.offset} count={count} slots={state.slots} />}
+        <HiddenCards
+          shown={unfolded}
+          opening={state.moving}
+          offset={state.offset}
+          count={count}
+          slots={state.slots}
+        />
       </nav>
     </>
   )
