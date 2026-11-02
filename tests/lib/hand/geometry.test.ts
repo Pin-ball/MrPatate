@@ -2,10 +2,12 @@ import {
   arcPlace,
   centeredOffset,
   clampOffset,
+  fullHandTop,
   hiddenCounts,
   isRendered,
   offsetShowing,
   pilePlace,
+  pileStart,
   visibleSlots,
 } from '@src/lib/hand/geometry.ts'
 import { describe, expect, it } from 'vitest'
@@ -17,17 +19,18 @@ const rounded = ({ x, y, rotate }: { x: number; y: number; rotate: number }) => 
 })
 
 describe('arcPlace', () => {
-  it('puts the middle slot upright at the top, the others symmetrically along the arc', () => {
-    expect(rounded(arcPlace(4, 9))).toEqual({ x: 0, y: -260, rotate: 0 })
-    expect(rounded(arcPlace(0, 9))).toEqual({ x: -294, y: -195, rotate: -24.8 })
-    expect(rounded(arcPlace(8, 9))).toEqual({ x: 294, y: -195, rotate: 24.8 })
+  it('puts the middle slot upright at the top, the outer slots at the height of the piles', () => {
+    expect(rounded(arcPlace(4, 9))).toEqual({ x: 0, y: -220, rotate: 0 })
+    expect(rounded(arcPlace(0, 9))).toEqual({ x: -294, y: -155, rotate: -24.8 })
+    expect(rounded(arcPlace(8, 9))).toEqual({ x: 294, y: -155, rotate: 24.8 })
+    expect(rounded(arcPlace(0, 1))).toEqual({ x: 0, y: -155, rotate: 0 })
   })
 
-  it('widens the arc for more cards, keeping its top, spacing and opening', () => {
+  it('widens the arc for more cards, keeping its bottom, spacing and opening', () => {
     const nine = arcPlace(8, 9)
     const thirteen = arcPlace(12, 13)
     expect(thirteen.rotate).toBeCloseTo(nine.rotate)
-    expect(arcPlace(6, 13).y).toBeCloseTo(arcPlace(4, 9).y)
+    expect(thirteen.y).toBeCloseTo(nine.y)
     expect(arcPlace(7, 13).x).toBeCloseTo(arcPlace(5, 9).x, 0)
     expect(thirteen.x).toBeGreaterThan(nine.x)
   })
@@ -45,6 +48,14 @@ describe('visibleSlots', () => {
     expect(visibleSlots(24, 2560)).toBe(12)
     expect(visibleSlots(24, 400)).toBe(1)
     expect(visibleSlots(7, 1280)).toBe(7)
+  })
+})
+
+describe('fullHandTop', () => {
+  it('rises with the screen width, as a full hand gets more slots', () => {
+    expect(Math.round(fullHandTop(1000))).toBe(232)
+    expect(Math.round(fullHandTop(1280))).toBe(273)
+    expect(Math.round(fullHandTop(2560))).toBe(312)
   })
 })
 
@@ -106,22 +117,28 @@ describe('isRendered', () => {
   }
   const hand = { ...pile, unfolded: true }
 
-  it('renders only the first cards of a folded pile', () => {
-    expect(isRendered(7, pile)).toBe(true)
-    expect(isRendered(8, pile)).toBe(false)
+  it('renders in a folded pile the cards the hand will open on', () => {
+    expect(pileStart(pile, 4)).toBe(4)
+    expect(isRendered(4, pile, 4)).toBe(true)
+    expect(isRendered(11, pile, 4)).toBe(true)
+    expect(isRendered(3, pile, 4)).toBe(false)
+    expect(isRendered(12, pile, 4)).toBe(false)
   })
 
   it('renders the visible cards of an open hand, with a margin', () => {
-    expect(isRendered(8, hand)).toBe(true)
-    expect(isRendered(19, hand)).toBe(true)
-    expect(isRendered(7, hand)).toBe(false)
-    expect(isRendered(20, hand)).toBe(false)
+    expect(isRendered(8, hand, 10)).toBe(true)
+    expect(isRendered(19, hand, 10)).toBe(true)
+    expect(isRendered(7, hand, 10)).toBe(false)
+    expect(isRendered(20, hand, 10)).toBe(false)
   })
 
-  it('keeps both while the cards move between the pile and the hand, without the margin', () => {
-    expect(isRendered(0, { ...hand, moving: true })).toBe(true)
-    expect(isRendered(15, { ...pile, moving: true })).toBe(true)
-    expect(isRendered(9, { ...pile, moving: true })).toBe(false)
-    expect(isRendered(18, { ...pile, moving: true })).toBe(false)
+  it('folds the visible cards of the hand into the pile, without the margin', () => {
+    const folding = { ...pile, moving: true }
+    expect(pileStart(folding, 4)).toBe(10)
+    expect(isRendered(10, folding, 10)).toBe(true)
+    expect(isRendered(17, folding, 10)).toBe(true)
+    expect(isRendered(9, folding, 10)).toBe(false)
+    expect(isRendered(18, folding, 10)).toBe(false)
+    expect(isRendered(9, { ...hand, moving: true }, 10)).toBe(false)
   })
 })

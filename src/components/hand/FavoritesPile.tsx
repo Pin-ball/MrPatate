@@ -22,7 +22,7 @@ export function FavoritesPile() {
   })
   const count = favorites.length + 1
   const pile = usePile('favorites', { count, startIndex: chosenIndex, events })
-  const { unfolded, layoutOf, rendered, reveal, spreadPile } = pile
+  const { unfolded, pileStart, layoutOf, rendered, reveal, spreadPile } = pile
 
   const unfold = () => {
     setHand({ kind: 'favorites' })
@@ -62,7 +62,7 @@ export function FavoritesPile() {
             removable={!builtInFavorites.includes(favorite)}
             layout={layoutOf(index, {
               zIndex: count - index + 1,
-              top: index === 1,
+              top: index === Math.max(pileStart, 1),
               id: favorite.id,
             })}
             onClick={unfolded ? () => apply(favorite) : unfold}

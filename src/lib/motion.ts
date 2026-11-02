@@ -13,7 +13,7 @@ export const DURATIONS = {
   bounce: 350,
   remove: 400,
   move: 550,
-  drop: 550,
+  drop: 440,
   parallax: 600,
   scrollHint: 1400,
 }

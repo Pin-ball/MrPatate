@@ -20,7 +20,7 @@ export function App() {
     <main
       style={MOTION_VARIABLES}
       data-backdrop={background.dark ? 'dark' : 'light'}
-      className="relative flex h-dvh flex-col overflow-hidden pb-[90px]"
+      className="relative flex h-dvh flex-col overflow-hidden"
     >
       <Background paint={background} />
       <Header />

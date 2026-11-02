@@ -17,6 +17,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max)
+
 export function readField(source: unknown, key: string): unknown {
   return typeof source === 'object' && source !== null ? Reflect.get(source, key) : undefined
 }

@@ -15,10 +15,10 @@ export function PartsPile() {
   const look = useEditor((state) => state.look)
   const openPart = hand.kind === 'variants' ? hand.part : null
   const pile = usePile('parts', { count: COUNT, startIndex: (COUNT - 1) / 2 })
-  const { unfolded, state, layoutOf, rendered, reveal, spreadPile } = pile
+  const { unfolded, pileStart, pileSize, layoutOf, rendered, reveal, spreadPile } = pile
 
   const onTop = (index: number, id: PartId) =>
-    openPart ? id === openPart : index === Math.min(COUNT, state.slots) - 1
+    openPart ? id === openPart : index === pileStart + pileSize - 1
 
   const layoutAt = (index: number, id: PartId) => {
     const isOpen = id === openPart

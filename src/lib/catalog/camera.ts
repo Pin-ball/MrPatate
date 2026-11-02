@@ -1,3 +1,4 @@
+import { clamp } from '@src/lib/utils.ts'
 import type { Box, Camera, Variant } from './types.ts'
 
 export const FRAME: Box = [180, 190, 620, 740]
@@ -24,8 +25,6 @@ function unionBox(boxes: Box[]): Box | null {
     Math.max(...boxes.map((box) => box[3])),
   ]
 }
-
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 export function cameraOf(variants: Variant[]): Camera | null {
   const [fx0, fy0, fx1, fy1] = FRAME

@@ -4,12 +4,15 @@ import type { CardLayout } from '@src/lib/hand/cards.ts'
 import { arcCardLayout, MOTION_DURATIONS, moveMotion, withState } from '@src/lib/hand/cards.ts'
 import type { PileKind } from '@src/lib/hand/geometry.ts'
 import {
+  centeredOffset,
   isRendered,
   PILE_ANCHORS,
   PILE_SIDES,
   pilePlace,
+  pileStart,
   placeStyle,
 } from '@src/lib/hand/geometry.ts'
+import { clamp } from '@src/lib/utils.ts'
 import { useEditor } from '@src/stores/editor.ts'
 import { useState } from 'react'
 
@@ -27,6 +30,7 @@ export function usePile(kind: PileKind, { count, startIndex, events }: PileOptio
     unfoldDuration: MOTION_DURATIONS.move,
   })
   const pileSize = Math.min(count, state.slots)
+  const start = pileStart(state, centeredOffset(startIndex, count, state.slots))
 
   const added = events?.added ?? null
   const addedId = added?.id ?? null
@@ -39,7 +43,7 @@ export function usePile(kind: PileKind, { count, startIndex, events }: PileOptio
   const layoutOf = (index: number, { zIndex, top, tilted = false, id }: PileCard): CardLayout => {
     const facts = events?.eventsOf(id) ?? {}
     if (unfolded) return withState(arcCardLayout(index, state, PILE_SIDES[kind]), facts)
-    const place = pilePlace(Math.min(index, pileSize - 1), pileSize, {
+    const place = pilePlace(clamp(index - start, 0, pileSize - 1), pileSize, {
       mirror: PILE_SIDES[kind] === 'right',
       spread,
       top,
@@ -62,8 +66,10 @@ export function usePile(kind: PileKind, { count, startIndex, events }: PileOptio
     unfolded,
     state,
     count,
+    pileStart: start,
+    pileSize,
     layoutOf,
-    rendered: (index: number) => isRendered(index, state),
+    rendered: (index: number) => isRendered(index, state, start),
     reveal,
     spreadPile,
     handlers,
