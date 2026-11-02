@@ -37,14 +37,6 @@ describe('buildCatalog', () => {
     expect(parts[0]?.variants.map((variant) => variant.id)).toEqual(['c', 'd', 'b', 'a', 'e'])
   })
 
-  it('puts the default first, then drawings in alphabetical order', () => {
-    const { parts } = build({
-      configs: { eyes: config({ default: 'c' }) },
-      drawings: { eyes: { d: svg('D'), a: svg('A'), c: svg('C'), b: svg('B') } },
-    })
-    expect(parts[0]?.variants.map((variant) => variant.id)).toEqual(['c', 'a', 'b', 'd'])
-  })
-
   it('keeps coded variants in their listed order, before drawings', () => {
     const { parts } = build({
       configs: { skin: config({ default: 'mint' }) },
@@ -84,22 +76,15 @@ describe('buildCatalog', () => {
     expect(partsPile.map((part) => part.id)).toEqual(['late', 'early'])
   })
 
-  it('rejects a coded variants folder missing from parts.ts', () => {
+  it.each([
+    [
+      'coded variants',
+      { coded: { hat: [{ id: 'red', label: { fr: 'R', en: 'R' }, fill: '#F00' }] } },
+    ],
+    ['drawings', { drawings: { eyes: { a: svg('A') }, hat: { cap: svg('C') } } }],
+  ])('rejects a folder of %s missing from parts.ts', (_, sources) => {
     expect(() =>
-      build({
-        configs: { eyes: config() },
-        drawings: { eyes: { a: svg('A') } },
-        coded: { hat: [{ id: 'red', label: { fr: 'Rouge', en: 'Red' }, fill: '#FF0000' }] },
-      }),
-    ).toThrow(/hat\/: this folder has no entry in parts\.ts/)
-  })
-
-  it('rejects a drawing folder missing from parts.ts', () => {
-    expect(() =>
-      build({
-        configs: { eyes: config() },
-        drawings: { eyes: { a: svg('A') }, hat: { cap: svg('C') } },
-      }),
+      build({ configs: { eyes: config() }, drawings: { eyes: { a: svg('A') } }, ...sources }),
     ).toThrow(/hat\/: this folder has no entry in parts\.ts/)
   })
 

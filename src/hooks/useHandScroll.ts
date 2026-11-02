@@ -1,4 +1,4 @@
-import { centeredOffset, clampOffset, offsetShowing } from '@src/lib/hand.ts'
+import { centeredOffset, clampOffset, offsetShowing } from '@src/lib/hand/geometry.ts'
 import { useMotionValueEvent, useSpring } from 'motion/react'
 import type { MouseEvent, PointerEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
@@ -11,11 +11,14 @@ const MAX_CARDS_PER_MS = 0.012
 const MAX_ELAPSED = 100
 const SPRING = { stiffness: 260, damping: 30 }
 
+let scrolledOnce = false
+
 type Scroll = {
   key: unknown
   start: number
   offset: number
   scrolling: boolean
+  scrolled: boolean
   instant: boolean
 }
 
@@ -25,7 +28,7 @@ type Drag = { x: number; moved: boolean; limit: SpeedLimit }
 
 const opened = (key: unknown, startIndex: number, count: number, slots: number): Scroll => {
   const start = centeredOffset(startIndex, count, slots)
-  return { key, start, offset: start, scrolling: false, instant: true }
+  return { key, start, offset: start, scrolling: false, scrolled: scrolledOnce, instant: true }
 }
 
 function createSpeedLimit(): SpeedLimit {
@@ -47,6 +50,7 @@ const movedBy = (
   ...scroll,
   offset: clampOffset(scroll.offset + delta, count, slots),
   scrolling: true,
+  scrolled: true,
   instant,
 })
 
@@ -91,6 +95,7 @@ export function useHandScroll(
     const onWheel = (event: WheelEvent) => {
       const delta = limit((event.deltaY || event.deltaX) / WHEEL_PER_CARD, event.timeStamp)
       setScroll((current) => movedBy(current, delta, count, slots, false))
+      scrolledOnce = true
       clearTimeout(snapTimer)
       snapTimer = setTimeout(
         () => setScroll((current) => snapped(current, count, slots)),
@@ -129,6 +134,7 @@ export function useHandScroll(
       if (Math.abs(dx) < DRAG_THRESHOLD) return
       current.moved = true
       event.currentTarget.setPointerCapture(event.pointerId)
+      scrolledOnce = true
     }
     const delta = current.limit(-dx / DRAG_PER_CARD, event.timeStamp)
     current.x = event.clientX
@@ -152,6 +158,7 @@ export function useHandScroll(
     offset,
     start: scroll.start,
     scrolling: scroll.scrolling || offset !== target,
+    scrolled: scroll.scrolled,
     reveal,
     handlers: {
       onPointerDown,

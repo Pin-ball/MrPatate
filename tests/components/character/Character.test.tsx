@@ -1,11 +1,13 @@
 // @vitest-environment happy-dom
 import { Character } from '@src/components/character/Character.tsx'
 import { defaultLook } from '@src/lib/catalog/index.ts'
+import { useEditor } from '@src/stores/editor.ts'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
 describe('Character', () => {
-  const markup = renderToStaticMarkup(<Character look={defaultLook} label="Pierre" />)
+  useEditor.setState({ look: defaultLook, preview: null })
+  const markup = renderToStaticMarkup(<Character label="Pierre" />)
 
   it('labels the 3D stage as an image', () => {
     expect(markup).toMatch(/^<div role="img" aria-label="Pierre" class="character-stage"/)

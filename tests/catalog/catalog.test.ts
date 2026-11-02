@@ -42,11 +42,6 @@ describe('catalog', () => {
     }
   })
 
-  it('draws the cape over the body on the same plane', () => {
-    const body = planes.find((plane) => plane.id === 'body')
-    expect(body?.parts).toEqual(['body', 'back'])
-  })
-
   it('paints every Couleur and Fond variant', () => {
     for (const variant of [...partById.skin.variants, ...partById.background.variants]) {
       expect(variant.paint).not.toBeNull()

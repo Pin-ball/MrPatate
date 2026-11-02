@@ -1,30 +1,30 @@
-import { hiddenCountStyle, hiddenCounts, MOVE_DURATION, openDuration } from '@src/lib/hand.ts'
+import { openDuration } from '@src/lib/hand/cards.ts'
+import type { HandState } from '@src/lib/hand/geometry.ts'
+import { hiddenCountStyle, hiddenCounts } from '@src/lib/hand/geometry.ts'
+import { DURATIONS, seconds } from '@src/lib/motion.ts'
 import { Appear } from '@src/ui/Appear.tsx'
 import { AnimatePresence } from 'motion/react'
 
-type HiddenCardsProps = {
-  shown: boolean
-  opening: boolean
-  offset: number
-  count: number
-  slots: number
-}
+type HiddenCardsProps = { state: HandState; count: number }
 
 type Side = { side: 'before' | 'after'; hidden: number }
 
-export function HiddenCards({ shown, opening, offset, count, slots }: HiddenCardsProps) {
+export function HiddenCards({
+  state: { unfolded, moving, offset, slots },
+  count,
+}: HiddenCardsProps) {
   const { before, after } = hiddenCounts(offset, count, slots)
   const sides: Side[] = [
     { side: 'before', hidden: before },
     { side: 'after', hidden: after },
   ]
-  const delay = opening ? openDuration(MOVE_DURATION / 2, slots) / 1000 : 0
+  const delay = moving ? seconds(openDuration(DURATIONS.move / 2, slots)) : 0
 
   return (
     <AnimatePresence>
       {sides.map(
         ({ side, hidden }) =>
-          shown &&
+          unfolded &&
           hidden > 0 && (
             <Appear
               key={side}

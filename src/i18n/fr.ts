@@ -26,6 +26,9 @@ export const fr = {
     fold: 'Replier les Parties dans leur emplacement',
     card: '{{part}} : {{variant}}, {{count}} variantes',
   },
+  hand: {
+    scroll_hint: 'Molette ou glisser pour voir la suite',
+  },
   variants: {
     label: 'Variantes : {{part}}',
     random: 'Variante au hasard',

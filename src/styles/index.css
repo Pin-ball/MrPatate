@@ -74,61 +74,149 @@
   --shadow-hard-sm: var(--shadow-hard-sm);
   --shadow-hard: var(--shadow-hard);
   --shadow-hard-lg: var(--shadow-hard-lg);
+}
 
-  --ease-overshoot-lg: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-overshoot-md: cubic-bezier(0.34, 1.4, 0.64, 1);
-  --ease-overshoot-sm: cubic-bezier(0.34, 1.2, 0.64, 1);
-  --ease-out-strong: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ease-in-out-strong: cubic-bezier(0.5, 0, 0.3, 1);
-  --ease-in-strong: cubic-bezier(0.5, 0, 0.75, 0);
+@keyframes card-enter {
+  from {
+    left: var(--from-left);
+    top: var(--from-top);
+  }
+}
 
-  --animate-enter: enter 0.55s var(--ease-overshoot-md) backwards;
+@keyframes card-drop {
+  0% {
+    margin-top: -150px;
+    opacity: 0;
+    scale: 0.85;
+    animation-timing-function: var(--ease-in-strong);
+  }
 
-  @keyframes enter {
-    from {
-      left: var(--from-left);
-      top: var(--from-top);
-    }
+  15% {
+    opacity: 1;
+  }
+
+  60% {
+    margin-top: 0;
+    scale: 1;
+    animation-timing-function: var(--ease-out-strong);
+  }
+
+  72% {
+    margin-top: 5px;
+    scale: 1.07 0.9;
+  }
+
+  86% {
+    margin-top: -3px;
+    scale: 0.98 1.03;
+  }
+}
+
+@keyframes card-bounce {
+  35% {
+    scale: 1.08;
+  }
+
+  70% {
+    scale: 0.97;
+  }
+}
+
+@keyframes card-fade {
+  40% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+    scale: 0.8;
+  }
+}
+
+@keyframes card-hit {
+  40% {
+    margin-top: 5px;
+  }
+}
+
+@keyframes mouse-wheel {
+  50% {
+    translate: 0 3px;
+    opacity: 0;
+  }
+}
+
+@utility wheel-motion {
+  & path {
+    animation: mouse-wheel var(--duration-scroll-hint) ease-in-out infinite;
   }
 }
 
 @utility card-motion {
   --move-ease: var(--ease-overshoot-sm);
-  --fade-duration: calc(var(--move-duration) * 0.5);
-  --fade-delay: var(--move-delay);
-  --scale-duration: var(--move-duration);
+  box-shadow: var(--shadow-hard);
   transition:
     left var(--move-duration) var(--move-ease) var(--move-delay),
     top var(--move-duration) var(--move-ease) var(--move-delay),
     rotate var(--move-duration) var(--move-ease) var(--move-delay),
-    scale var(--scale-duration) var(--move-ease) var(--move-delay),
-    opacity var(--fade-duration) linear var(--fade-delay),
-    margin-top 0.2s var(--ease-overshoot-lg),
-    background-color 0.15s ease;
+    scale var(--duration-short) linear var(--move-delay),
+    opacity var(--duration-short) linear var(--move-delay),
+    margin-top var(--duration-lift) var(--ease-overshoot-lg),
+    background-color var(--duration-short) ease;
 
-  &[data-ease="out"] {
-    --move-ease: var(--ease-out-strong);
+  &:not([data-folded]):is(:hover, :has(:focus-visible)) {
+    margin-top: -24px;
+  }
+
+  &:not([data-folded]):hover::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    height: 32px;
+  }
+
+  &[data-folded] {
+    box-shadow: var(--shadow-hard-sm);
+  }
+
+  &[data-ignore-pointer] {
+    pointer-events: none;
   }
 
   &[data-hidden] {
-    --fade-duration: calc(var(--move-duration) * 0.25);
-    --fade-delay: calc(var(--move-delay) + var(--move-duration) * 0.3);
+    --move-ease: var(--ease-out-strong);
     opacity: 0;
     scale: 0.85;
   }
 
-  &[data-scrolling] {
-    --fade-duration: 0.15s;
-    --fade-delay: 0s;
-    --scale-duration: 0.15s;
+  &[data-motion="enter"] {
+    animation: card-enter var(--move-duration) var(--ease-overshoot-md) var(--move-delay) backwards;
+  }
+
+  &[data-just-chosen]:not([data-folded], [data-added]) {
+    animation: card-bounce var(--duration-bounce) ease-in-out;
+  }
+
+  &[data-added] {
+    animation: card-drop var(--duration-drop) both;
+  }
+
+  &[data-other-added] {
+    animation: card-hit var(--duration-hit) var(--ease-out-strong) calc(var(--duration-drop) * 0.6);
+  }
+
+  &[data-removed] {
+    pointer-events: none;
+    animation: card-fade var(--duration-remove) var(--ease-out-strong) forwards;
   }
 }
 
 @utility pressable {
   box-shadow: var(--shadow-hard);
   transition:
-    translate 0.12s,
-    box-shadow 0.12s;
+    translate var(--duration-press),
+    box-shadow var(--duration-press);
 
   &:active:not(:disabled) {
     translate: 3px 3px;

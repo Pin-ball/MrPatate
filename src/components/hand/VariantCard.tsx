@@ -1,7 +1,7 @@
 import { VariantThumbnail } from '@src/components/character/VariantThumbnail.tsx'
 import { useLabel } from '@src/hooks/useLocale.ts'
 import type { Look, Part, Variant } from '@src/lib/catalog/types.ts'
-import type { CardLayout } from '@src/lib/hand.ts'
+import type { CardLayout } from '@src/lib/hand/cards.ts'
 import { cn } from '@src/lib/utils.ts'
 import { HandCard } from './HandCard.tsx'
 

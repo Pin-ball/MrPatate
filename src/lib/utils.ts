@@ -6,14 +6,6 @@ const twMerge = extendTailwindMerge({
   extend: {
     theme: {
       shadow: ['hard-sm', 'hard', 'hard-lg'],
-      ease: [
-        'overshoot-lg',
-        'overshoot-md',
-        'overshoot-sm',
-        'out-strong',
-        'in-out-strong',
-        'in-strong',
-      ],
     },
     classGroups: {
       'border-w': ['border-stroke'],

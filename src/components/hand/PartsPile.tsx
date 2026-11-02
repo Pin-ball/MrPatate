@@ -14,7 +14,7 @@ export function PartsPile() {
   const hand = useEditor((state) => state.hand)
   const look = useEditor((state) => state.look)
   const openPart = hand.kind === 'variants' ? hand.part : null
-  const pile = usePile('parts', COUNT, (COUNT - 1) / 2)
+  const pile = usePile('parts', { count: COUNT, startIndex: (COUNT - 1) / 2 })
   const { unfolded, state, layoutOf, rendered, reveal, spreadPile } = pile
 
   const onTop = (index: number, id: PartId) =>

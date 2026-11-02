@@ -1,5 +1,5 @@
-import type { Anchor } from '@src/lib/hand.ts'
-import { placeStyle } from '@src/lib/hand.ts'
+import type { Anchor } from '@src/lib/hand/geometry.ts'
+import { placeStyle } from '@src/lib/hand/geometry.ts'
 import type { LucideIcon } from 'lucide-react'
 import type { ComponentProps } from 'react'
 

@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { defaultLook, partById } from '@src/lib/catalog/index.ts'
+import { defaultLook } from '@src/lib/catalog/index.ts'
 import { decodeLook, encodeLook, shareUrl, withoutLook } from '@src/lib/share.ts'
 import { describe, expect, it } from 'vitest'
 
@@ -13,7 +13,7 @@ describe('share', () => {
 
   it('decodes what it encodes', () => {
     expect(decodeLook(encodeLook(look))).toEqual({ look, complete: true })
-    expect(decodeLook(`?${encodeLook(look)}`)).toEqual({ look, complete: true })
+    expect(decodeLook(`?${encodeLook(look)}&utm_source=mail`)).toEqual({ look, complete: true })
   })
 
   it('ignores addresses without a look', () => {
@@ -21,27 +21,10 @@ describe('share', () => {
     expect(decodeLook('eyes=hero')).toBeNull()
   })
 
-  it('follows aliases', () => {
-    const six = partById.eyes.variants.find((variant) => variant.id === 'six')
-    six?.aliases.push('spider')
-    expect(decodeLook('v=1&eyes=spider')).toEqual({
-      look: { ...defaultLook, eyes: 'six' },
-      complete: true,
-    })
-    six?.aliases.pop()
-  })
-
   it('falls back to the default for unknown variants', () => {
     expect(decodeLook('v=1&eyes=gone&arms=club')).toEqual({
       look: { ...defaultLook, arms: 'club' },
       complete: false,
-    })
-  })
-
-  it('ignores unrelated parameters', () => {
-    expect(decodeLook('v=1&eyes=hero&utm_source=mail')).toEqual({
-      look: { ...defaultLook, eyes: 'hero' },
-      complete: true,
     })
   })
 

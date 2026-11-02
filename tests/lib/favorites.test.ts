@@ -36,9 +36,6 @@ describe('readFavorites', () => {
       ],
     })
     expect(favorites).toEqual([{ id: 'a', createdAt: 1, name: 'Pierre', look: sixEyes }])
-  })
-
-  it('reads nothing from an empty or broken save', () => {
     expect(readFavorites(null)).toEqual([])
     expect(readFavorites({ favorites: 'junk' })).toEqual([])
   })

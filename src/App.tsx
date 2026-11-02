@@ -8,6 +8,7 @@ import { Toaster } from '@src/components/Toaster.tsx'
 import { useCloseHandOnEscape } from '@src/hooks/useCloseHandOnEscape.ts'
 import { useSharedLink } from '@src/hooks/useSharedLink.ts'
 import { backgroundOf } from '@src/lib/catalog/layers.ts'
+import { MOTION_VARIABLES } from '@src/lib/motion.ts'
 import { useShownLook } from '@src/stores/editor.ts'
 
 export function App() {
@@ -17,6 +18,7 @@ export function App() {
 
   return (
     <main
+      style={MOTION_VARIABLES}
       data-backdrop={background.dark ? 'dark' : 'light'}
       className="relative flex h-dvh flex-col overflow-hidden pb-[90px]"
     >

@@ -37,23 +37,21 @@ describe('editor', () => {
     expect(state().look.eyes).toBe('six')
   })
 
-  it('records nothing when the look does not change', () => {
+  it('records only looks that change, never the preview or the open hand', () => {
     setVariant('eyes', defaultLook.eyes)
     setLook({ ...defaultLook })
-    setHand({ kind: 'parts' })
-    expect(history().pastStates).toHaveLength(0)
-  })
-
-  it('keeps the preview and the open hand out of the history', () => {
     setPreview({ eyes: 'six' })
     setHand({ kind: 'variants', part: 'eyes' })
     expect(history().pastStates).toHaveLength(0)
     expect(state().look).toEqual(defaultLook)
   })
 
-  it('drops the preview once a look is chosen', () => {
+  it('drops the preview once a look is chosen or the hand changes', () => {
     setPreview({ eyes: 'six' })
     setVariant('mouth', 'sad')
+    expect(state().preview).toBeNull()
+    setPreview({ eyes: 'six' })
+    setHand({ kind: 'parts' })
     expect(state().preview).toBeNull()
   })
 
@@ -90,13 +88,6 @@ describe('editor', () => {
     await useEditor.persist.rehydrate()
     expect(state().look).toEqual({ ...defaultLook, eyes: 'six' })
     expect(history().pastStates).toHaveLength(0)
-  })
-
-  it('drops the preview when the hand changes', () => {
-    setHand({ kind: 'variants', part: 'eyes' })
-    setPreview({ eyes: 'six' })
-    closeHand()
-    expect(state().preview).toBeNull()
   })
 
   it('closes a hand of variants back to the parts, any other hand entirely', () => {

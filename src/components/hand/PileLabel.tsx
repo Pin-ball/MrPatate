@@ -1,4 +1,4 @@
-import type { Anchor } from '@src/lib/hand.ts'
+import type { Anchor } from '@src/lib/hand/geometry.ts'
 import { Appear } from '@src/ui/Appear.tsx'
 
 const BELOW_PILE_CENTER = 90

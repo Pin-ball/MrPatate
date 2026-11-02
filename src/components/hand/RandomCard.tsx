@@ -1,4 +1,4 @@
-import type { CardLayout } from '@src/lib/hand.ts'
+import type { CardLayout } from '@src/lib/hand/cards.ts'
 import { Dices } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { HandCard } from './HandCard.tsx'

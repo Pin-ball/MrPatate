@@ -1,7 +1,9 @@
+import { useCardEvents } from '@src/hooks/useCardEvents.ts'
 import { useFavoriteActions } from '@src/hooks/useFavoriteActions.ts'
 import { usePile } from '@src/hooks/usePile.ts'
+import { lookEquals } from '@src/lib/catalog/look.ts'
 import { allFavorites, builtInFavorites, DEFAULT_FAVORITE_ID } from '@src/lib/favorites.ts'
-import { setHand, setPreview } from '@src/stores/editor.ts'
+import { setHand, setPreview, useEditor } from '@src/stores/editor.ts'
 import { useFavorites } from '@src/stores/favorites.ts'
 import { Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -12,13 +14,14 @@ import { Pile } from './Pile.tsx'
 export function FavoritesPile() {
   const { t } = useTranslation()
   const favorites = allFavorites(useFavorites((state) => state.favorites))
+  const look = useEditor((state) => state.look)
   const { currentFavorite, add, remove, apply } = useFavoriteActions()
+  const { cards, chosenIndex, events } = useCardEvents(favorites, {
+    chosenId: currentFavorite?.id,
+    firstIndex: 1,
+  })
   const count = favorites.length + 1
-  const pile = usePile(
-    'favorites',
-    count,
-    currentFavorite ? favorites.indexOf(currentFavorite) + 1 : 0,
-  )
+  const pile = usePile('favorites', { count, startIndex: chosenIndex, events })
   const { unfolded, layoutOf, rendered, reveal, spreadPile } = pile
 
   const unfold = () => {
@@ -45,23 +48,27 @@ export function FavoritesPile() {
           }}
         />
       )}
-      {favorites.map((favorite, index) => {
-        if (!rendered(index + 1)) return null
-        const selected = favorite === currentFavorite
+      {cards.map(({ item: favorite, index }) => {
+        if (!rendered(index)) return null
+        const selected = lookEquals(favorite.look, look)
         const preview = () => setPreview(selected ? null : favorite.look)
         return (
           <FavoriteCard
             key={favorite.id}
             favorite={favorite}
-            number={index + 1}
+            number={index}
             selected={selected}
             isDefault={favorite.id === DEFAULT_FAVORITE_ID}
             removable={!builtInFavorites.includes(favorite)}
-            layout={layoutOf(index + 1, { zIndex: count - index, top: index === 0 })}
+            layout={layoutOf(index, {
+              zIndex: count - index + 1,
+              top: index === 1,
+              id: favorite.id,
+            })}
             onClick={unfolded ? () => apply(favorite) : unfold}
             onPointerEnter={unfolded ? preview : spreadPile}
             onFocus={() => {
-              reveal(index + 1)
+              reveal(index)
               preview()
             }}
             onRemove={() => remove(favorite)}

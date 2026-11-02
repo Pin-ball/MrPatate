@@ -1,7 +1,7 @@
 import { CharacterImage } from '@src/components/character/CharacterImage.tsx'
 import { frameView } from '@src/lib/catalog/camera.ts'
 import type { Favorite } from '@src/lib/favorites.ts'
-import type { CardLayout } from '@src/lib/hand.ts'
+import type { CardLayout } from '@src/lib/hand/cards.ts'
 import { cn } from '@src/lib/utils.ts'
 import { useTranslation } from 'react-i18next'
 import { HandCard } from './HandCard.tsx'
@@ -49,13 +49,13 @@ export function FavoriteCard({
       onFocus={onFocus}
       corner={
         removable &&
-        !layout.folded && (
+        !layout.state.folded && (
           <button
             type="button"
             aria-label={t('favorites.remove', { n: number })}
             onClick={onRemove}
             onFocus={onFocus}
-            className="border-foreground bg-card hover:bg-primary absolute -top-[11px] -right-[11px] flex size-7 cursor-pointer items-center justify-center rounded-full border-2 text-[13px] font-bold opacity-0 transition-[opacity,background-color] duration-150 group-hover:opacity-100 focus-visible:opacity-100"
+            className="border-foreground bg-card hover:bg-primary absolute -top-[11px] -right-[11px] flex size-7 cursor-pointer items-center justify-center rounded-full border-2 text-[13px] font-bold opacity-0 transition-[opacity,background-color] duration-(--duration-short) group-hover:opacity-100 focus-visible:opacity-100"
           >
             ✕
           </button>

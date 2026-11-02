@@ -5,7 +5,7 @@ import { SvgNodes } from './SvgNodes.tsx'
 const hasRole = (layer: Layer, role: string) =>
   layer.nodes.some((node) => node.attrs['data-role'] === role)
 
-function PartLayer({ layer, skin }: { layer: Layer; skin: SkinPaint }) {
+export function PartLayer({ layer, skin }: { layer: Layer; skin: SkinPaint }) {
   const clipId = useSvgId('skin')
   const shadowClip = hasRole(layer, 'skin') && hasRole(layer, 'shadow') ? clipId : undefined
 

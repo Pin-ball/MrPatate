@@ -13,7 +13,7 @@ const buttonVariants = cva(
         secondary:
           'border-stroke bg-secondary text-secondary-foreground pressable h-11 rounded-full px-4 text-sm',
         ghost:
-          'hover:bg-background justify-start rounded-sm px-3 py-2.5 text-sm transition-colors duration-150 focus-visible:outline-offset-2',
+          'hover:bg-background justify-start rounded-sm px-3 py-2.5 text-sm transition-colors duration-(--duration-short) focus-visible:outline-offset-2',
       },
     },
     defaultVariants: { variant: 'secondary' },

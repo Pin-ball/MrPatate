@@ -2,7 +2,7 @@ import { VariantThumbnail } from '@src/components/character/VariantThumbnail.tsx
 import { useLabel } from '@src/hooks/useLocale.ts'
 import { findVariant, visibleVariants } from '@src/lib/catalog/index.ts'
 import type { Look, Part } from '@src/lib/catalog/types.ts'
-import type { CardLayout } from '@src/lib/hand.ts'
+import type { CardLayout } from '@src/lib/hand/cards.ts'
 import { useTranslation } from 'react-i18next'
 import { HandCard } from './HandCard.tsx'
 

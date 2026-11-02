@@ -1,8 +1,9 @@
 import { useHandScroll } from '@src/hooks/useHandScroll.ts'
 import { useMoving } from '@src/hooks/useMoving.ts'
 import { useWindowWidth } from '@src/hooks/useWindowWidth.ts'
-import type { HandState } from '@src/lib/hand.ts'
-import { openDuration, visibleSlots } from '@src/lib/hand.ts'
+import { openDuration } from '@src/lib/hand/cards.ts'
+import type { HandState } from '@src/lib/hand/geometry.ts'
+import { visibleSlots } from '@src/lib/hand/geometry.ts'
 import { setPreview } from '@src/stores/editor.ts'
 import type { FocusEvent } from 'react'
 import { useState } from 'react'
@@ -33,11 +34,16 @@ export function useHand({
     open ? openDuration(unfoldDuration, slots) : foldDuration,
     open,
   )
-  const { offset, start, scrolling, reveal, handlers } = useHandScroll(count, slots, startIndex, {
-    open,
-    resetKey,
-  })
-  const state: HandState = { offset, slots, unfolded: open, moving, scrolling }
+  const { offset, start, scrolling, scrolled, reveal, handlers } = useHandScroll(
+    count,
+    slots,
+    startIndex,
+    {
+      open,
+      resetKey,
+    },
+  )
+  const state: HandState = { offset, slots, unfolded: open, moving, scrolling, scrolled }
 
   const onPointerLeave = () => {
     setPreview(null)

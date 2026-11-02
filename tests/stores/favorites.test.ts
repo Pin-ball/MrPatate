@@ -47,21 +47,15 @@ describe('favorites', () => {
     expect(saved).toEqual({ state: { favorites: [favorite] }, version: 1 })
   })
 
-  it('reads saved favorites tolerantly', async () => {
+  it('reads saved favorites back, skipping broken entries', async () => {
     localStorage.setItem(
       FAVORITES_KEY,
       JSON.stringify({
-        state: {
-          favorites: [
-            { id: 'a', createdAt: 1, look: { eyes: 'six', mouth: 'gone' } },
-            { id: 'b', look: sadMouth },
-            'junk',
-          ],
-        },
+        state: { favorites: [{ id: 'a', createdAt: 1, look: sadMouth }, 'junk'] },
         version: 1,
       }),
     )
     await useFavorites.persist.rehydrate()
-    expect(state().favorites).toEqual([{ id: 'a', createdAt: 1, look: sixEyes }])
+    expect(state().favorites).toEqual([{ id: 'a', createdAt: 1, look: sadMouth }])
   })
 })

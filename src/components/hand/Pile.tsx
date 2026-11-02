@@ -1,11 +1,12 @@
 import type { usePile } from '@src/hooks/usePile.ts'
-import { PILE_ANCHORS } from '@src/lib/hand.ts'
+import { PILE_ANCHORS } from '@src/lib/hand/geometry.ts'
 import { setHand } from '@src/stores/editor.ts'
 import type { LucideIcon } from 'lucide-react'
 import { AnimatePresence } from 'motion/react'
 import type { ReactNode } from 'react'
 import { HiddenCards } from './HiddenCards.tsx'
 import { PileLabel } from './PileLabel.tsx'
+import { ScrollHint } from './ScrollHint.tsx'
 import { Slot } from './Slot.tsx'
 
 type PileProps = {
@@ -40,13 +41,8 @@ export function Pile({
       </AnimatePresence>
       <nav aria-label={label} className="isolate" {...handlers}>
         {children}
-        <HiddenCards
-          shown={unfolded}
-          opening={state.moving}
-          offset={state.offset}
-          count={count}
-          slots={state.slots}
-        />
+        <HiddenCards state={state} count={count} />
+        <ScrollHint state={state} count={count} />
       </nav>
     </>
   )

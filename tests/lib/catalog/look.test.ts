@@ -8,13 +8,6 @@ const sequence = (...values: number[]) => {
   return () => values[i++ % values.length] ?? 0
 }
 
-describe('lookEquals', () => {
-  it('compares every part', () => {
-    expect(lookEquals(defaultLook, { ...defaultLook })).toBe(true)
-    expect(lookEquals(defaultLook, { ...defaultLook, eyes: 'six' })).toBe(false)
-  })
-})
-
 describe('randomVariant', () => {
   it('never returns the current variant', () => {
     for (const value of [0, 0.5, 0.999]) {

@@ -1,45 +1,60 @@
+import type { HandEvents } from '@src/hooks/useCardEvents.ts'
 import { useHand } from '@src/hooks/useHand.ts'
-import type { CardLayout, PileKind } from '@src/lib/hand.ts'
+import type { CardLayout } from '@src/lib/hand/cards.ts'
+import { arcCardLayout, MOTION_DURATIONS, moveMotion, withState } from '@src/lib/hand/cards.ts'
+import type { PileKind } from '@src/lib/hand/geometry.ts'
 import {
-  arcCardLayout,
   isRendered,
-  MOVE_DURATION,
   PILE_ANCHORS,
-  pileMoveDuration,
+  PILE_SIDES,
   pilePlace,
   placeStyle,
-} from '@src/lib/hand.ts'
+} from '@src/lib/hand/geometry.ts'
 import { useEditor } from '@src/stores/editor.ts'
+import { useState } from 'react'
 
-type PileCard = { zIndex: number; top: boolean; tilted?: boolean }
+type PileOptions = { count: number; startIndex: number; events?: HandEvents }
 
-const SIDES: Record<PileKind, 'left' | 'right'> = { parts: 'left', favorites: 'right' }
+type PileCard = { zIndex: number; top: boolean; tilted?: boolean; id?: string }
 
-export function usePile(kind: PileKind, count: number, startIndex: number) {
+export function usePile(kind: PileKind, { count, startIndex, events }: PileOptions) {
   const unfolded = useEditor((state) => state.hand.kind === kind)
   const { state, reveal, spread, spreadPile, handlers } = useHand({
     count,
     open: unfolded,
     resetKey: unfolded,
     startIndex,
-    unfoldDuration: MOVE_DURATION,
+    unfoldDuration: MOTION_DURATIONS.move,
   })
   const pileSize = Math.min(count, state.slots)
 
-  const layoutOf = (index: number, { zIndex, top, tilted = false }: PileCard): CardLayout => {
-    if (unfolded) return arcCardLayout(index, state, SIDES[kind])
+  const added = events?.added ?? null
+  const addedId = added?.id ?? null
+  const [revealed, setRevealed] = useState<string | null>(null)
+  if (addedId !== revealed && (unfolded || !added)) {
+    setRevealed(addedId)
+    if (added) reveal(added.index)
+  }
+
+  const layoutOf = (index: number, { zIndex, top, tilted = false, id }: PileCard): CardLayout => {
+    const facts = events?.eventsOf(id) ?? {}
+    if (unfolded) return withState(arcCardLayout(index, state, PILE_SIDES[kind]), facts)
     const place = pilePlace(Math.min(index, pileSize - 1), pileSize, {
-      mirror: kind === 'favorites',
+      mirror: PILE_SIDES[kind] === 'right',
       spread,
       top,
       tilted,
     })
-    return {
-      place: { ...placeStyle(PILE_ANCHORS[kind], place), zIndex },
-      folded: true,
-      ignorePointer: state.moving,
-      moveDuration: pileMoveDuration(index, state),
-    }
+    return withState(
+      {
+        place: {
+          ...placeStyle(PILE_ANCHORS[kind], place),
+          zIndex: facts.removed ? count + 1 : zIndex,
+        },
+        state: { motion: moveMotion(index, state), folded: true, ignorePointer: state.moving },
+      },
+      facts,
+    )
   }
 
   return {

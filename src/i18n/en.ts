@@ -28,6 +28,9 @@ export const en = {
     fold: 'Fold the Parts back into their slot',
     card: '{{part}}: {{variant}}, {{count}} variants',
   },
+  hand: {
+    scroll_hint: 'Scroll or drag to see more',
+  },
   variants: {
     label: 'Variants: {{part}}',
     random: 'Random variant',

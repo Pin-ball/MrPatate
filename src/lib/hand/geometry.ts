@@ -6,21 +6,7 @@ type Arc = { radius: number; centerBelow: number; step: number }
 
 export type Anchor = { left: string; bottom: number }
 
-type PileOptions = { mirror?: boolean; spread?: boolean; top?: boolean; tilted?: boolean }
-
-type MoveEase = 'overshoot' | 'out'
-
-export type CardLayout = {
-  place: CSSProperties
-  folded?: boolean
-  ignorePointer: boolean
-  moveDuration?: number
-  moveDelay?: number
-  ease?: MoveEase
-  hidden?: boolean
-  scrolling?: boolean
-  enter?: CSSProperties
-}
+type PilePlaceOptions = { mirror?: boolean; spread?: boolean; top?: boolean; tilted?: boolean }
 
 export type HandState = {
   offset: number
@@ -28,7 +14,12 @@ export type HandState = {
   unfolded: boolean
   moving: boolean
   scrolling: boolean
+  scrolled: boolean
 }
+
+export type PileKind = 'parts' | 'favorites'
+
+export type PileSide = 'left' | 'right'
 
 const CENTER: Place = { x: 0, y: 0, rotate: 0 }
 
@@ -37,7 +28,8 @@ export const CARD_HEIGHT = 136
 
 const PILE_INSET = 160
 const PILE_GAP = 32
-export type PileKind = 'parts' | 'favorites'
+
+export const PILE_SIDES: Record<PileKind, PileSide> = { parts: 'left', favorites: 'right' }
 
 export const PILE_ANCHORS: Record<PileKind, Anchor> = {
   parts: { left: `${PILE_INSET}px`, bottom: 155 },
@@ -52,12 +44,10 @@ const BELOW_SCREEN = 140
 
 const RENDERED_MARGIN = 2
 
+const SCROLL_HINT_ABOVE = 120
+
 const HIDDEN_COUNT_BEYOND = 1.45
 const HIDDEN_COUNT_HALF_WIDTH = 17
-
-export const MOVE_DURATION = 550
-const ENTER_STAGGER = 45
-export const SHORT_MOVE_DURATION = 300
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
@@ -86,6 +76,10 @@ function hiddenCountPlace(side: 'before' | 'after', slots: number): Place {
 
 export function hiddenCountStyle(side: 'before' | 'after', slots: number) {
   return placeStyle(ARC_ANCHOR, hiddenCountPlace(side, slots))
+}
+
+export function scrollHintStyle() {
+  return placeStyle(ARC_ANCHOR, { x: 0, y: -SCROLL_HINT_ABOVE, rotate: 0 })
 }
 
 function outerReach(slots: number, withCounts: boolean): number {
@@ -122,10 +116,6 @@ export function hiddenCounts(offset: number, count: number, slots: number) {
   return { before, after: count - slots - before }
 }
 
-function nearestSlot(slot: number, slots: number): number {
-  return clamp(Math.round(slot), 0, slots - 1)
-}
-
 export function isInWindow(
   index: number,
   { offset, slots }: HandState,
@@ -142,72 +132,18 @@ export function isRendered(index: number, state: HandState) {
   return unfolded ? inWindow || (moving && inPile) : inPile || (moving && inWindow)
 }
 
-function isShown(slot: number, slots: number): boolean {
+export function nearestSlot(slot: number, slots: number): number {
+  return clamp(Math.round(slot), 0, slots - 1)
+}
+
+export function isShown(slot: number, slots: number): boolean {
   return Math.round(slot) === nearestSlot(slot, slots)
-}
-
-function openDelay(slot: number, slots: number, pileSide: 'left' | 'right'): number {
-  const fromLeft = nearestSlot(slot, slots)
-  return (pileSide === 'left' ? slots - 1 - fromLeft : fromLeft) * ENTER_STAGGER
-}
-
-function cardMoveDuration(shown: boolean, moving: boolean, scrolling: boolean): number {
-  if (scrolling || (moving && !shown)) return 0
-  return MOVE_DURATION
-}
-
-export function arcCardLayout(
-  index: number,
-  { offset, slots, unfolded, moving, scrolling }: HandState,
-  pileSide?: 'left' | 'right',
-): CardLayout {
-  const slot = index - offset
-  const shown = isShown(slot, slots)
-  const place = {
-    ...(shown ? arcStyle(slot, slots) : beyondArcStyle(slot, slots)),
-    zIndex: index + 1,
-  }
-  if (!unfolded) {
-    return {
-      place,
-      hidden: true,
-      ignorePointer: true,
-      moveDuration: SHORT_MOVE_DURATION,
-      ease: 'out',
-    }
-  }
-  return {
-    place,
-    hidden: !shown,
-    ignorePointer: moving || !shown,
-    moveDelay: moving && shown && pileSide ? openDelay(slot, slots, pileSide) : 0,
-    moveDuration: cardMoveDuration(shown, moving, scrolling),
-    ease: shown ? 'overshoot' : 'out',
-    scrolling,
-  }
-}
-
-export function pileMoveDuration(index: number, { offset, slots, moving }: HandState) {
-  return cardMoveDuration(isShown(index - offset, slots), moving, false)
-}
-
-export function enterStyle(index: number, start: number, slots: number) {
-  const { left, top } = belowArcStyle(index - start, slots)
-  return {
-    '--from-left': left,
-    '--from-top': top,
-    animationDelay: `${nearestSlot(index - start, slots) * ENTER_STAGGER}ms`,
-  }
-}
-
-export function openDuration(duration: number, slots: number): number {
-  return duration + (slots - 1) * ENTER_STAGGER
 }
 
 export function pilePlace(
   index: number,
   count: number,
-  { mirror = false, spread = false, top = false, tilted = false }: PileOptions = {},
+  { mirror = false, spread = false, top = false, tilted = false }: PilePlaceOptions = {},
 ): Place {
   const side = mirror ? -1 : 1
   const gap = spread ? 9 : 3
@@ -226,15 +162,15 @@ export function placeStyle({ left, bottom }: Anchor, { x, y, rotate }: Place = C
   }
 }
 
-function arcStyle(slot: number, slots: number) {
+export function arcStyle(slot: number, slots: number): CSSProperties {
   return placeStyle(ARC_ANCHOR, arcPlace(slot, slots))
 }
 
-function beyondArcStyle(slot: number, slots: number) {
+export function beyondArcStyle(slot: number, slots: number): CSSProperties {
   return arcStyle(clamp(slot, -1, slots), slots)
 }
 
-function belowArcStyle(slot: number, slots: number) {
+export function belowArcStyle(slot: number, slots: number) {
   const { x, rotate } = arcPlace(nearestSlot(slot, slots), slots)
   return placeStyle(ARC_ANCHOR, { x, y: BELOW_SCREEN, rotate })
 }
