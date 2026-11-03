@@ -14,13 +14,14 @@ import { useShownLook } from '@src/stores/editor.ts'
 export function App() {
   useSharedLink()
   useCloseHandOnEscape()
-  const background = backgroundOf(useShownLook())
+  const look = useShownLook()
+  const background = backgroundOf(look)
 
   return (
     <main
       style={MOTION_VARIABLES}
-      data-backdrop={background.dark ? 'dark' : 'light'}
-      className="relative flex h-dvh flex-col overflow-hidden"
+      data-background={background.dark ? 'dark' : 'light'}
+      className="relative flex h-dvh flex-col overflow-hidden pt-(--safe-top) pb-(--safe-bottom)"
     >
       <Background paint={background} />
       <Header />

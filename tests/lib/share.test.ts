@@ -1,9 +1,10 @@
 // @vitest-environment happy-dom
 import { defaultLook } from '@src/lib/catalog/index.ts'
+import type { Look } from '@src/lib/catalog/types.ts'
 import { decodeLook, encodeLook, shareUrl, withoutLook } from '@src/lib/share.ts'
 import { describe, expect, it } from 'vitest'
 
-const look = { ...defaultLook, eyes: 'hero', arms: 'club' } as const
+const look: Look = { ...defaultLook, eyes: 'hero', arms: 'club' }
 
 describe('share', () => {
   it('encodes only what differs from the default look', () => {

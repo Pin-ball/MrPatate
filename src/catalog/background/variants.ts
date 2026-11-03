@@ -99,33 +99,6 @@ export default [
     },
   },
   {
-    id: 'curtain',
-    label: {
-      fr: 'Rideau',
-      en: 'Curtain',
-    },
-    fill: '#A3222E',
-    dark: true,
-    pattern: {
-      width: 52,
-      height: 52,
-      svg: '<rect width="26" height="52" fill="#861A25"/>',
-    },
-  },
-  {
-    id: 'clouds',
-    label: {
-      fr: 'Nuages',
-      en: 'Clouds',
-    },
-    fill: '#CFE8FF',
-    pattern: {
-      width: 180,
-      height: 120,
-      svg: '<g fill="#FFFFFF"><circle cx="34" cy="36" r="13"/><circle cx="50" cy="28" r="17"/><circle cx="68" cy="37" r="12"/><rect x="24" y="36" width="54" height="13" rx="6.5"/></g><g fill="#FFFFFF" fill-opacity="0.8"><circle cx="116" cy="88" r="10"/><circle cx="130" cy="81" r="14"/><circle cx="145" cy="89" r="9"/><rect x="108" y="88" width="45" height="10" rx="5"/></g>',
-    },
-  },
-  {
     id: 'checkers',
     label: {
       fr: 'Damier',

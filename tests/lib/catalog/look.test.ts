@@ -1,9 +1,9 @@
 // @vitest-environment happy-dom
 import { defaultLook, partById, partIds, visibleVariants } from '@src/lib/catalog/index.ts'
-import { lookEquals, randomLook, randomVariant, readLook } from '@src/lib/catalog/look.ts'
+import { lookEquals, randomLook, randomVariantId, readLook } from '@src/lib/catalog/look.ts'
 import { describe, expect, it } from 'vitest'
 
-const sequence = (...values: number[]) => {
+function sequence(...values: number[]) {
   let i = 0
   return () => values[i++ % values.length] ?? 0
 }
@@ -11,17 +11,17 @@ const sequence = (...values: number[]) => {
 describe('randomVariant', () => {
   it('never returns the current variant', () => {
     for (const value of [0, 0.5, 0.999]) {
-      expect(randomVariant(partById.arms, 'basic', () => value)).toBe('club')
+      expect(randomVariantId(partById.arms, 'basic', () => value)).toBe('club')
     }
   })
 
   it('keeps the variant when there is no other choice', () => {
-    expect(randomVariant(partById.body, 'basic')).toBe('basic')
+    expect(randomVariantId(partById.body, 'basic')).toBe('basic')
   })
 
   it('never picks a hidden variant', () => {
     const picks = [0, 0.25, 0.5, 0.75, 0.999].map((value) =>
-      randomVariant(partById.background, 'cream', () => value),
+      randomVariantId(partById.background, 'cream', () => value),
     )
     expect(picks).not.toContain('mountain')
   })

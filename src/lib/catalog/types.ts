@@ -14,10 +14,10 @@ export type SvgNode = {
   children: SvgNode[]
 }
 
-export type Plane = {
+export type Plane<Id extends string = PartId> = {
   id: string
   depth: number
-  parts: PartId[]
+  parts: Id[]
 }
 
 export type Camera = {
@@ -25,7 +25,7 @@ export type Camera = {
   focus: [x: number, y: number]
 }
 
-export type Pattern = {
+type Pattern = {
   width: number
   height: number
   transform: string | null
@@ -33,7 +33,7 @@ export type Pattern = {
 }
 
 export type Paint =
-  | { kind: 'skin'; skin: string; shadow: string }
+  | { kind: 'skin'; color: string; shadow: string }
   | { kind: 'background'; fill: string; pattern: Pattern | null; dark: boolean }
 
 export type VariantConfig = {
@@ -66,18 +66,18 @@ export type Variant = {
   paint: Paint | null
 }
 
-export type Part = {
-  id: PartId
+export type Part<Id extends string = PartId> = {
+  id: Id
   label: Label
   camera: Camera | null
   variants: Variant[]
 }
 
-type CodedVariantIds<P extends PartId> = P extends keyof CodedIds ? CodedIds[P] : never
+type CodedIdsOf<P extends PartId> = P extends keyof CodedIds ? CodedIds[P] : never
 
-type DrawnIds<P extends PartId> = P extends keyof DrawingIds ? DrawingIds[P] : never
+type DrawingIdsOf<P extends PartId> = P extends keyof DrawingIds ? DrawingIds[P] : never
 
-export type VariantId<P extends PartId = PartId> = CodedVariantIds<P> | DrawnIds<P>
+export type VariantId<P extends PartId = PartId> = CodedIdsOf<P> | DrawingIdsOf<P>
 
 export type Look = { [P in PartId]: VariantId<P> }
 

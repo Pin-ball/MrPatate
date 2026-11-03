@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
+import { characterSvg } from '@src/components/character/export.ts'
 import { defaultLook } from '@src/lib/catalog/index.ts'
-import { characterSvg } from '@src/lib/export.ts'
 import { describe, expect, it } from 'vitest'
 
 describe('characterSvg', () => {

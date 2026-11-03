@@ -1,15 +1,15 @@
 @layer components {
-  .character-stage {
+  .character-perspective {
     --perspective: 1000;
     --tilt-x: 10deg;
     --tilt-y: 6deg;
-    --shade: 1.5;
-    --gaze: 3;
+    --shadow-shift: 1.5;
+    --pupil-shift: 3;
     position: relative;
     perspective: calc(var(--perspective) * 1px);
   }
 
-  .character-scene {
+  .character-tilt {
     position: absolute;
     inset: 0;
     transform-style: preserve-3d;
@@ -30,16 +30,16 @@
 
   .character-plane [data-role="shadow"] {
     transform: translate(
-      calc(var(--pointer-x, 0) * var(--shade) * -1px),
-      calc(var(--pointer-y, 0) * var(--shade) * -1px)
+      calc(var(--pointer-x, 0) * var(--shadow-shift) * -1px),
+      calc(var(--pointer-y, 0) * var(--shadow-shift) * -1px)
     );
     transition: transform var(--duration-parallax) var(--ease-out-strong);
   }
 
   .character-plane [data-role="eye-pupil"] {
     transform: translate(
-      calc(var(--pointer-x, 0) * var(--gaze) * 1px),
-      calc(var(--pointer-y, 0) * var(--gaze) * 1px)
+      calc(var(--pointer-x, 0) * var(--pupil-shift) * 1px),
+      calc(var(--pointer-y, 0) * var(--pupil-shift) * 1px)
     );
     transition: transform var(--duration-parallax) var(--ease-out-strong);
   }

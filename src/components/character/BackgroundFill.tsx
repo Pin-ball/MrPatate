@@ -7,12 +7,12 @@ type Area = Pick<SVGProps<SVGRectElement>, 'x' | 'y' | 'width' | 'height'>
 
 const WHOLE_AREA: Area = { x: 0, y: 0, width: '100%', height: '100%' }
 
-type BackdropProps = {
+type BackgroundFillProps = {
   paint: BackgroundPaint
   area?: Area
 }
 
-export function Backdrop({ paint, area = WHOLE_AREA }: BackdropProps) {
+export function BackgroundFill({ paint, area = WHOLE_AREA }: BackgroundFillProps) {
   const patternId = useSvgId('pattern')
   const { pattern } = paint
 

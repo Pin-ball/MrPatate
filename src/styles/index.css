@@ -3,9 +3,12 @@
 @import "@fontsource-variable/space-grotesk";
 
 @custom-variant dark (&:is(.dark *));
-@custom-variant on-dark (&:is([data-backdrop="dark"] *));
+@custom-variant on-dark (&:is([data-background="dark"] *));
+@custom-variant desktop (@media (min-width: 1024px) and (min-height: 600px));
 
 :root {
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
   --radius: 16px;
   --stroke: 2.5px;
 
@@ -149,30 +152,32 @@
 }
 
 @utility card-motion {
-  --move-ease: var(--ease-overshoot-sm);
+  --card-ease: var(--ease-overshoot-sm);
   box-shadow: var(--shadow-hard);
   transition:
-    left var(--move-duration) var(--move-ease) var(--move-delay),
-    top var(--move-duration) var(--move-ease) var(--move-delay),
-    rotate var(--move-duration) var(--move-ease) var(--move-delay),
-    scale var(--duration-short) linear var(--move-delay),
-    opacity var(--duration-short) linear var(--move-delay),
+    left var(--card-duration) var(--card-ease) var(--card-delay),
+    top var(--card-duration) var(--card-ease) var(--card-delay),
+    rotate var(--card-duration) var(--card-ease) var(--card-delay),
+    scale var(--duration-short) linear var(--card-delay),
+    opacity var(--duration-short) linear var(--opacity-delay, var(--card-delay)),
     margin-top var(--duration-lift) var(--ease-overshoot-lg),
     background-color var(--duration-short) ease;
 
-  &:not([data-folded]):is(:hover, :has(:focus-visible)) {
-    margin-top: -24px;
+  @variant desktop {
+    &:not([data-in-pile]):is(:hover, :has(:focus-visible)) {
+      margin-top: -24px;
+    }
+
+    &:not([data-in-pile]):hover::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 100%;
+      height: 32px;
+    }
   }
 
-  &:not([data-folded]):hover::after {
-    content: "";
-    position: absolute;
-    inset-inline: 0;
-    top: 100%;
-    height: 32px;
-  }
-
-  &[data-folded] {
+  &[data-in-pile] {
     box-shadow: var(--shadow-hard-sm);
   }
 
@@ -181,16 +186,21 @@
   }
 
   &[data-hidden] {
-    --move-ease: var(--ease-out-strong);
+    --card-ease: var(--ease-out-strong);
     opacity: 0;
     scale: 0.85;
   }
 
-  &[data-motion="enter"] {
-    animation: card-enter var(--move-duration) var(--ease-overshoot-md) var(--move-delay) backwards;
+  &[data-partial] {
+    --opacity-delay: calc(var(--card-delay) + var(--card-duration) / 2);
+    opacity: 0.5;
   }
 
-  &[data-just-chosen]:not([data-folded], [data-added]) {
+  &[data-motion="enter"] {
+    animation: card-enter var(--card-duration) var(--ease-overshoot-md) var(--card-delay) backwards;
+  }
+
+  &[data-just-chosen]:not([data-in-pile], [data-added]) {
     animation: card-bounce var(--duration-bounce) ease-in-out;
   }
 

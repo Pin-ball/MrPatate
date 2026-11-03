@@ -28,7 +28,7 @@ export function PartCard({
   onFocus,
 }: PartCardProps) {
   const { t } = useTranslation()
-  const label = useLabel()
+  const labelOf = useLabel()
   const variant = findVariant(part, look[part.id])
   if (!variant) return null
   const count = visibleVariants(part).length
@@ -36,7 +36,7 @@ export function PartCard({
   return (
     <HandCard
       layout={layout}
-      aria-label={t('parts.card', { part: label(part), variant: label(variant), count })}
+      aria-label={t('parts.card', { part: labelOf(part), variant: labelOf(variant), count })}
       aria-expanded={open}
       onClick={onClick}
       onPointerEnter={onPointerEnter}
@@ -54,8 +54,10 @@ export function PartCard({
     >
       <VariantThumbnail look={look} part={part} variant={variant} />
       <span className="flex w-full flex-col gap-0.5">
-        <span className="text-[10px] font-bold tracking-[0.08em] uppercase">{label(part)}</span>
-        <span className="text-muted-foreground truncate text-xs font-medium">{label(variant)}</span>
+        <span className="text-[10px] font-bold tracking-[0.08em] uppercase">{labelOf(part)}</span>
+        <span className="text-muted-foreground truncate text-xs font-medium">
+          {labelOf(variant)}
+        </span>
       </span>
     </HandCard>
   )

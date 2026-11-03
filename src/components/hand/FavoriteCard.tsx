@@ -13,8 +13,8 @@ const PORTRAIT_VIEW = frameView(PORTRAIT_ZOOM, PORTRAIT_HEIGHT / PORTRAIT_WIDTH)
 
 type FavoriteCardProps = {
   favorite: Favorite
-  number: number
-  selected: boolean
+  position: number
+  chosen: boolean
   isDefault: boolean
   removable: boolean
   layout: CardLayout
@@ -26,8 +26,8 @@ type FavoriteCardProps = {
 
 export function FavoriteCard({
   favorite,
-  number,
-  selected,
+  position,
+  chosen,
   isDefault,
   removable,
   layout,
@@ -37,22 +37,22 @@ export function FavoriteCard({
   onRemove,
 }: FavoriteCardProps) {
   const { t } = useTranslation()
-  const caption = selected ? t('favorites.current') : isDefault ? t('favorites.default') : ''
+  const caption = chosen ? t('favorites.current') : isDefault ? t('favorites.default') : ''
 
   return (
     <HandCard
       layout={layout}
-      className={cn(selected && 'bg-accent')}
-      aria-label={isDefault ? t('favorites.apply_default') : t('favorites.apply', { n: number })}
+      className={cn(chosen && 'bg-accent')}
+      aria-label={isDefault ? t('favorites.apply_default') : t('favorites.apply', { n: position })}
       onClick={onClick}
       onPointerEnter={onPointerEnter}
       onFocus={onFocus}
       corner={
         removable &&
-        !layout.state.folded && (
+        !layout.state.inPile && (
           <button
             type="button"
-            aria-label={t('favorites.remove', { n: number })}
+            aria-label={t('favorites.remove', { n: position })}
             onClick={onRemove}
             onFocus={onFocus}
             className="border-foreground bg-card hover:bg-primary absolute -top-[11px] -right-[11px] flex size-7 cursor-pointer items-center justify-center rounded-full border-2 text-[13px] font-bold opacity-0 transition-[opacity,background-color] duration-(--duration-short) group-hover:opacity-100 focus-visible:opacity-100"

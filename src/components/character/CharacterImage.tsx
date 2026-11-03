@@ -1,7 +1,7 @@
 import { FRAME, viewBoxOf } from '@src/lib/catalog/camera.ts'
 import { backgroundOf, layersOf, skinOf } from '@src/lib/catalog/layers.ts'
 import type { Box, Look } from '@src/lib/catalog/types.ts'
-import { Backdrop } from './Backdrop.tsx'
+import { BackgroundFill } from './BackgroundFill.tsx'
 import { PartLayers } from './PartLayers.tsx'
 
 type CharacterImageProps = {
@@ -35,7 +35,7 @@ export function CharacterImage({
       aria-label={label}
       aria-hidden={label ? undefined : true}
     >
-      <Backdrop
+      <BackgroundFill
         paint={backgroundOf(look)}
         area={{ x: x0, y: y0, width: x1 - x0, height: y1 - y0 }}
       />

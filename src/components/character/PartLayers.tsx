@@ -2,8 +2,9 @@ import { useSvgId } from '@src/hooks/useSvgId.ts'
 import type { Layer, SkinPaint } from '@src/lib/catalog/layers.ts'
 import { SvgNodes } from './SvgNodes.tsx'
 
-const hasRole = (layer: Layer, role: string) =>
-  layer.nodes.some((node) => node.attrs['data-role'] === role)
+function hasRole(layer: Layer, role: string) {
+  return layer.nodes.some((node) => node.attrs['data-role'] === role)
+}
 
 export function PartLayer({ layer, skin }: { layer: Layer; skin: SkinPaint }) {
   const clipId = useSvgId('skin')

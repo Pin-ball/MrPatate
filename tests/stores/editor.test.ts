@@ -16,8 +16,13 @@ import {
 } from '@src/stores/editor.ts'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-const state = () => useEditor.getState()
-const history = () => useEditor.temporal.getState()
+function state() {
+  return useEditor.getState()
+}
+
+function history() {
+  return useEditor.temporal.getState()
+}
 
 beforeEach(() => {
   localStorage.clear()

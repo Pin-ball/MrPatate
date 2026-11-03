@@ -2,15 +2,17 @@ import { cameraOf, FRAME, frameView, MAX_ZOOM, thumbnailView } from '@src/lib/ca
 import type { Box, Variant } from '@src/lib/catalog/types.ts'
 import { describe, expect, it } from 'vitest'
 
-const variant = (box: Box | null, hidden = false): Variant => ({
-  id: 'v',
-  label: { fr: 'V', en: 'V' },
-  hidden,
-  aliases: [],
-  box,
-  layers: {},
-  paint: null,
-})
+function variant(box: Box | null, hidden = false): Variant {
+  return {
+    id: 'v',
+    label: { fr: 'V', en: 'V' },
+    hidden,
+    aliases: [],
+    box,
+    layers: {},
+    paint: null,
+  }
+}
 
 function framed(...variants: Variant[]) {
   const camera = cameraOf(variants)

@@ -4,16 +4,16 @@ import type { CardEvents, HandChanges } from '@src/lib/hand/cards.ts'
 import { CHANGE_DURATION, cardEvents } from '@src/lib/hand/cards.ts'
 import { DURATIONS } from '@src/lib/motion.ts'
 
-type CardEventsOptions = { chosenId: string | undefined; firstIndex: number }
+type HandCardsOptions = { chosenId: string | undefined; firstIndex: number }
 
 export type HandEvents = {
   added: { id: string; index: number } | null
   eventsOf: (id?: string) => CardEvents
 }
 
-export function useCardEvents<T extends { id: string }>(
+export function useHandCards<T extends { id: string }>(
   items: T[],
-  { chosenId, firstIndex }: CardEventsOptions,
+  { chosenId, firstIndex }: HandCardsOptions,
 ) {
   const { entries, added } = useListChanges(items, CHANGE_DURATION)
   const justChosenId = useRecentChange(chosenId, DURATIONS.bounce)
@@ -22,7 +22,7 @@ export function useCardEvents<T extends { id: string }>(
   const changes: HandChanges = {
     addedId: added?.id ?? null,
     removedIds: entries.flatMap(({ item, removed }) => (removed ? [item.id] : [])),
-    chosenId: justChosenId ?? null,
+    justChosenId: justChosenId ?? null,
   }
 
   const events: HandEvents = {

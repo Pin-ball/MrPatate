@@ -5,25 +5,25 @@ import { buildCatalog } from '@src/lib/catalog/load.ts'
 import type { PartConfig } from '@src/lib/catalog/types.ts'
 import { describe, expect, it } from 'vitest'
 
-const LOCALES = ['fr', 'en']
+function svg(label: string, attrs = '') {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000"${attrs}><title lang="fr">${label}</title><title lang="en">${label}</title><path d="M0 0L10 10"/></svg>`
+}
 
-const svg = (label: string, attrs = '') =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000"${attrs}><title lang="fr">${label}</title><title lang="en">${label}</title><path d="M0 0L10 10"/></svg>`
+function config(extra: Partial<PartConfig> = {}): PartConfig {
+  return {
+    label: { fr: 'Partie', en: 'Part' },
+    default: 'a',
+    ...extra,
+  }
+}
 
-const config = (extra: Partial<PartConfig> = {}): PartConfig => ({
-  label: { fr: 'Partie', en: 'Part' },
-  default: 'a',
-  ...extra,
-})
-
-function build(sources: Partial<CatalogSources> & Pick<CatalogSources, 'configs'>) {
+function build(sources: Partial<CatalogSources<string>> & Pick<CatalogSources<string>, 'configs'>) {
   const partIds = Object.keys(sources.configs)
   return buildCatalog({
     drawings: {},
     coded: {},
     planes: [{ id: 'main', depth: 1, parts: partIds }],
     partsPile: partIds,
-    locales: LOCALES,
     ...sources,
   })
 }

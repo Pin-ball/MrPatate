@@ -1,7 +1,7 @@
-import { CharacterImage } from '@src/components/character/CharacterImage.tsx'
 import { FRAME } from '@src/lib/catalog/camera.ts'
 import type { Look } from '@src/lib/catalog/types.ts'
 import { createElement } from 'react'
+import { CharacterImage } from './CharacterImage.tsx'
 
 const [x0, y0, x1, y1] = FRAME
 const FRAME_WIDTH = x1 - x0

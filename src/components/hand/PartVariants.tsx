@@ -1,23 +1,23 @@
 import { useLabel } from '@src/hooks/useLocale.ts'
 import { useVariantsHand } from '@src/hooks/useVariantsHand.ts'
-import type { Part, VariantId } from '@src/lib/catalog/types.ts'
+import { withVariant } from '@src/lib/catalog/look.ts'
+import type { Part } from '@src/lib/catalog/types.ts'
 import { randomizeVariant, setPreview, setVariant, useEditor } from '@src/stores/editor.ts'
 import { useTranslation } from 'react-i18next'
-import { HiddenCards } from './HiddenCards.tsx'
 import { RandomCard } from './RandomCard.tsx'
-import { ScrollHint } from './ScrollHint.tsx'
+import { ScrollCues } from './ScrollCues.tsx'
 import { VariantCard } from './VariantCard.tsx'
 
 export function PartVariants({ part }: { part: Part }) {
   const { t } = useTranslation()
-  const label = useLabel()
+  const labelOf = useLabel()
   const look = useEditor((state) => state.look)
-  const { state, count, cards, hasRandomCard, layoutOf, rendered, reveal, handlers } =
+  const { state, cards, hasRandomCard, layoutOf, rendered, reveal, handlers } =
     useVariantsHand(part)
 
   return (
-    <fieldset className="isolate" {...handlers}>
-      <legend className="sr-only">{t('variants.label', { part: label(part) })}</legend>
+    <fieldset className="isolate touch-pan-y" {...handlers}>
+      <legend className="sr-only">{t('variants.label', { part: labelOf(part) })}</legend>
       {hasRandomCard && rendered(0) && (
         <RandomCard
           layout={layoutOf(0)}
@@ -31,27 +31,26 @@ export function PartVariants({ part }: { part: Part }) {
       )}
       {cards.map(({ item: variant, index }) => {
         if (!rendered(index)) return null
-        const selected = look[part.id] === variant.id
-        const preview = () => setPreview(selected ? null : { [part.id]: variant.id })
+        const chosen = look[part.id] === variant.id
+        const showPreview = () => setPreview(chosen ? null : withVariant(look, part.id, variant.id))
         return (
           <VariantCard
             key={`${part.id}:${variant.id}`}
             look={look}
             part={part}
             variant={variant}
-            selected={selected}
+            chosen={chosen}
             layout={layoutOf(index, variant.id)}
-            onPointerEnter={preview}
+            onPointerEnter={showPreview}
             onFocus={() => {
               reveal(index)
-              preview()
+              showPreview()
             }}
-            onClick={() => setVariant(part.id, variant.id as VariantId)}
+            onClick={() => setVariant(part.id, variant.id)}
           />
         )
       })}
-      <HiddenCards state={state} count={count} />
-      <ScrollHint state={state} count={count} />
+      <ScrollCues state={state} />
     </fieldset>
   )
 }

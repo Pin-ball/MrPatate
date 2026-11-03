@@ -11,15 +11,14 @@ export type Layer = {
   nodes: SvgNode[]
 }
 
-export type PlaneLayers = {
+type PlaneLayers = {
   plane: Plane
   layers: Layer[]
 }
 
 function variantOf(look: Look, part: PartId): Variant {
-  const { variants } = partById[part]
-  const variant = findVariant(partById[part], look[part]) ?? variants[0]
-  if (!variant) throw new Error(`Part "${part}" has no variant`)
+  const variant = findVariant(partById[part], look[part])
+  if (!variant) throw new Error(`Part "${part}" has no variant "${look[part]}"`)
   return variant
 }
 

@@ -14,22 +14,21 @@ export function PartsPile() {
   const hand = useEditor((state) => state.hand)
   const look = useEditor((state) => state.look)
   const openPart = hand.kind === 'variants' ? hand.part : null
-  const pile = usePile('parts', { count: COUNT, startIndex: (COUNT - 1) / 2 })
-  const { unfolded, pileStart, pileSize, layoutOf, rendered, reveal, spreadPile } = pile
+  const pile = usePile('parts', { count: COUNT, openingIndex: (COUNT - 1) / 2 })
+  const { unfolded, held, layoutOf, rendered, reveal, spreadPile } = pile
 
-  const onTop = (index: number, id: PartId) =>
-    openPart ? id === openPart : index === pileStart + pileSize - 1
+  const isOnTop = (index: number, id: PartId) => (openPart ? id === openPart : index === held.last)
 
-  const layoutAt = (index: number, id: PartId) => {
+  const partLayout = (index: number, id: PartId) => {
     const isOpen = id === openPart
     return layoutOf(index, {
       zIndex: isOpen ? COUNT + 1 : index + 1,
-      top: onTop(index, id),
+      onTop: isOnTop(index, id),
       tilted: isOpen,
     })
   }
 
-  const open = (id: PartId) => {
+  const pickPart = (id: PartId) => {
     setHand(unfolded ? { kind: 'variants', part: id } : { kind: 'parts' })
   }
 
@@ -38,7 +37,7 @@ export function PartsPile() {
       pile={pile}
       icon={Layers}
       label={t('parts.label')}
-      slotLabel={t(unfolded ? 'parts.fold' : 'parts.unfold')}
+      pileSlotLabel={t(unfolded ? 'parts.fold' : 'parts.unfold')}
       pileLabel={t('parts.label')}
     >
       {partsPile.map(
@@ -48,10 +47,10 @@ export function PartsPile() {
               key={part.id}
               part={part}
               look={look}
-              layout={layoutAt(index, part.id)}
+              layout={partLayout(index, part.id)}
               open={part.id === openPart}
-              showCount={unfolded || onTop(index, part.id)}
-              onClick={() => open(part.id)}
+              showCount={unfolded || isOnTop(index, part.id)}
+              onClick={() => pickPart(part.id)}
               onPointerEnter={unfolded ? undefined : spreadPile}
               onFocus={() => reveal(index)}
             />

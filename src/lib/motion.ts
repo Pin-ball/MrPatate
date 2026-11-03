@@ -8,12 +8,12 @@ export const DURATIONS = {
   lift: 200,
   appearFade: 200,
   hit: 250,
-  fold: 300,
+  leave: 300,
   appear: 350,
   bounce: 350,
   remove: 400,
-  move: 550,
   drop: 440,
+  move: 550,
   parallax: 600,
   scrollHint: 1400,
 }
@@ -26,9 +26,13 @@ export const EASES = {
   inStrong: [0.5, 0, 0.75, 0],
 } satisfies Record<string, Bezier>
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
+function kebab(name: string) {
+  return name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
+}
 
-export const seconds = (duration: number) => duration / 1000
+export function seconds(duration: number) {
+  return duration / 1000
+}
 
 export const MOTION_VARIABLES: CSSProperties = Object.fromEntries([
   ...Object.entries(DURATIONS).map(([name, duration]) => [

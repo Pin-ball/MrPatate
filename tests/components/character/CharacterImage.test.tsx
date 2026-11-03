@@ -5,10 +5,11 @@ import type { Look } from '@src/lib/catalog/types.ts'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
-const render = (look: Look, label?: string) =>
-  renderToStaticMarkup(
+function render(look: Look, label?: string) {
+  return renderToStaticMarkup(
     label ? <CharacterImage look={look} label={label} /> : <CharacterImage look={look} />,
   )
+}
 
 describe('CharacterImage', () => {
   it('renders a single svg framed on Pierre', () => {

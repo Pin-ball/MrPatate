@@ -1,10 +1,12 @@
-import { centeredOffset, clampOffset, offsetShowing } from '@src/lib/hand/geometry.ts'
+import type { HandShape } from '@src/lib/hand/geometry.ts'
+import type { OffsetBounds } from '@src/lib/hand/window.ts'
+import { clampOffset, isScrollable, offsetBounds } from '@src/lib/hand/window.ts'
+import { clamp } from '@src/lib/utils.ts'
 import { useMotionValueEvent, useSpring } from 'motion/react'
 import type { MouseEvent, PointerEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
 
 const WHEEL_PER_CARD = 100
-const DRAG_PER_CARD = 80
 const DRAG_THRESHOLD = 8
 const SNAP_DELAY = 140
 const MAX_CARDS_PER_MS = 0.012
@@ -15,20 +17,26 @@ let scrolledOnce = false
 
 type Scroll = {
   key: unknown
-  start: number
   offset: number
   scrolling: boolean
   scrolled: boolean
   instant: boolean
 }
 
+type HandScrollOptions = {
+  count: number
+  shape: HandShape
+  openingOffset: number
+  unfolded: boolean
+  resetKey: unknown
+}
+
 type SpeedLimit = (delta: number, time: number) => number
 
 type Drag = { x: number; moved: boolean; limit: SpeedLimit }
 
-const opened = (key: unknown, startIndex: number, count: number, slots: number): Scroll => {
-  const start = centeredOffset(startIndex, count, slots)
-  return { key, start, offset: start, scrolling: false, scrolled: scrolledOnce, instant: true }
+function opened(key: unknown, offset: number): Scroll {
+  return { key, offset, scrolling: false, scrolled: scrolledOnce, instant: true }
 }
 
 function createSpeedLimit(): SpeedLimit {
@@ -36,46 +44,47 @@ function createSpeedLimit(): SpeedLimit {
   return (delta, time) => {
     const max = Math.min(time - last, MAX_ELAPSED) * MAX_CARDS_PER_MS
     last = time
-    return Math.max(-max, Math.min(max, delta))
+    return clamp(delta, -max, max)
   }
 }
 
-const movedBy = (
-  scroll: Scroll,
-  delta: number,
-  count: number,
-  slots: number,
-  instant: boolean,
-): Scroll => ({
-  ...scroll,
-  offset: clampOffset(scroll.offset + delta, count, slots),
-  scrolling: true,
-  scrolled: true,
-  instant,
-})
+function movedBy(scroll: Scroll, delta: number, bounds: OffsetBounds, instant: boolean): Scroll {
+  return {
+    ...scroll,
+    offset: clampOffset(scroll.offset + delta, bounds),
+    scrolling: true,
+    scrolled: true,
+    instant,
+  }
+}
 
-const snapped = (scroll: Scroll, count: number, slots: number): Scroll => ({
-  ...scroll,
-  offset: Math.round(clampOffset(scroll.offset, count, slots)),
-  scrolling: false,
-  instant: false,
-})
+function snapped(scroll: Scroll, bounds: OffsetBounds): Scroll {
+  return {
+    ...scroll,
+    offset: Math.round(clampOffset(scroll.offset, bounds)),
+    scrolling: false,
+    instant: false,
+  }
+}
 
-export function useHandScroll(
-  count: number,
-  slots: number,
-  startIndex: number,
-  { open, resetKey }: { open: boolean; resetKey: unknown },
-) {
-  const [scroll, setScroll] = useState(() => opened(resetKey, startIndex, count, slots))
+export function useHandScroll({
+  count,
+  shape,
+  openingOffset,
+  unfolded,
+  resetKey,
+}: HandScrollOptions) {
+  const [scroll, setScroll] = useState(() => opened(resetKey, openingOffset))
   const drag = useRef<Drag | null>(null)
-  const dragged = useRef(false)
+  const justDragged = useRef(false)
+  const bounds = offsetBounds(count, shape)
+  const { min, max } = bounds
 
   if (scroll.key !== resetKey) {
-    setScroll(open ? opened(resetKey, startIndex, count, slots) : { ...scroll, key: resetKey })
+    setScroll(unfolded ? opened(resetKey, openingOffset) : { ...scroll, key: resetKey })
   }
 
-  const target = clampOffset(scroll.offset, count, slots)
+  const target = clampOffset(scroll.offset, bounds)
   const spring = useSpring(target, SPRING)
   const [springOffset, setSpringOffset] = useState(target)
   useMotionValueEvent(spring, 'change', setSpringOffset)
@@ -86,21 +95,19 @@ export function useHandScroll(
   }, [spring, target, scroll.instant])
 
   const offset = scroll.instant ? target : springOffset
-  const scrollable = open && count > slots
+  const scrollable = unfolded && isScrollable(count, shape)
 
   useEffect(() => {
     if (!scrollable) return
+    const bounds = { min, max }
     let snapTimer: ReturnType<typeof setTimeout> | undefined
     const limit = createSpeedLimit()
     const onWheel = (event: WheelEvent) => {
       const delta = limit((event.deltaY || event.deltaX) / WHEEL_PER_CARD, event.timeStamp)
-      setScroll((current) => movedBy(current, delta, count, slots, false))
+      setScroll((previous) => movedBy(previous, delta, bounds, false))
       scrolledOnce = true
       clearTimeout(snapTimer)
-      snapTimer = setTimeout(
-        () => setScroll((current) => snapped(current, count, slots)),
-        SNAP_DELAY,
-      )
+      snapTimer = setTimeout(() => setScroll((previous) => snapped(previous, bounds)), SNAP_DELAY)
     }
     const listeners = new AbortController()
     addEventListener('wheel', onWheel, listeners)
@@ -108,27 +115,30 @@ export function useHandScroll(
       listeners.abort()
       clearTimeout(snapTimer)
       drag.current = null
-      setScroll((current) => snapped(current, count, slots))
+      setScroll((previous) => snapped(previous, bounds))
     }
-  }, [scrollable, count, slots])
+  }, [scrollable, min, max])
 
   const endDrag = () => {
     const current = drag.current
     drag.current = null
     if (!current?.moved) return
-    dragged.current = true
-    setScroll((scroll) => snapped(scroll, count, slots))
+    justDragged.current = true
+    setScroll((previous) => snapped(previous, bounds))
   }
 
   const onPointerDown = (event: PointerEvent) => {
-    dragged.current = false
+    justDragged.current = false
     if (scrollable) drag.current = { x: event.clientX, moved: false, limit: createSpeedLimit() }
   }
 
   const onPointerMove = (event: PointerEvent<HTMLElement>) => {
     const current = drag.current
     if (!current) return
-    if (event.buttons === 0) return endDrag()
+    if (event.buttons === 0) {
+      endDrag()
+      return
+    }
     const dx = event.clientX - current.x
     if (!current.moved) {
       if (Math.abs(dx) < DRAG_THRESHOLD) return
@@ -136,27 +146,30 @@ export function useHandScroll(
       event.currentTarget.setPointerCapture(event.pointerId)
       scrolledOnce = true
     }
-    const delta = current.limit(-dx / DRAG_PER_CARD, event.timeStamp)
+    const delta = current.limit(-dx / shape.dragPerCard, event.timeStamp)
     current.x = event.clientX
-    setScroll((scroll) => movedBy(scroll, delta, count, slots, true))
+    setScroll((previous) => movedBy(previous, delta, bounds, true))
+  }
+
+  const onLostPointerCapture = (event: PointerEvent) => {
+    if (event.target === event.currentTarget) endDrag()
   }
 
   const onClickCapture = (event: MouseEvent) => {
-    if (!dragged.current) return
-    dragged.current = false
+    if (!justDragged.current) return
+    justDragged.current = false
     event.stopPropagation()
   }
 
   const reveal = (index: number) =>
-    setScroll((current) => ({
-      ...current,
+    setScroll((previous) => ({
+      ...previous,
+      offset: shape.offsetShowing(index, Math.round(clampOffset(previous.offset, bounds))),
       instant: false,
-      offset: offsetShowing(index, Math.round(clampOffset(current.offset, count, slots)), slots),
     }))
 
   return {
     offset,
-    start: scroll.start,
     scrolling: scroll.scrolling || offset !== target,
     scrolled: scroll.scrolled,
     reveal,
@@ -165,7 +178,7 @@ export function useHandScroll(
       onPointerMove,
       onPointerUp: endDrag,
       onPointerCancel: endDrag,
-      onLostPointerCapture: endDrag,
+      onLostPointerCapture,
       onClickCapture,
     },
   }

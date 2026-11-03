@@ -4,7 +4,9 @@ export type ListChanges<T> = { removed: ListEntry<T>[]; added: T | null }
 
 type WithId = { id: string }
 
-const includesId = (items: WithId[], id: string) => items.some((item) => item.id === id)
+function includesId(items: WithId[], id: string) {
+  return items.some((item) => item.id === id)
+}
 
 export function withRemoved<T>(items: T[], removed: ListEntry<T>[]): ListEntry<T>[] {
   const entries = items.map((item, index) => ({ item, index, removed: false }))

@@ -11,14 +11,16 @@ const EXIT: TargetAndTransition = {
   transition: { duration: seconds(DURATIONS.short), ease: EASES.inStrong },
 }
 
-const shown = (delay: number): TargetAndTransition => ({
-  opacity: 1,
-  scale: 1,
-  transition: {
-    opacity: { duration: seconds(DURATIONS.appearFade), ease: EASES.outStrong, delay },
-    scale: { duration: seconds(DURATIONS.appear), ease: EASES.overshootLg, delay },
-  },
-})
+function shown(delay: number): TargetAndTransition {
+  return {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      opacity: { duration: seconds(DURATIONS.appearFade), ease: EASES.outStrong, delay },
+      scale: { duration: seconds(DURATIONS.appear), ease: EASES.overshootLg, delay },
+    },
+  }
+}
 
 export function Appear({ delay = 0, ...props }: AppearProps) {
   return <motion.div initial={HIDDEN} animate={shown(delay)} exit={EXIT} {...props} />

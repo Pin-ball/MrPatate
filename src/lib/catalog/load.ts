@@ -1,28 +1,27 @@
 import { cameraOf } from './camera.ts'
 import type { Drawing } from './svg.ts'
 import { CatalogError, parseDrawing, parseNodes } from './svg.ts'
-import type { Paint, Part, PartConfig, PartId, Plane, Variant, VariantConfig } from './types.ts'
+import type { Paint, Part, PartConfig, Plane, Variant, VariantConfig } from './types.ts'
 
 const ID = /^[a-z0-9]+(-[a-z0-9]+)*$/
 
-type PlaneSource = { id: string; depth: number; parts: readonly string[] }
+type PlaneSource<Id extends string> = { id: string; depth: number; parts: readonly Id[] }
 
-export type CatalogSources = {
-  configs: Record<string, PartConfig>
+export type CatalogSources<Id extends string> = {
+  configs: Record<Id, PartConfig>
   drawings: Record<string, Record<string, string>>
   coded: Record<string, readonly VariantConfig[]>
-  planes: readonly PlaneSource[]
-  partsPile: readonly string[]
-  locales: readonly string[]
+  planes: readonly PlaneSource<Id>[]
+  partsPile: readonly Id[]
 }
 
-export type Catalog = { parts: Part[]; planes: Plane[]; partsPile: Part[] }
+type Catalog<Id extends string> = { parts: Part<Id>[]; planes: Plane<Id>[]; partsPile: Part<Id>[] }
 
 function checkId(id: string, file: string) {
   if (!ID.test(id)) throw new CatalogError(file, `invalid id "${id}" (kebab-case expected)`)
 }
 
-export function checkPlanes(planes: readonly PlaneSource[], partIds: string[]) {
+function checkPlanes(planes: readonly PlaneSource<string>[], partIds: string[]) {
   const file = 'planes.ts'
   const ids = new Set<string>()
   let previousDepth = 0
@@ -47,7 +46,7 @@ export function checkPlanes(planes: readonly PlaneSource[], partIds: string[]) {
   }
 }
 
-export function checkPartsPile(pile: readonly string[], partIds: string[]) {
+function checkPartsPile(pile: readonly string[], partIds: string[]) {
   const file = 'parts.ts (partsPile)'
   for (const part of pile) {
     if (!partIds.includes(part)) throw new CatalogError(file, `unknown part "${part}"`)
@@ -56,7 +55,7 @@ export function checkPartsPile(pile: readonly string[], partIds: string[]) {
 }
 
 function toPaint(config: VariantConfig, file: string): Paint {
-  if ('skin' in config) return { kind: 'skin', skin: config.skin, shadow: config.shadow }
+  if ('skin' in config) return { kind: 'skin', color: config.skin, shadow: config.shadow }
   const { pattern } = config
   return {
     kind: 'background',
@@ -79,14 +78,13 @@ function buildVariants(
   sources: Record<string, string>,
   coded: readonly VariantConfig[],
   planeIds: string[],
-  locales: readonly string[],
 ): Variant[] {
   const file = `parts.ts (${partId})`
   const drawings = new Map<string, Drawing>()
   for (const [id, source] of Object.entries(sources)) {
     const svgFile = `${partId}/${id}.svg`
     checkId(id, svgFile)
-    drawings.set(id, parseDrawing(source, svgFile, planeIds, locales))
+    drawings.set(id, parseDrawing(source, svgFile, planeIds))
   }
 
   const codedFile = `${partId}/variants.ts`
@@ -115,13 +113,15 @@ function buildVariants(
     .sort((a, b) => rank(a.id) - rank(b.id) || a.id.localeCompare(b.id))
 
   const variants = [...codedVariants, ...drawnVariants]
-  const fallback = variants.find((variant) => variant.id === config.default)
-  if (!fallback) throw new CatalogError(file, `default variant "${config.default}" does not exist`)
-  if (fallback.hidden) throw new CatalogError(file, `default variant "${config.default}" is hidden`)
-  return [fallback, ...variants.filter((variant) => variant !== fallback)]
+  const defaultVariant = variants.find((variant) => variant.id === config.default)
+  if (!defaultVariant)
+    throw new CatalogError(file, `default variant "${config.default}" does not exist`)
+  if (defaultVariant.hidden)
+    throw new CatalogError(file, `default variant "${config.default}" is hidden`)
+  return [defaultVariant, ...variants.filter((variant) => variant !== defaultVariant)]
 }
 
-function checkVariants(part: Part, file: string) {
+function checkVariants(part: Part<string>, file: string) {
   const names = new Map<string, string>()
   for (const variant of part.variants) {
     for (const alias of variant.aliases) checkId(alias, file)
@@ -135,36 +135,29 @@ function checkVariants(part: Part, file: string) {
   }
 }
 
-export function buildCatalog({
+export function buildCatalog<Id extends string>({
   configs,
   drawings,
   coded,
   planes,
   partsPile,
-  locales,
-}: CatalogSources): Catalog {
-  const partIds = Object.keys(configs)
+}: CatalogSources<Id>): Catalog<Id> {
+  const partIds = Object.keys(configs).filter((id): id is Id => Object.hasOwn(configs, id))
   for (const folder of new Set([...Object.keys(drawings), ...Object.keys(coded)])) {
-    if (!partIds.includes(folder)) {
+    if (!Object.hasOwn(configs, folder)) {
       throw new CatalogError(`${folder}/`, 'this folder has no entry in parts.ts')
     }
   }
   checkPlanes(planes, partIds)
   checkPartsPile(partsPile, partIds)
-  const parts = Object.entries(configs).map(([id, config]) => {
+  const parts = partIds.map((id) => {
+    const config = configs[id]
     const file = `parts.ts (${id})`
     checkId(id, file)
     const planeIds = planes.filter((plane) => plane.parts.includes(id)).map((plane) => plane.id)
-    const variants = buildVariants(
+    const variants = buildVariants(id, config, drawings[id] ?? {}, coded[id] ?? [], planeIds)
+    const part: Part<Id> = {
       id,
-      config,
-      drawings[id] ?? {},
-      coded[id] ?? [],
-      planeIds,
-      locales,
-    )
-    const part: Part = {
-      id: id as PartId,
       label: config.label,
       camera: cameraOf(variants),
       variants,
@@ -172,11 +165,11 @@ export function buildCatalog({
     checkVariants(part, file)
     return part
   })
-  const rank = (id: string) => (partsPile.includes(id) ? partsPile.indexOf(id) : partsPile.length)
+  const rank = (id: Id) => (partsPile.includes(id) ? partsPile.indexOf(id) : partsPile.length)
   parts.sort((a, b) => rank(a.id) - rank(b.id) || a.id.localeCompare(b.id))
   return {
     parts,
-    planes: planes as Plane[],
+    planes: planes.map(({ id, depth, parts }) => ({ id, depth, parts: [...parts] })),
     partsPile: parts.filter((part) => partsPile.includes(part.id)),
   }
 }

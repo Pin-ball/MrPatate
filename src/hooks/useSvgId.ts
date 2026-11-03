@@ -1,5 +1,6 @@
 import { useId } from 'react'
 
 export function useSvgId(prefix: string): string {
-  return `${prefix}-${useId().replace(/[^a-zA-Z0-9]/g, '')}`
+  const id = useId()
+  return `${prefix}-${id.replace(/[^a-zA-Z0-9]/g, '')}`
 }

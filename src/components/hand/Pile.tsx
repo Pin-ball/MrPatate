@@ -1,37 +1,34 @@
 import type { usePile } from '@src/hooks/usePile.ts'
-import { PILE_ANCHORS } from '@src/lib/hand/geometry.ts'
 import { setHand } from '@src/stores/editor.ts'
 import type { LucideIcon } from 'lucide-react'
 import { AnimatePresence } from 'motion/react'
 import type { ReactNode } from 'react'
-import { HiddenCards } from './HiddenCards.tsx'
 import { PileLabel } from './PileLabel.tsx'
-import { ScrollHint } from './ScrollHint.tsx'
-import { Slot } from './Slot.tsx'
+import { PileSlot } from './PileSlot.tsx'
+import { ScrollCues } from './ScrollCues.tsx'
 
 type PileProps = {
   pile: ReturnType<typeof usePile>
   icon: LucideIcon
   label: string
-  slotLabel: string
+  pileSlotLabel: string
   pileLabel: string
   children: ReactNode
 }
 
 export function Pile({
-  pile: { kind, unfolded, state, count, handlers },
+  pile: { kind, anchor, unfolded, state, handlers },
   icon,
   label,
-  slotLabel,
+  pileSlotLabel,
   pileLabel,
   children,
 }: PileProps) {
-  const anchor = PILE_ANCHORS[kind]
   return (
     <>
-      <Slot
+      <PileSlot
         anchor={anchor}
-        aria-label={slotLabel}
+        aria-label={pileSlotLabel}
         icon={icon}
         label={label}
         onClick={() => setHand(unfolded ? { kind: 'none' } : { kind })}
@@ -39,10 +36,9 @@ export function Pile({
       <AnimatePresence>
         {!unfolded && <PileLabel anchor={anchor}>{pileLabel}</PileLabel>}
       </AnimatePresence>
-      <nav aria-label={label} className="isolate" {...handlers}>
+      <nav aria-label={label} className="isolate touch-pan-y" {...handlers}>
         {children}
-        <HiddenCards state={state} count={count} />
-        <ScrollHint state={state} count={count} />
+        <ScrollCues state={state} />
       </nav>
     </>
   )

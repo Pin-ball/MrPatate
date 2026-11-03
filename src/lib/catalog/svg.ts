@@ -1,8 +1,8 @@
 import { svgPathBbox } from 'svg-path-bbox'
+import { locales } from '../../i18n/locales.ts'
 import type { Box, Label, SvgNode } from './types.ts'
 
-export const VIEW_BOX = '0 0 800 1000'
-
+const VIEW_BOX = '0 0 800 1000'
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
 const DRAWING_TAGS = new Set(['g', 'path', 'circle', 'ellipse', 'rect', 'polygon', 'polyline'])
@@ -76,46 +76,61 @@ function flatten(nodes: SvgNode[]): SvgNode[] {
   return nodes.flatMap((node) => [node, ...flatten(node.children)])
 }
 
-export function boxOf(nodes: SvgNode[]): Box | null {
-  const boxes = flatten(nodes)
-    .map(nodeBox)
-    .filter((box) => box !== null)
+export function unionBox(boxes: Box[]): Box | null {
   if (!boxes.length) return null
   return [
-    Math.floor(Math.min(...boxes.map((box) => box[0]))),
-    Math.floor(Math.min(...boxes.map((box) => box[1]))),
-    Math.ceil(Math.max(...boxes.map((box) => box[2]))),
-    Math.ceil(Math.max(...boxes.map((box) => box[3]))),
+    Math.min(...boxes.map((box) => box[0])),
+    Math.min(...boxes.map((box) => box[1])),
+    Math.max(...boxes.map((box) => box[2])),
+    Math.max(...boxes.map((box) => box[3])),
   ]
 }
 
-function readLabel(root: Element, locales: readonly string[], file: string): Label {
-  const label: Record<string, string> = {}
+export function boxOf(nodes: SvgNode[]): Box | null {
+  const box = unionBox(
+    flatten(nodes)
+      .map(nodeBox)
+      .filter((found) => found !== null),
+  )
+  if (!box) return null
+  const [x0, y0, x1, y1] = box
+  return [Math.floor(x0), Math.floor(y0), Math.ceil(x1), Math.ceil(y1)]
+}
+
+function isLabel(label: Partial<Label>): label is Label {
+  return locales.every((locale) => label[locale] !== undefined)
+}
+
+function readLabel(root: Element, file: string): Label {
+  const label: Partial<Label> = {}
   for (const title of root.children) {
     if (title.localName !== 'title') continue
-    const locale = title.getAttribute('lang')
-    if (!locale) throw new CatalogError(file, 'every <title> needs a lang attribute')
-    if (!locales.includes(locale)) throw new CatalogError(file, `unknown locale "${locale}"`)
+    const lang = title.getAttribute('lang')
+    if (!lang) throw new CatalogError(file, 'every <title> needs a lang attribute')
+    const locale = locales.find((known) => known === lang)
+    if (!locale) throw new CatalogError(file, `unknown locale "${lang}"`)
     if (label[locale]) throw new CatalogError(file, `label "${locale}" given twice`)
     const text = title.textContent?.trim()
     if (text) label[locale] = text
   }
-  const missing = locales.filter((locale) => !label[locale])
-  if (missing.length) throw new CatalogError(file, `missing label for ${missing.join(', ')}`)
-  return label as Label
+  if (!isLabel(label)) {
+    const missing = locales.filter((locale) => !label[locale])
+    throw new CatalogError(file, `missing label for ${missing.join(', ')}`)
+  }
+  return label
 }
 
-function readLayers(drawing: Element[], planeIds: string[], file: string) {
+function readLayers(elements: Element[], planeIds: string[], file: string) {
   const layers: Record<string, SvgNode[]> = {}
   const [onlyPlane] = planeIds
-  if (drawing.length && !onlyPlane) {
+  if (elements.length && !onlyPlane) {
     throw new CatalogError(file, 'this part is not placed on any plane (planes.ts)')
   }
   if (planeIds.length === 1 && onlyPlane) {
-    if (drawing.length) layers[onlyPlane] = drawing.map((child) => toSvgNode(child, file))
+    if (elements.length) layers[onlyPlane] = elements.map((child) => toSvgNode(child, file))
     return layers
   }
-  for (const group of drawing) {
+  for (const group of elements) {
     const plane = group.getAttribute('data-plane')
     if (group.localName !== 'g' || !plane) {
       throw new CatalogError(
@@ -143,21 +158,16 @@ export type Drawing = {
   box: Box | null
 }
 
-export function parseDrawing(
-  source: string,
-  file: string,
-  planeIds: string[],
-  locales: readonly string[],
-): Drawing {
+export function parseDrawing(source: string, file: string, planeIds: string[]): Drawing {
   const root = parseSvgRoot(source, file)
   if (root.localName !== 'svg') throw new CatalogError(file, 'expected an <svg> root')
   if (root.getAttribute('viewBox') !== VIEW_BOX) {
     throw new CatalogError(file, `viewBox must be "${VIEW_BOX}"`)
   }
-  const drawing = [...root.children].filter((child) => child.localName !== 'title')
-  const layers = readLayers(drawing, planeIds, file)
+  const elements = [...root.children].filter((child) => child.localName !== 'title')
+  const layers = readLayers(elements, planeIds, file)
   return {
-    label: readLabel(root, locales, file),
+    label: readLabel(root, file),
     hidden: root.getAttribute('data-hidden') === 'true',
     aliases: (root.getAttribute('data-aliases') ?? '').split(/\s+/).filter(Boolean),
     layers,

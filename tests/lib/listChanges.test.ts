@@ -2,10 +2,17 @@ import type { ListEntry } from '@src/lib/listChanges.ts'
 import { listChanges, withRemoved } from '@src/lib/listChanges.ts'
 import { describe, expect, it } from 'vitest'
 
-const items = (...ids: string[]) => ids.map((id) => ({ id }))
-const shown = (...ids: string[]) => withRemoved(items(...ids), [])
-const ids = (entries: ListEntry<{ id: string }>[]) =>
-  entries.map(({ item, index, removed }) => `${item.id}${index}${removed ? '-' : ''}`)
+function items(...ids: string[]) {
+  return ids.map((id) => ({ id }))
+}
+
+function shown(...ids: string[]) {
+  return withRemoved(items(...ids), [])
+}
+
+function ids(entries: ListEntry<{ id: string }>[]) {
+  return entries.map(({ item, index, removed }) => `${item.id}${index}${removed ? '-' : ''}`)
+}
 
 describe('listChanges', () => {
   it('reports nothing when the list did not change', () => {

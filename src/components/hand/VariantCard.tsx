@@ -9,7 +9,7 @@ type VariantCardProps = {
   look: Look
   part: Part
   variant: Variant
-  selected: boolean
+  chosen: boolean
   layout: CardLayout
   onPointerEnter: () => void
   onFocus: () => void
@@ -20,25 +20,25 @@ export function VariantCard({
   look,
   part,
   variant,
-  selected,
+  chosen,
   layout,
   onPointerEnter,
   onFocus,
   onClick,
 }: VariantCardProps) {
-  const label = useLabel()
+  const labelOf = useLabel()
 
   return (
     <HandCard
       layout={layout}
-      className={cn(selected && 'bg-accent')}
-      aria-pressed={selected}
+      className={cn(chosen && 'bg-accent')}
+      aria-pressed={chosen}
       onPointerEnter={onPointerEnter}
       onFocus={onFocus}
       onClick={onClick}
     >
       <VariantThumbnail look={look} part={part} variant={variant} />
-      <span className="line-clamp-2 w-full text-xs font-bold">{label(variant)}</span>
+      <span className="line-clamp-2 w-full text-xs font-bold">{labelOf(variant)}</span>
     </HandCard>
   )
 }

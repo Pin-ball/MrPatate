@@ -10,7 +10,7 @@ type SvgNodesProps = {
 }
 
 function fillOf({ attrs }: SvgNode, skin?: SkinPaint): string | undefined {
-  if (skin && attrs['data-role'] === 'skin') return skin.skin
+  if (skin && attrs['data-role'] === 'skin') return skin.color
   if (skin && attrs['data-role'] === 'shadow') return skin.shadow
   return attrs['fill']
 }

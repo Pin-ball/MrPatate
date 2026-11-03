@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { defaultLook } from '@src/lib/catalog/index.ts'
+import type { Look } from '@src/lib/catalog/types.ts'
 import {
   addFavorite,
   FAVORITES_KEY,
@@ -9,9 +10,12 @@ import {
 } from '@src/stores/favorites.ts'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-const state = () => useFavorites.getState()
-const sixEyes = { ...defaultLook, eyes: 'six' } as const
-const sadMouth = { ...defaultLook, mouth: 'sad' } as const
+function state() {
+  return useFavorites.getState()
+}
+
+const sixEyes: Look = { ...defaultLook, eyes: 'six' }
+const sadMouth: Look = { ...defaultLook, mouth: 'sad' }
 
 beforeEach(() => {
   localStorage.clear()

@@ -1,5 +1,5 @@
+import { characterPng, characterSvg } from '@src/components/character/export.ts'
 import { download } from '@src/lib/download.ts'
-import { characterPng, characterSvg } from '@src/lib/export.ts'
 import { shareUrl } from '@src/lib/share.ts'
 import { useEditor } from '@src/stores/editor.ts'
 import { showToast } from '@src/stores/toast.ts'

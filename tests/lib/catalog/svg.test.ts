@@ -3,12 +3,13 @@
 import { boxOf, parseDrawing, parseNodes } from '@src/lib/catalog/svg.ts'
 import { describe, expect, it } from 'vitest'
 
-const LOCALES = ['fr', 'en']
+function svg(body: string, attrs = '') {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000"${attrs}>${body}</svg>`
+}
 
-const svg = (body: string, attrs = '') =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000"${attrs}>${body}</svg>`
-
-const titles = (text = 'A') => `<title lang="fr">${text}</title><title lang="en">${text}</title>`
+function titles(text = 'A') {
+  return `<title lang="fr">${text}</title><title lang="en">${text}</title>`
+}
 
 describe('parseDrawing', () => {
   it('reads the label, roles and React attribute names of a single-plane drawing', () => {
@@ -18,7 +19,6 @@ describe('parseDrawing', () => {
       ),
       'eyes/test.svg',
       ['face'],
-      LOCALES,
     )
     expect(drawing.label).toEqual({ fr: 'Œil & demi', en: 'Eye' })
     expect(drawing.hidden).toBe(false)
@@ -40,7 +40,6 @@ describe('parseDrawing', () => {
       ),
       'arms/test.svg',
       ['back', 'front'],
-      LOCALES,
     )
     expect(Object.keys(drawing.layers)).toEqual(['back', 'front'])
     expect(drawing.box).toEqual([0, 0, 15, 15])
@@ -51,7 +50,6 @@ describe('parseDrawing', () => {
       svg(titles(), ' data-hidden="true" data-aliases="old ancient"'),
       'x.svg',
       ['face'],
-      LOCALES,
     )
     expect(drawing.hidden).toBe(true)
     expect(drawing.aliases).toEqual(['old', 'ancient'])
@@ -108,7 +106,7 @@ describe('parseDrawing', () => {
       /not placed on any plane/,
     ],
   ])('rejects %s', (_, source, planes, error) => {
-    expect(() => parseDrawing(source, 'x.svg', planes, LOCALES)).toThrow(error)
+    expect(() => parseDrawing(source, 'x.svg', planes)).toThrow(error)
   })
 })
 

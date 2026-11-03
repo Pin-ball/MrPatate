@@ -1,75 +1,73 @@
-import type { HandEvents } from '@src/hooks/useCardEvents.ts'
 import { useHand } from '@src/hooks/useHand.ts'
+import type { HandEvents } from '@src/hooks/useHandCards.ts'
+import { useHandGeometry } from '@src/hooks/useLayout.ts'
 import type { CardLayout } from '@src/lib/hand/cards.ts'
-import { arcCardLayout, MOTION_DURATIONS, moveMotion, withState } from '@src/lib/hand/cards.ts'
+import { arcCardLayout, CARD_MOTION_DURATIONS, moveMotion, withState } from '@src/lib/hand/cards.ts'
 import type { PileKind } from '@src/lib/hand/geometry.ts'
-import {
-  centeredOffset,
-  isRendered,
-  PILE_ANCHORS,
-  PILE_SIDES,
-  pilePlace,
-  pileStart,
-  placeStyle,
-} from '@src/lib/hand/geometry.ts'
+import { PILE_SIDES, pilePlace, placeStyle } from '@src/lib/hand/geometry.ts'
+import { rangeSize } from '@src/lib/hand/window.ts'
 import { clamp } from '@src/lib/utils.ts'
 import { useEditor } from '@src/stores/editor.ts'
 import { useState } from 'react'
 
-type PileOptions = { count: number; startIndex: number; events?: HandEvents }
+type PileOptions = { count: number; openingIndex: number; events?: HandEvents }
 
-type PileCard = { zIndex: number; top: boolean; tilted?: boolean; id?: string }
+type PileCardOptions = { zIndex: number; onTop: boolean; tilted?: boolean; id?: string }
 
-export function usePile(kind: PileKind, { count, startIndex, events }: PileOptions) {
+export function usePile(kind: PileKind, { count, openingIndex, events }: PileOptions) {
   const unfolded = useEditor((state) => state.hand.kind === kind)
-  const { state, reveal, spread, spreadPile, handlers } = useHand({
+  const { state, held, rendered, reveal, spread, spreadPile, handlers } = useHand({
     count,
-    open: unfolded,
+    openingIndex,
+    unfolded,
     resetKey: unfolded,
-    startIndex,
-    unfoldDuration: MOTION_DURATIONS.move,
+    unfoldDuration: CARD_MOTION_DURATIONS.move,
   })
-  const pileSize = Math.min(count, state.slots)
-  const start = pileStart(state, centeredOffset(startIndex, count, state.slots))
+  const geometry = useHandGeometry()
+  const anchor = geometry.piles[kind]
+  const side = PILE_SIDES[kind]
 
   const added = events?.added ?? null
   const addedId = added?.id ?? null
-  const [revealed, setRevealed] = useState<string | null>(null)
-  if (addedId !== revealed && (unfolded || !added)) {
-    setRevealed(addedId)
+  const [revealedId, setRevealedId] = useState<string | null>(null)
+  if (addedId !== revealedId && (unfolded || !added)) {
+    setRevealedId(addedId)
     if (added) reveal(added.index)
   }
 
-  const layoutOf = (index: number, { zIndex, top, tilted = false, id }: PileCard): CardLayout => {
-    const facts = events?.eventsOf(id) ?? {}
-    if (unfolded) return withState(arcCardLayout(index, state, PILE_SIDES[kind]), facts)
-    const place = pilePlace(clamp(index - start, 0, pileSize - 1), pileSize, {
-      mirror: PILE_SIDES[kind] === 'right',
+  const layoutOf = (
+    index: number,
+    { zIndex, onTop, tilted = false, id }: PileCardOptions,
+  ): CardLayout => {
+    const eventsOfCard = events?.eventsOf(id) ?? {}
+    if (unfolded) return withState(arcCardLayout(index, state, side), eventsOfCard)
+    const size = rangeSize(held)
+    const place = pilePlace(clamp(index - held.first, 0, size - 1), size, {
+      mirror: side === 'right',
       spread,
-      top,
+      onTop,
       tilted,
     })
     return withState(
       {
-        place: {
-          ...placeStyle(PILE_ANCHORS[kind], place),
-          zIndex: facts.removed ? count + 1 : zIndex,
+        style: {
+          ...placeStyle(anchor, place),
+          zIndex: eventsOfCard.removed ? count + 1 : zIndex,
         },
-        state: { motion: moveMotion(index, state), folded: true, ignorePointer: state.moving },
+        state: { motion: moveMotion(index, state), inPile: true, ignorePointer: state.moving },
       },
-      facts,
+      eventsOfCard,
     )
   }
 
   return {
     kind,
+    anchor,
     unfolded,
     state,
-    count,
-    pileStart: start,
-    pileSize,
+    held,
     layoutOf,
-    rendered: (index: number) => isRendered(index, state, start),
+    rendered,
     reveal,
     spreadPile,
     handlers,

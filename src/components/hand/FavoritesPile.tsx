@@ -1,5 +1,5 @@
-import { useCardEvents } from '@src/hooks/useCardEvents.ts'
 import { useFavoriteActions } from '@src/hooks/useFavoriteActions.ts'
+import { useHandCards } from '@src/hooks/useHandCards.ts'
 import { usePile } from '@src/hooks/usePile.ts'
 import { lookEquals } from '@src/lib/catalog/look.ts'
 import { allFavorites, builtInFavorites, DEFAULT_FAVORITE_ID } from '@src/lib/favorites.ts'
@@ -13,16 +13,17 @@ import { Pile } from './Pile.tsx'
 
 export function FavoritesPile() {
   const { t } = useTranslation()
-  const favorites = allFavorites(useFavorites((state) => state.favorites))
+  const userFavorites = useFavorites((state) => state.favorites)
+  const favorites = allFavorites(userFavorites)
   const look = useEditor((state) => state.look)
   const { currentFavorite, add, remove, apply } = useFavoriteActions()
-  const { cards, chosenIndex, events } = useCardEvents(favorites, {
+  const { cards, chosenIndex, events } = useHandCards(favorites, {
     chosenId: currentFavorite?.id,
     firstIndex: 1,
   })
   const count = favorites.length + 1
-  const pile = usePile('favorites', { count, startIndex: chosenIndex, events })
-  const { unfolded, pileStart, layoutOf, rendered, reveal, spreadPile } = pile
+  const pile = usePile('favorites', { count, openingIndex: chosenIndex, events })
+  const { unfolded, held, layoutOf, rendered, reveal, spreadPile } = pile
 
   const unfold = () => {
     setHand({ kind: 'favorites' })
@@ -33,13 +34,13 @@ export function FavoritesPile() {
       pile={pile}
       icon={Star}
       label={t('favorites.label')}
-      slotLabel={t(unfolded ? 'favorites.fold' : 'favorites.unfold')}
+      pileSlotLabel={t(unfolded ? 'favorites.fold' : 'favorites.unfold')}
       pileLabel={t('favorites.count', { count: favorites.length })}
     >
       {rendered(0) && (
         <AddCard
           added={Boolean(currentFavorite)}
-          layout={layoutOf(0, { zIndex: 1, top: count === 1 })}
+          layout={layoutOf(0, { zIndex: 1, onTop: count === 1 })}
           onClick={unfolded ? add : unfold}
           onPointerEnter={unfolded ? () => setPreview(null) : spreadPile}
           onFocus={() => {
@@ -50,26 +51,26 @@ export function FavoritesPile() {
       )}
       {cards.map(({ item: favorite, index }) => {
         if (!rendered(index)) return null
-        const selected = lookEquals(favorite.look, look)
-        const preview = () => setPreview(selected ? null : favorite.look)
+        const chosen = lookEquals(favorite.look, look)
+        const showPreview = () => setPreview(chosen ? null : favorite.look)
         return (
           <FavoriteCard
             key={favorite.id}
             favorite={favorite}
-            number={index}
-            selected={selected}
+            position={index}
+            chosen={chosen}
             isDefault={favorite.id === DEFAULT_FAVORITE_ID}
             removable={!builtInFavorites.includes(favorite)}
             layout={layoutOf(index, {
               zIndex: count - index + 1,
-              top: index === Math.max(pileStart, 1),
+              onTop: index === Math.max(held.first, 1),
               id: favorite.id,
             })}
             onClick={unfolded ? () => apply(favorite) : unfold}
-            onPointerEnter={unfolded ? preview : spreadPile}
+            onPointerEnter={unfolded ? showPreview : spreadPile}
             onFocus={() => {
               reveal(index)
-              preview()
+              showPreview()
             }}
             onRemove={() => remove(favorite)}
           />

@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 
 type ListState<T> = ListChanges<T> & { items: T[]; ids: string }
 
-const idsOf = (items: { id: string }[]) => items.map((item) => item.id).join(' ')
+function idsOf(items: { id: string }[]) {
+  return items.map((item) => item.id).join(' ')
+}
 
 export function useListChanges<T extends { id: string }>(items: T[], duration: number) {
   const ids = idsOf(items)

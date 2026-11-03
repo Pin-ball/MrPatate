@@ -4,7 +4,7 @@ export const pivotDepth = 60
 
 export const planes = [
   {
-    id: 'scene',
+    id: 'background',
     depth: 20,
     parts: ['background'],
   },

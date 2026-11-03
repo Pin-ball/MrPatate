@@ -1,7 +1,8 @@
 import { thumbnailView } from '@src/lib/catalog/camera.ts'
 import { defaultLook } from '@src/lib/catalog/index.ts'
+import { withVariant } from '@src/lib/catalog/look.ts'
 import type { Look, Part, Variant } from '@src/lib/catalog/types.ts'
-import { Backdrop } from './Backdrop.tsx'
+import { BackgroundFill } from './BackgroundFill.tsx'
 import { CharacterImage } from './CharacterImage.tsx'
 
 type VariantThumbnailProps = {
@@ -16,16 +17,16 @@ export function VariantThumbnail({ look, part, variant }: VariantThumbnailProps)
   return (
     <span className="border-foreground bg-background size-[72px] shrink-0 overflow-hidden rounded-[14px] border-2">
       {paint?.kind === 'skin' && (
-        <span className="block size-full" style={{ background: paint.skin }} />
+        <span className="block size-full" style={{ background: paint.color }} />
       )}
       {paint?.kind === 'background' && (
         <svg className="block size-full" aria-hidden>
-          <Backdrop paint={paint} />
+          <BackgroundFill paint={paint} />
         </svg>
       )}
       {!paint && (
         <CharacterImage
-          look={{ ...look, background: defaultLook.background, [part.id]: variant.id }}
+          look={withVariant({ ...look, background: defaultLook.background }, part.id, variant.id)}
           view={thumbnailView(variant)}
           className="block size-full"
         />

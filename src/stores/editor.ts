@@ -1,16 +1,17 @@
 import { defaultLook } from '@src/lib/catalog/index.ts'
-import { lookEquals, randomLook, readLook, withRandomVariant } from '@src/lib/catalog/look.ts'
-import type { Look, PartId, VariantId } from '@src/lib/catalog/types.ts'
+import {
+  lookEquals,
+  randomLook,
+  readLook,
+  withRandomVariant,
+  withVariant,
+} from '@src/lib/catalog/look.ts'
+import type { Look, PartId } from '@src/lib/catalog/types.ts'
+import type { Hand } from '@src/lib/hand/geometry.ts'
 import { readField } from '@src/lib/utils.ts'
 import { temporal } from 'zundo'
 import { create, useStore } from 'zustand'
 import { persist } from 'zustand/middleware'
-
-export type Hand =
-  | { kind: 'none' }
-  | { kind: 'parts' }
-  | { kind: 'variants'; part: PartId }
-  | { kind: 'favorites' }
 
 type EditorState = {
   look: Look
@@ -47,22 +48,37 @@ export const useEditor = create<EditorState>()(
 
 const { getState, setState } = useEditor
 
-export const setLook = (look: Look) => setState({ look, preview: null })
+export function setLook(look: Look) {
+  setState({ look, preview: null })
+}
 
-export const setVariant = <P extends PartId>(part: P, variant: VariantId<P>) =>
-  setLook({ ...getState().look, [part]: variant })
+export function setVariant(part: PartId, variantId: string) {
+  setLook(withVariant(getState().look, part, variantId))
+}
 
-export const randomizeLook = () => setLook(randomLook(getState().look))
+export function randomizeLook() {
+  setLook(randomLook(getState().look))
+}
 
-export const randomizeVariant = (part: PartId) => setLook(withRandomVariant(getState().look, part))
+export function randomizeVariant(part: PartId) {
+  setLook(withRandomVariant(getState().look, part))
+}
 
-export const undo = () => useEditor.temporal.getState().undo()
+export function undo() {
+  useEditor.temporal.getState().undo()
+}
 
-export const redo = () => useEditor.temporal.getState().redo()
+export function redo() {
+  useEditor.temporal.getState().redo()
+}
 
-export const setPreview = (preview: Partial<Look> | null) => setState({ preview })
+export function setPreview(preview: Partial<Look> | null) {
+  setState({ preview })
+}
 
-export const setHand = (hand: Hand) => setState({ hand, preview: null })
+export function setHand(hand: Hand) {
+  setState({ hand, preview: null })
+}
 
 export function closeHand() {
   const { kind } = getState().hand

@@ -1,9 +1,10 @@
 // @vitest-environment happy-dom
 import { defaultLook } from '@src/lib/catalog/index.ts'
+import type { Look } from '@src/lib/catalog/types.ts'
 import { builtInFavorites, findFavorite, readFavorites } from '@src/lib/favorites.ts'
 import { describe, expect, it } from 'vitest'
 
-const sixEyes = { ...defaultLook, eyes: 'six' } as const
+const sixEyes: Look = { ...defaultLook, eyes: 'six' }
 
 describe('builtInFavorites', () => {
   it('lists the presets, then the default look', () => {

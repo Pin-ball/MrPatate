@@ -30,9 +30,11 @@ export function readFavorites(persisted: unknown): Favorite[] {
   const stored = readField(persisted, 'favorites')
   if (!Array.isArray(stored)) return []
   return stored.flatMap((item: unknown) => {
-    if (typeof item !== 'object' || item === null) return []
-    const { id, name, createdAt, look } = item as Record<string, unknown>
+    const id = readField(item, 'id')
+    const name = readField(item, 'name')
+    const createdAt = readField(item, 'createdAt')
     if (typeof id !== 'string' || typeof createdAt !== 'number') return []
-    return [{ id, createdAt, look: readLook(look), ...(typeof name === 'string' && { name }) }]
+    const look = readLook(readField(item, 'look'))
+    return [{ id, createdAt, look, ...(typeof name === 'string' && { name }) }]
   })
 }

@@ -18,7 +18,8 @@ export function Menu({ trigger, children, ...buttonProps }: MenuProps) {
   useEffect(() => {
     if (!open) return
     const closeOutside = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) setOpen(false)
+      if (event.target instanceof Node && root.current?.contains(event.target)) return
+      setOpen(false)
     }
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return

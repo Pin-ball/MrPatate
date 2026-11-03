@@ -1,6 +1,6 @@
 import { pivotDepth } from '@src/catalog/planes.ts'
 import { useParallax } from '@src/hooks/useParallax.ts'
-import { FRAME, viewBoxOf } from '@src/lib/catalog/camera.ts'
+import { FRAME, FRAME_RATIO, viewBoxOf } from '@src/lib/catalog/camera.ts'
 import { layersOf, skinOf } from '@src/lib/catalog/layers.ts'
 import { DURATIONS, seconds } from '@src/lib/motion.ts'
 import { cn } from '@src/lib/utils.ts'
@@ -12,13 +12,13 @@ import { useRef } from 'react'
 import { PartLayer } from './PartLayers.tsx'
 import './character.css'
 
-type ScenePlaneProps = {
+type CharacterPlaneProps = {
   id: string
   depth: number
   children: ReactNode
 }
 
-function ScenePlane({ id, depth, children }: ScenePlaneProps) {
+function CharacterPlane({ id, depth, children }: CharacterPlaneProps) {
   return (
     <svg
       data-plane={id}
@@ -48,13 +48,19 @@ export function Character({ label, className }: CharacterProps) {
   const look = useShownLook()
   const chosenLook = useEditor((state) => state.look)
   const skin = skinOf(look)
-  const planes = layersOf(look)
+  const planeLayers = layersOf(look)
 
   return (
-    <div ref={ref} role="img" aria-label={label} className={cn('character-stage', className)}>
-      <div className="character-scene">
-        {planes.map(({ plane, layers }) => (
-          <ScenePlane key={plane.id} id={plane.id} depth={plane.depth}>
+    <div
+      ref={ref}
+      role="img"
+      aria-label={label}
+      style={{ aspectRatio: FRAME_RATIO }}
+      className={cn('character-perspective', className)}
+    >
+      <div className="character-tilt">
+        {planeLayers.map(({ plane, layers }) => (
+          <CharacterPlane key={plane.id} id={plane.id} depth={plane.depth}>
             <AnimatePresence initial={false}>
               {layers.map((layer) => (
                 <motion.g
@@ -66,7 +72,7 @@ export function Character({ label, className }: CharacterProps) {
                 </motion.g>
               ))}
             </AnimatePresence>
-          </ScenePlane>
+          </CharacterPlane>
         ))}
       </div>
     </div>

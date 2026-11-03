@@ -1,7 +1,10 @@
 import { clamp } from '@src/lib/utils.ts'
+import { unionBox } from './svg.ts'
 import type { Box, Camera, Variant } from './types.ts'
 
 export const FRAME: Box = [180, 190, 620, 740]
+
+export const FRAME_RATIO = (FRAME[2] - FRAME[0]) / (FRAME[3] - FRAME[1])
 
 const FILL = 0.75
 
@@ -14,16 +17,6 @@ export const FRAME_CAMERA: Camera = {
 
 export function viewBoxOf([x0, y0, x1, y1]: Box): string {
   return `${x0} ${y0} ${x1 - x0} ${y1 - y0}`
-}
-
-function unionBox(boxes: Box[]): Box | null {
-  if (!boxes.length) return null
-  return [
-    Math.min(...boxes.map((box) => box[0])),
-    Math.min(...boxes.map((box) => box[1])),
-    Math.max(...boxes.map((box) => box[2])),
-    Math.max(...boxes.map((box) => box[3])),
-  ]
 }
 
 export function cameraOf(variants: Variant[]): Camera | null {
@@ -53,16 +46,6 @@ export function frameView(zoom: number, ratio: number): Box {
   const width = (FRAME[2] - FRAME[0]) / zoom
   const height = width * ratio
   return [x - width / 2, y - height / 2, x + width / 2, y + height / 2]
-}
-
-export function cameraTransform({ zoom, focus: [x, y] }: Camera, shiftY = 0) {
-  const [x0, y0, x1, y1] = FRAME
-  const originX = ((x - x0) / (x1 - x0)) * 100
-  const originY = ((y - y0) / (y1 - y0)) * 100
-  return {
-    transform: `translate(${50 - originX}%, calc(${shiftY}px + ${50 - originY}%)) scale(${zoom})`,
-    transformOrigin: `${originX}% ${originY}%`,
-  }
 }
 
 const THUMBNAIL_MARGIN = 1.3
