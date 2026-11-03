@@ -1,12 +1,13 @@
 import { DESKTOP_GEOMETRY } from '@src/lib/hand/desktop.ts'
 import { MOBILE_GEOMETRY } from '@src/lib/hand/mobile.ts'
 import {
-  cardVisibility,
   centeredOffset,
   clampOffset,
+  handPosition,
   heldCards,
   hiddenCounts,
   isRendered,
+  isShown,
   offsetBounds,
   visibleCards,
 } from '@src/lib/hand/window.ts'
@@ -28,10 +29,10 @@ const pile = {
 describe('hand scrolling', () => {
   it('can center the first and the last card', () => {
     const bounds = offsetBounds(24, MOBILE)
-    expect(bounds).toEqual({ min: -2, max: 21 })
-    expect(centeredOffset(0, 24, MOBILE)).toBe(-2)
-    expect(centeredOffset(23, 24, MOBILE)).toBe(21)
-    expect(clampOffset(-5, bounds)).toBe(-2)
+    expect(bounds).toEqual({ min: -3, max: 20 })
+    expect(centeredOffset(0, 24, MOBILE)).toBe(-3)
+    expect(centeredOffset(23, 24, MOBILE)).toBe(20)
+    expect(clampOffset(-5, bounds)).toBe(-3)
     expect(offsetBounds(24, NINE)).toEqual({ min: 0, max: 15 })
   })
 
@@ -50,38 +51,31 @@ describe('hand scrolling', () => {
 })
 
 describe('visibleCards', () => {
-  it('spans the slots, and the peeking cards, keeping only the existing cards', () => {
+  it('spans the slots, keeping only the existing cards', () => {
     expect(visibleCards(4, 24, NINE)).toEqual({ first: 4, last: 12 })
-    expect(visibleCards(4.4, 24, MOBILE)).toEqual({ first: 3, last: 9 })
-    expect(visibleCards(-2, 24, MOBILE)).toEqual({ first: 0, last: 3 })
-    expect(visibleCards(21, 24, MOBILE)).toEqual({ first: 20, last: 23 })
+    expect(visibleCards(3.4, 24, MOBILE)).toEqual({ first: 3, last: 9 })
+    expect(visibleCards(-3, 24, MOBILE)).toEqual({ first: 0, last: 3 })
+    expect(visibleCards(20, 24, MOBILE)).toEqual({ first: 20, last: 23 })
   })
 })
 
-describe('cardVisibility', () => {
-  it('shows the cards of the slots, desktop hiding the others', () => {
-    expect(cardVisibility(-1, NINE)).toBe('hidden')
-    expect(cardVisibility(8.4, NINE)).toBe('shown')
-    expect(cardVisibility(8.6, NINE)).toBe('hidden')
+describe('isShown', () => {
+  it('shows the cards of the slots, hiding the others', () => {
+    expect(isShown(-1, NINE)).toBe(false)
+    expect(isShown(8.4, NINE)).toBe(true)
+    expect(isShown(8.6, NINE)).toBe(false)
   })
 
-  it('lets the next card peek past each end of a mobile hand', () => {
-    expect([-2, -1, 0, 4, 5, 6].map((slot) => cardVisibility(slot, MOBILE))).toEqual([
-      'hidden',
-      'partial',
-      'shown',
-      'shown',
-      'partial',
-      'hidden',
-    ])
+  it('counts the cards cut by the screen edge as slots of a mobile hand', () => {
+    expect([-1, 0, 6, 7].map((slot) => isShown(slot, MOBILE))).toEqual([false, true, true, false])
   })
 })
 
 describe('heldCards', () => {
   it('keeps only the existing cards when the hand opens past an end', () => {
     const mobile = { ...pile, shape: MOBILE }
-    expect(heldCards(mobile, -2)).toEqual({ first: 0, last: 3 })
-    expect(heldCards({ ...mobile, count: 6 }, 2)).toEqual({ first: 1, last: 5 })
+    expect(heldCards(mobile, -3)).toEqual({ first: 0, last: 3 })
+    expect(heldCards({ ...mobile, count: 6 }, 1)).toEqual({ first: 1, last: 5 })
   })
 })
 
@@ -116,12 +110,12 @@ describe('isRendered', () => {
     expect(isRendered(9, { ...open, moving: true }, folded)).toBe(false)
   })
 
-  it('holds the peeking cards in the pile, so they open and fold with the others', () => {
-    const mobile = { ...pile, shape: MOBILE }
-    expect(heldCards(mobile, 4)).toEqual({ first: 3, last: 9 })
+  it('holds the cards cut by the screen edge in the pile, so they open and fold with the others', () => {
+    const mobile = { ...pile, offset: 9, shape: MOBILE }
+    expect(heldCards(mobile, 3)).toEqual({ first: 3, last: 9 })
     const opening = { ...mobile, unfolded: true, moving: true }
-    expect(isRendered(9, opening, heldCards(opening, 10))).toBe(true)
-    expect(isRendered(8, opening, heldCards(opening, 10))).toBe(false)
+    expect(isRendered(9, opening, heldCards(opening, 9))).toBe(true)
+    expect(isRendered(8, opening, heldCards(opening, 9))).toBe(false)
   })
 })
 
@@ -132,5 +126,20 @@ describe('hiddenCounts', () => {
     expect(hiddenCounts(15, 24, NINE)).toEqual({ before: 15, after: 0 })
     const seven = DESKTOP_GEOMETRY.handShape(1280, 7)
     expect(hiddenCounts(0, 7, seven)).toEqual({ before: 0, after: 0 })
+  })
+})
+
+describe('handPosition', () => {
+  it('gives the position of the middle card among the cards that follow the first index', () => {
+    expect(handPosition(-0.6, 24, MOBILE, 0)).toEqual({ position: 3, total: 24 })
+    expect(handPosition(2, 24, MOBILE, 1)).toEqual({ position: 5, total: 23 })
+  })
+
+  it('gives position 0 when a card before the first index is in the middle', () => {
+    expect(handPosition(-3, 24, MOBILE, 1)).toEqual({ position: 0, total: 23 })
+  })
+
+  it('stays on the last card when the hand is dragged past its end', () => {
+    expect(handPosition(30, 24, MOBILE, 0)).toEqual({ position: 24, total: 24 })
   })
 })

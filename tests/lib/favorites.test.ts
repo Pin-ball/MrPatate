@@ -1,7 +1,12 @@
 // @vitest-environment happy-dom
 import { defaultLook } from '@src/lib/catalog/index.ts'
 import type { Look } from '@src/lib/catalog/types.ts'
-import { builtInFavorites, findFavorite, readFavorites } from '@src/lib/favorites.ts'
+import {
+  builtInFavorites,
+  createFavoriteId,
+  findFavorite,
+  readFavorites,
+} from '@src/lib/favorites.ts'
 import { describe, expect, it } from 'vitest'
 
 const sixEyes: Look = { ...defaultLook, eyes: 'six' }
@@ -39,5 +44,13 @@ describe('readFavorites', () => {
     expect(favorites).toEqual([{ id: 'a', createdAt: 1, name: 'Pierre', look: sixEyes }])
     expect(readFavorites(null)).toEqual([])
     expect(readFavorites({ favorites: 'junk' })).toEqual([])
+  })
+})
+
+describe('createFavoriteId', () => {
+  it('creates a new random id each time, without needing a secure context', () => {
+    const id = createFavoriteId()
+    expect(id).toMatch(/^[0-9a-f]{32}$/)
+    expect(createFavoriteId()).not.toBe(id)
   })
 })

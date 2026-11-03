@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "@fontsource/bowlby-one";
 @import "@fontsource-variable/space-grotesk";
+@import "./hand.css";
 
-@custom-variant dark (&:is(.dark *));
 @custom-variant on-dark (&:is([data-background="dark"] *));
 @custom-variant desktop (@media (min-width: 1024px) and (min-height: 600px));
 
@@ -31,8 +31,6 @@
   --input: #141210;
   --ring: #ff5b2e;
 
-  --scrim: rgb(20 18 16 / 0.4);
-  --floor: rgb(20 18 16 / 0.14);
   --divider: rgb(20 18 16 / 0.15);
   --slot: rgb(20 18 16 / 0.4);
 
@@ -63,8 +61,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-scrim: var(--scrim);
-  --color-floor: var(--floor);
   --color-divider: var(--divider);
   --color-slot: var(--slot);
 
@@ -79,166 +75,32 @@
   --shadow-hard-lg: var(--shadow-hard-lg);
 }
 
-@keyframes card-enter {
-  from {
-    left: var(--from-left);
-    top: var(--from-top);
-  }
-}
-
-@keyframes card-drop {
-  0% {
-    margin-top: -220px;
-    opacity: 0;
-    scale: 0.85;
-    animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
-  }
-
-  10% {
-    opacity: 1;
-  }
-
-  45% {
-    margin-top: 0;
-    scale: 1;
-    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  60% {
-    margin-top: 5px;
-    scale: 1.07 0.9;
-  }
-
-  78% {
-    margin-top: -3px;
-    scale: 0.98 1.03;
-  }
-}
-
-@keyframes card-bounce {
-  35% {
-    scale: 1.08;
-  }
-
-  70% {
-    scale: 0.97;
-  }
-}
-
-@keyframes card-fade {
-  to {
-    opacity: 0;
-    scale: 0.8;
-  }
-}
-
-@keyframes card-hit {
-  40% {
-    margin-top: 5px;
-  }
-}
-
-@keyframes mouse-wheel {
-  50% {
-    translate: 0 3px;
-    opacity: 0;
-  }
-}
-
-@utility wheel-motion {
-  & path {
-    animation: mouse-wheel var(--duration-scroll-hint) ease-in-out infinite;
-  }
-}
-
-@utility card-motion {
-  --card-ease: var(--ease-overshoot-sm);
-  box-shadow: var(--shadow-hard);
-  transition:
-    left var(--card-duration) var(--card-ease) var(--card-delay),
-    top var(--card-duration) var(--card-ease) var(--card-delay),
-    rotate var(--card-duration) var(--card-ease) var(--card-delay),
-    scale var(--duration-short) linear var(--card-delay),
-    opacity var(--duration-short) linear var(--opacity-delay, var(--card-delay)),
-    margin-top var(--duration-lift) var(--ease-overshoot-lg),
-    background-color var(--duration-short) ease;
-
-  @variant desktop {
-    &:not([data-in-pile]):is(:hover, :has(:focus-visible)) {
-      margin-top: -24px;
-    }
-
-    &:not([data-in-pile]):hover::after {
-      content: "";
-      position: absolute;
-      inset-inline: 0;
-      top: 100%;
-      height: 32px;
-    }
-  }
-
-  &[data-in-pile] {
-    box-shadow: var(--shadow-hard-sm);
-  }
-
-  &[data-ignore-pointer] {
-    pointer-events: none;
-  }
-
-  &[data-hidden] {
-    --card-ease: var(--ease-out-strong);
-    opacity: 0;
-    scale: 0.85;
-  }
-
-  &[data-partial] {
-    --opacity-delay: calc(var(--card-delay) + var(--card-duration) / 2);
-    opacity: 0.5;
-  }
-
-  &[data-motion="enter"] {
-    animation: card-enter var(--card-duration) var(--ease-overshoot-md) var(--card-delay) backwards;
-  }
-
-  &[data-just-chosen]:not([data-in-pile], [data-added]) {
-    animation: card-bounce var(--duration-bounce) ease-in-out;
-  }
-
-  &[data-added] {
-    animation: card-drop var(--duration-drop) both;
-  }
-
-  &[data-other-added] {
-    animation: card-hit var(--duration-hit) var(--ease-out-strong) calc(var(--duration-drop) * 0.45);
-  }
-
-  &[data-removed] {
-    pointer-events: none;
-    animation: card-fade var(--duration-remove) ease-in-out forwards;
-  }
-}
-
 @utility pressable {
   box-shadow: var(--shadow-hard);
   transition:
-    translate var(--duration-press),
-    box-shadow var(--duration-press);
+    translate var(--duration-press) var(--duration-press-hold),
+    box-shadow var(--duration-press) var(--duration-press-hold);
 
   &:active:not(:disabled) {
     translate: 3px 3px;
     box-shadow: none;
+    transition: none;
+  }
+}
+
+@utility pressable-scale {
+  transition:
+    background-color var(--duration-short),
+    scale var(--duration-press) var(--duration-press-hold);
+
+  &:active:not(:disabled) {
+    scale: 0.92;
+    transition: background-color var(--duration-short);
   }
 }
 
 @utility border-stroke {
   border-width: var(--stroke);
-}
-
-@utility label-caps {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 @layer base {

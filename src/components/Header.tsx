@@ -7,10 +7,14 @@ export function Header() {
   const { t } = useTranslation()
 
   return (
-    <header className="relative z-60 grid h-20 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3.5 px-6">
-      <h1 className="font-display on-dark:text-background text-[26px]">{t('app.title')}</h1>
-      <div className="flex items-center gap-3.5">
-        <Toolbar />
+    <header className="desktop:grid desktop:h-20 desktop:grid-cols-[1fr_auto_1fr] desktop:gap-3.5 desktop:px-6 relative z-60 flex h-16 shrink-0 items-center gap-2 px-4">
+      <h1 className="font-display on-dark:text-background desktop:not-sr-only sr-only text-[26px]">
+        {t('app.title')}
+      </h1>
+      <div className="desktop:flex desktop:items-center desktop:gap-3.5 contents">
+        <div className="desktop:me-0 me-auto">
+          <Toolbar />
+        </div>
         <ShareMenu />
       </div>
       <div className="justify-self-end">

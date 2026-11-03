@@ -11,6 +11,8 @@ import { AddCard } from './AddCard.tsx'
 import { FavoriteCard } from './FavoriteCard.tsx'
 import { Pile } from './Pile.tsx'
 
+const FIRST_FAVORITE_INDEX = 1
+
 export function FavoritesPile() {
   const { t } = useTranslation()
   const userFavorites = useFavorites((state) => state.favorites)
@@ -19,7 +21,7 @@ export function FavoritesPile() {
   const { currentFavorite, add, remove, apply } = useFavoriteActions()
   const { cards, chosenIndex, events } = useHandCards(favorites, {
     chosenId: currentFavorite?.id,
-    firstIndex: 1,
+    firstIndex: FIRST_FAVORITE_INDEX,
   })
   const count = favorites.length + 1
   const pile = usePile('favorites', { count, openingIndex: chosenIndex, events })
@@ -34,6 +36,7 @@ export function FavoritesPile() {
       pile={pile}
       icon={Star}
       label={t('favorites.label')}
+      firstIndex={FIRST_FAVORITE_INDEX}
       pileSlotLabel={t(unfolded ? 'favorites.fold' : 'favorites.unfold')}
       pileLabel={t('favorites.count', { count: favorites.length })}
     >

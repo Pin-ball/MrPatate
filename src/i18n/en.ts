@@ -30,6 +30,7 @@ export const en = {
   },
   hand: {
     scroll_hint: 'Scroll or drag to see more',
+    close: 'Close: {{name}}',
   },
   variants: {
     label: 'Variants: {{part}}',

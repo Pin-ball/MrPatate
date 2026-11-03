@@ -1,4 +1,4 @@
-import { pilePlace } from '@src/lib/hand/geometry.ts'
+import { dragAreaStyle, pilePlace } from '@src/lib/hand/geometry.ts'
 import { describe, expect, it } from 'vitest'
 
 describe('pilePlace', () => {
@@ -18,5 +18,14 @@ describe('pilePlace', () => {
   it('tilts a card at a fixed angle', () => {
     expect(pilePlace(1, 7, { tilted: true })).toEqual({ x: 0, y: -2, rotate: -3 })
     expect(pilePlace(1, 7, { spread: true, tilted: true })).toEqual({ x: 0, y: -2, rotate: -6 })
+  })
+})
+
+describe('dragAreaStyle', () => {
+  it('spans from a little above the hand down to the safe area', () => {
+    expect(dragAreaStyle(229, 16)).toEqual({
+      top: 'calc(100% - var(--safe-bottom) - 245px)',
+      bottom: 'var(--safe-bottom)',
+    })
   })
 })

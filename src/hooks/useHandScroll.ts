@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 const WHEEL_PER_CARD = 100
 const DRAG_THRESHOLD = 8
 const SNAP_DELAY = 140
-const MAX_CARDS_PER_MS = 0.012
+const MAX_CARDS_PER_MS = 0.05
 const MAX_ELAPSED = 100
 const SPRING = { stiffness: 260, damping: 30 }
 

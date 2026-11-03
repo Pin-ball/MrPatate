@@ -4,7 +4,7 @@ import { useHandGeometry } from '@src/hooks/useLayout.ts'
 import type { CardLayout } from '@src/lib/hand/cards.ts'
 import { arcCardLayout, CARD_MOTION_DURATIONS, moveMotion, withState } from '@src/lib/hand/cards.ts'
 import type { PileKind } from '@src/lib/hand/geometry.ts'
-import { PILE_SIDES, pilePlace, placeStyle } from '@src/lib/hand/geometry.ts'
+import { loweredAnchor, PILE_SIDES, pilePlace, placeStyle } from '@src/lib/hand/geometry.ts'
 import { rangeSize } from '@src/lib/hand/window.ts'
 import { clamp } from '@src/lib/utils.ts'
 import { useEditor } from '@src/stores/editor.ts'
@@ -16,6 +16,7 @@ type PileCardOptions = { zIndex: number; onTop: boolean; tilted?: boolean; id?: 
 
 export function usePile(kind: PileKind, { count, openingIndex, events }: PileOptions) {
   const unfolded = useEditor((state) => state.hand.kind === kind)
+  const handOpen = useEditor((state) => state.hand.kind !== 'none')
   const { state, held, rendered, reveal, spread, spreadPile, handlers } = useHand({
     count,
     openingIndex,
@@ -24,8 +25,10 @@ export function usePile(kind: PileKind, { count, openingIndex, events }: PileOpt
     unfoldDuration: CARD_MOTION_DURATIONS.move,
   })
   const geometry = useHandGeometry()
-  const anchor = geometry.piles[kind]
+  const lowered = geometry.lowerPiles && handOpen
+  const anchor = lowered ? loweredAnchor(geometry.piles[kind]) : geometry.piles[kind]
   const side = PILE_SIDES[kind]
+  const cardsOnScreen = unfolded || !lowered
 
   const added = events?.added ?? null
   const addedId = added?.id ?? null
@@ -39,7 +42,7 @@ export function usePile(kind: PileKind, { count, openingIndex, events }: PileOpt
     index: number,
     { zIndex, onTop, tilted = false, id }: PileCardOptions,
   ): CardLayout => {
-    const eventsOfCard = events?.eventsOf(id) ?? {}
+    const eventsOfCard = cardsOnScreen && events ? events.eventsOf(id) : {}
     if (unfolded) return withState(arcCardLayout(index, state, side), eventsOfCard)
     const size = rangeSize(held)
     const place = pilePlace(clamp(index - held.first, 0, size - 1), size, {
@@ -63,6 +66,7 @@ export function usePile(kind: PileKind, { count, openingIndex, events }: PileOpt
   return {
     kind,
     anchor,
+    lowered,
     unfolded,
     state,
     held,

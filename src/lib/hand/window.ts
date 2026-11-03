@@ -15,8 +15,6 @@ export type OffsetBounds = { min: number; max: number }
 
 type CardRange = { first: number; last: number }
 
-type CardVisibility = 'shown' | 'partial' | 'hidden'
-
 const RENDERED_MARGIN = 2
 
 export function offsetBounds(count: number, { slots, overscroll }: HandShape): OffsetBounds {
@@ -41,11 +39,19 @@ export function hiddenCounts(offset: number, count: number, shape: HandShape) {
   return { before, after: count - shape.slots - before }
 }
 
+export function handPosition(offset: number, count: number, shape: HandShape, firstIndex: number) {
+  const middle = clamp(Math.round(offset + (shape.slots - 1) / 2), 0, count - 1)
+  return {
+    position: Math.max(middle - firstIndex + 1, 0),
+    total: count - firstIndex,
+  }
+}
+
 export function visibleCards(offset: number, count: number, shape: HandShape): CardRange {
-  const first = Math.round(offset) - shape.partialCards
+  const first = Math.round(offset)
   return {
     first: Math.max(first, 0),
-    last: Math.min(first + shape.slots + 2 * shape.partialCards, count) - 1,
+    last: Math.min(first + shape.slots, count) - 1,
   }
 }
 
@@ -65,9 +71,7 @@ export function isRendered(index: number, { unfolded, moving }: HandState, cards
   return index >= cards.first - margin && index <= cards.last + margin
 }
 
-export function cardVisibility(slot: number, { slots, partialCards }: HandShape): CardVisibility {
+export function isShown(slot: number, { slots }: HandShape): boolean {
   const nearest = Math.round(slot)
-  if (nearest >= 0 && nearest < slots) return 'shown'
-  if (nearest >= -partialCards && nearest < slots + partialCards) return 'partial'
-  return 'hidden'
+  return nearest >= 0 && nearest < slots
 }

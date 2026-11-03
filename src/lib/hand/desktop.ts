@@ -78,11 +78,9 @@ function desktopHandShape(width: number, count: number): HandShape {
   const arc = desktopArc(slots)
   return {
     slots,
-    partialCards: 0,
     overscroll: 0,
     dragPerCard: DRAG_PER_CARD,
     place: (slot) => desktopPlace(slot, slots, arc),
-    stackOrder: (_slot, index) => index + 1,
     offsetShowing: (index, offset) => clamp(offset, index - slots + 1, index),
   }
 }
@@ -106,7 +104,9 @@ export const DESKTOP_GEOMETRY: HandGeometry = {
     favorites: { left: `calc(100% - ${PILE_INSET}px)`, bottom: PILE_BOTTOM },
   },
   labelBelowPile: LABEL_BELOW_PILE,
+  lowerPiles: false,
   scrollCues: { hiddenCountStyle, scrollHintStyle },
+  dragAreaAbove: null,
   handShape: desktopHandShape,
   handTop: desktopHandTop,
 }

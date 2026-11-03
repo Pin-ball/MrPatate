@@ -19,11 +19,9 @@ export type HandEnd = 'before' | 'after'
 
 export type HandShape = {
   slots: number
-  partialCards: number
   overscroll: number
   dragPerCard: number
   place: (slot: number) => Place
-  stackOrder: (slot: number, index: number) => number
   offsetShowing: (index: number, offset: number) => number
 }
 
@@ -36,7 +34,9 @@ export type HandGeometry = {
   cardZoom: number
   piles: Record<PileKind, Anchor>
   labelBelowPile: number
+  lowerPiles: boolean
   scrollCues: ScrollCueStyles | null
+  dragAreaAbove: number | null
   handShape: (width: number, count: number) => HandShape
   handTop: (width: number) => number
 }
@@ -96,16 +96,23 @@ export function handStyle(place: Place) {
 }
 
 export function arcStyle(shape: HandShape, slot: number) {
-  const { slots, partialCards } = shape
-  return handStyle(shape.place(clamp(slot, -partialCards - 1, slots + partialCards)))
+  return handStyle(shape.place(clamp(slot, -1, shape.slots)))
 }
 
 export function belowArcStyle(shape: HandShape, slot: number) {
-  const { slots, partialCards } = shape
-  const { x, rotate } = shape.place(
-    clamp(Math.round(slot), -partialCards, slots - 1 + partialCards),
-  )
+  const { x, rotate } = shape.place(clamp(Math.round(slot), 0, shape.slots - 1))
   return handStyle({ x, y: BELOW_SCREEN, rotate })
+}
+
+export function loweredAnchor({ left }: Anchor): Anchor {
+  return { left, bottom: -BELOW_SCREEN }
+}
+
+export function dragAreaStyle(handTop: number, above: number) {
+  return {
+    top: `calc(100% - var(--safe-bottom) - ${handTop + above}px)`,
+    bottom: 'var(--safe-bottom)',
+  }
 }
 
 export function labelStyle(anchor: Anchor, below: number) {

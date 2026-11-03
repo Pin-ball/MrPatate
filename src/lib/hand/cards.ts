@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react'
 import type { PileSide } from './geometry.ts'
 import { arcStyle, belowArcStyle } from './geometry.ts'
 import type { HandState } from './window.ts'
-import { cardVisibility, visibleCards } from './window.ts'
+import { isShown, visibleCards } from './window.ts'
 
 type CardMotion = 'move' | 'instant' | 'leave' | 'scroll' | 'enter'
 
@@ -19,7 +19,6 @@ type CardState = CardEvents & {
   delay?: number
   inPile?: boolean
   hidden?: boolean
-  partial?: boolean
   ignorePointer?: boolean
 }
 
@@ -48,14 +47,14 @@ function waveDelay(index: number, { count, offset, shape }: HandState, pileSide:
 }
 
 export function moveMotion(index: number, { offset, shape, moving }: HandState): CardMotion {
-  return moving && cardVisibility(index - offset, shape) === 'hidden' ? 'instant' : 'move'
+  return moving && !isShown(index - offset, shape) ? 'instant' : 'move'
 }
 
 export function arcCardLayout(index: number, state: HandState, pileSide?: PileSide): CardLayout {
   const { offset, shape, unfolded, moving, scrolling } = state
   const slot = index - offset
-  const visibility = cardVisibility(slot, shape)
-  const style = { ...arcStyle(shape, slot), zIndex: shape.stackOrder(slot, index) }
+  const shown = isShown(slot, shape)
+  const style = { ...arcStyle(shape, slot), zIndex: index + 1 }
   if (!unfolded) {
     return { style, state: { motion: 'leave', hidden: true, ignorePointer: true } }
   }
@@ -63,10 +62,9 @@ export function arcCardLayout(index: number, state: HandState, pileSide?: PileSi
     style,
     state: {
       motion: scrolling ? 'scroll' : moveMotion(index, state),
-      delay: moving && visibility !== 'hidden' && pileSide ? waveDelay(index, state, pileSide) : 0,
-      hidden: visibility === 'hidden',
-      partial: visibility === 'partial',
-      ignorePointer: moving || visibility !== 'shown',
+      delay: moving && shown && pileSide ? waveDelay(index, state, pileSide) : 0,
+      hidden: !shown,
+      ignorePointer: moving || !shown,
     },
   }
 }

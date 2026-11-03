@@ -1,6 +1,6 @@
 import type { Look } from '@src/lib/catalog/types.ts'
 import type { Favorite } from '@src/lib/favorites.ts'
-import { findFavorite, readFavorites } from '@src/lib/favorites.ts'
+import { createFavoriteId, findFavorite, readFavorites } from '@src/lib/favorites.ts'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -25,7 +25,7 @@ const { getState, setState } = useFavorites
 export function addFavorite(look: Look): Favorite | null {
   const { favorites } = getState()
   if (findFavorite(favorites, look)) return null
-  const favorite = { id: crypto.randomUUID(), createdAt: Date.now(), look }
+  const favorite = { id: createFavoriteId(), createdAt: Date.now(), look }
   setState({ favorites: [favorite, ...favorites] })
   return favorite
 }

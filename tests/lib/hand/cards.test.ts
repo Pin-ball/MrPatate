@@ -71,26 +71,18 @@ describe('arcCardLayout', () => {
     expect(arcCardLayout(8, at(-0.6)).state.ignorePointer).toBe(true)
   })
 
-  it('lets the next card peek past each end of a mobile hand, out of reach', () => {
-    const middle = handState({ count: 12, offset: 4, shape: MOBILE })
-    expect(arcCardLayout(3, middle).state).toMatchObject({
-      partial: true,
-      hidden: false,
-      ignorePointer: true,
-    })
-    expect(arcCardLayout(9, middle).state).toMatchObject({ partial: true, hidden: false })
-    expect(arcCardLayout(2, middle).state).toMatchObject({ partial: false, hidden: true })
-    expect(arcCardLayout(3, { ...middle, shape: NINE }).state).toMatchObject({
-      partial: false,
-      hidden: true,
-    })
+  it('lets the cards cut by the screen edge react like the others', () => {
+    const middle = handState({ count: 12, offset: 3, shape: MOBILE })
+    expect(arcCardLayout(3, middle).state).toMatchObject({ hidden: false, ignorePointer: false })
+    expect(arcCardLayout(9, middle).state).toMatchObject({ hidden: false, ignorePointer: false })
+    expect(arcCardLayout(2, middle).state).toMatchObject({ hidden: true, ignorePointer: true })
   })
 
-  it('stacks the middle card of a mobile hand on top', () => {
+  it('stacks the cards from left to right, on mobile as on desktop', () => {
     const middle = handState({ count: 12, offset: 4, shape: MOBILE })
-    expect(arcCardLayout(6, middle).style.zIndex).toBe(5)
-    expect(arcCardLayout(5, middle).style.zIndex).toBe(4)
-    expect(arcCardLayout(9, middle).style.zIndex).toBe(2)
+    expect(arcCardLayout(5, middle).style.zIndex).toBe(6)
+    expect(arcCardLayout(6, middle).style.zIndex).toBe(7)
+    expect(arcCardLayout(6, { ...middle, offset: 4.4 }).style.zIndex).toBe(7)
   })
 })
 
@@ -104,8 +96,8 @@ describe('card motion', () => {
     expect(moveMotion(3, { ...opening, unfolded: false })).toBe('move')
   })
 
-  it('moves the peeking cards with the others', () => {
-    const mobile = handState({ count: 12, offset: 4, shape: MOBILE, moving: true })
+  it('moves the cards cut by the screen edge with the others', () => {
+    const mobile = handState({ count: 12, offset: 3, shape: MOBILE, moving: true })
     expect(arcCardLayout(3, mobile).state.motion).toBe('move')
     expect(arcCardLayout(2, mobile).state.motion).toBe('instant')
   })
@@ -123,25 +115,25 @@ describe('card motion', () => {
     expect(arcCardLayout(7, opening).state.delay).toBe(0)
   })
 
-  it('gives the peeking cards their own turn in the wave', () => {
-    const mobile = handState({ count: 12, offset: 4, shape: MOBILE, moving: true })
+  it('gives the cards cut by the screen edge their own turn in the wave', () => {
+    const mobile = handState({ count: 12, offset: 3, shape: MOBILE, moving: true })
     expect([3, 4, 8, 9].map((index) => arcCardLayout(index, mobile, 'right').state.delay)).toEqual([
       0, 45, 225, 270,
     ])
     expect([3, 4, 8, 9].map((index) => arcCardLayout(index, mobile, 'left').state.delay)).toEqual([
       270, 225, 45, 0,
     ])
-    const entering = enteringLayout(arcCardLayout(3, mobile), 3, 4, mobile)
+    const entering = enteringLayout(arcCardLayout(3, mobile), 3, 3, mobile)
     expect(entering.state.delay).toBe(0)
-    expect(enteringLayout(arcCardLayout(9, mobile), 9, 4, mobile).state.delay).toBe(270)
+    expect(enteringLayout(arcCardLayout(9, mobile), 9, 3, mobile).state.delay).toBe(270)
   })
 
   it('starts the stagger at the first card when the hand opens past an end', () => {
-    const centeredOnFirst = handState({ count: 4, offset: -2, shape: MOBILE, moving: true })
+    const centeredOnFirst = handState({ count: 4, offset: -3, shape: MOBILE, moving: true })
     expect(arcCardLayout(0, centeredOnFirst, 'right').state.delay).toBe(0)
     expect(arcCardLayout(3, centeredOnFirst, 'left').state.delay).toBe(0)
     const layout = arcCardLayout(0, centeredOnFirst)
-    expect(enteringLayout(layout, 0, -2, centeredOnFirst).state.delay).toBe(0)
+    expect(enteringLayout(layout, 0, -3, centeredOnFirst).state.delay).toBe(0)
   })
 })
 

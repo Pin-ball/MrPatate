@@ -4,6 +4,7 @@ type Bezier = [number, number, number, number]
 
 export const DURATIONS = {
   press: 120,
+  pressHold: 70,
   short: 150,
   lift: 200,
   appearFade: 200,

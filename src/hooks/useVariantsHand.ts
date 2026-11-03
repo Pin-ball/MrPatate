@@ -43,6 +43,7 @@ export function useVariantsHand(part: Part) {
   return {
     state,
     cards,
+    firstIndex,
     hasRandomCard,
     layoutOf,
     rendered,

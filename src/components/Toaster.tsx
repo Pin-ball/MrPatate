@@ -7,10 +7,10 @@ export function Toaster() {
   const toast = useToast((state) => state.toast)
 
   return (
-    <div className="desktop:top-[140px] pointer-events-none fixed inset-x-3 top-[calc(var(--safe-top)+0.5rem)] z-50 flex justify-center">
+    <div className="desktop:top-[140px] pointer-events-none fixed inset-x-3 top-[calc(var(--safe-top)+4.5rem)] z-50 flex justify-center">
       <AnimatePresence mode="wait">
         {toast && (
-          <Appear key={toast.id} className="desktop:w-auto pointer-events-auto w-full">
+          <Appear key={toast.id} className="pointer-events-auto">
             <Toast
               message={toast.message}
               {...(toast.action && {

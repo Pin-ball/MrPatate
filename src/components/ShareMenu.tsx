@@ -42,11 +42,11 @@ export function ShareMenu() {
   return (
     <Menu
       variant="primary"
-      className="h-12"
+      className="desktop:w-auto desktop:px-5 size-12 px-0"
       trigger={
         <>
           <Share2 size={18} strokeWidth={2.5} />
-          {t('share.label')}
+          <span className="desktop:not-sr-only sr-only">{t('share.label')}</span>
         </>
       }
     >

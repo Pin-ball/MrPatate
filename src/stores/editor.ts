@@ -17,6 +17,7 @@ type EditorState = {
   look: Look
   preview: Partial<Look> | null
   hand: Hand
+  previousHand: Hand
 }
 
 export const HISTORY_LIMIT = 50
@@ -30,6 +31,7 @@ export const useEditor = create<EditorState>()(
         look: defaultLook,
         preview: null,
         hand: { kind: 'none' },
+        previousHand: { kind: 'none' },
       }),
       {
         partialize: ({ look }) => ({ look }),
@@ -77,7 +79,7 @@ export function setPreview(preview: Partial<Look> | null) {
 }
 
 export function setHand(hand: Hand) {
-  setState({ hand, preview: null })
+  setState({ hand, previousHand: getState().hand, preview: null })
 }
 
 export function closeHand() {

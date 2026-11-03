@@ -15,10 +15,10 @@ export function LocaleMenu() {
   return (
     <Menu
       aria-label={t('app.language', { language: localeNames[current] })}
-      className="h-12 uppercase"
+      className="desktop:w-auto desktop:px-4 size-12 px-0 uppercase"
       trigger={
         <>
-          <Languages size={18} strokeWidth={2.25} />
+          <Languages size={18} strokeWidth={2.25} className="desktop:block hidden" />
           {current}
         </>
       }

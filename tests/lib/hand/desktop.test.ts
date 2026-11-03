@@ -40,10 +40,6 @@ describe('desktop arc', () => {
     expect(NINE.place(-1).rotate).toBeCloseTo(-31)
   })
 
-  it('stacks the cards from left to right', () => {
-    expect(NINE.stackOrder(2, 7)).toBe(8)
-  })
-
   it('scrolls just enough to show a card', () => {
     expect(NINE.offsetShowing(10, 0)).toBe(2)
     expect(NINE.offsetShowing(1, 5)).toBe(1)

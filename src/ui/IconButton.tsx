@@ -14,7 +14,7 @@ const iconButtonVariants = cva(
         outline: 'border-stroke bg-secondary text-secondary-foreground pressable size-11',
         primary: 'border-stroke bg-primary text-primary-foreground pressable size-11',
         ghost:
-          'hover:bg-background relative size-[34px] transition-[background-color,scale] duration-(--duration-short) before:absolute before:-inset-[5px] focus-visible:outline-offset-2 active:scale-92 disabled:bg-transparent disabled:active:scale-100',
+          'hover:bg-background pressable-scale relative size-[34px] before:absolute before:-inset-[5px] focus-visible:outline-offset-2 disabled:bg-transparent',
       },
     },
     defaultVariants: { variant: 'outline' },

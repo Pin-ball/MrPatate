@@ -28,6 +28,7 @@ export const fr = {
   },
   hand: {
     scroll_hint: 'Molette ou glisser pour voir la suite',
+    close: 'Fermer : {{name}}',
   },
   variants: {
     label: 'Variantes : {{part}}',

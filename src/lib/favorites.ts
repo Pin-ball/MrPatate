@@ -18,6 +18,11 @@ export const builtInFavorites: Favorite[] = [
   { id: DEFAULT_FAVORITE_ID, createdAt: 0, look: defaultLook },
 ]
 
+export function createFavoriteId(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(16))
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+}
+
 export function allFavorites(favorites: Favorite[]): Favorite[] {
   return [...favorites, ...builtInFavorites]
 }

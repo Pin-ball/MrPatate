@@ -19,6 +19,7 @@ export function HandCard({
   className,
   type = 'button',
   onFocus,
+  onPointerEnter,
   ...props
 }: HandCardProps) {
   const { cardZoom } = useHandGeometry()
@@ -36,7 +37,6 @@ export function HandCard({
       data-motion={state.motion}
       data-in-pile={state.inPile || undefined}
       data-hidden={state.hidden || undefined}
-      data-partial={state.partial || undefined}
       data-ignore-pointer={state.ignorePointer || undefined}
       data-added={state.added || undefined}
       data-other-added={state.otherAdded || undefined}
@@ -51,6 +51,9 @@ export function HandCard({
           aria-hidden={state.inPile || undefined}
           tabIndex={state.inPile ? -1 : undefined}
           onFocus={state.inPile ? undefined : onFocus}
+          onPointerEnter={(event) => {
+            if (event.pointerType !== 'touch') onPointerEnter?.(event)
+          }}
           className="flex size-full cursor-pointer flex-col items-center justify-start gap-2 rounded-[inherit] px-2 pt-2.5 pb-2 text-center leading-[1.15]"
           {...props}
         />
