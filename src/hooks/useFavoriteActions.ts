@@ -20,14 +20,14 @@ export function useFavoriteActions() {
   const add = () => {
     if (currentFavorite) return
     addFavorite(look)
-    showToast(t('toast.favorite_added'))
+    showToast(t('favorites.added'))
   }
 
   const remove = (favorite: Favorite) => {
     const removal = removeFavorite(favorite.id)
-    if (!removal) return showToast(t('toast.favorite_built_in'))
-    showToast(t('toast.favorite_removed'), {
-      label: t('toolbar.undo'),
+    if (!removal) return showToast(t('favorites.built_in'))
+    showToast(t('favorites.removed'), {
+      label: t('history.undo'),
       onClick: () => restoreFavorite(removal),
     })
   }
@@ -35,7 +35,7 @@ export function useFavoriteActions() {
   const apply = (favorite: Favorite) => {
     if (lookEquals(favorite.look, look)) return
     setLook(favorite.look)
-    showToast(t('toast.favorite_applied'), { label: t('toolbar.undo'), onClick: undo })
+    showToast(t('favorites.applied'), { label: t('history.undo'), onClick: undo })
   }
 
   return { currentFavorite, add, remove, apply }

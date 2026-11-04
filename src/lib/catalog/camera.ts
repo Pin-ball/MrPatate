@@ -1,5 +1,5 @@
 import { clamp } from '@src/lib/utils.ts'
-import { unionBox } from './svg.ts'
+import { unionBox } from './box.ts'
 import type { Box, Camera, Variant } from './types.ts'
 
 export const FRAME: Box = [180, 190, 620, 740]

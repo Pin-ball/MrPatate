@@ -2,49 +2,59 @@ import type { fr } from './fr.ts'
 
 export const en = {
   app: {
-    title: 'Mr Patate',
+    title: 'Kayoo',
     character: 'Pierre',
     language: 'Language: {{language}}',
   },
-  toolbar: {
-    label: 'Actions',
+  history: {
     undo: 'Undo',
     redo: 'Redo',
-    random_look: 'Surprise: a random Pierre',
+  },
+  toolbar: {
+    label: 'Actions',
+  },
+  look: {
+    random: 'Random look',
+    random_done: 'New look',
+    preview: 'trying',
+  },
+  parallax: {
+    ask: 'Turn on the depth effect by tilting your phone?',
+    enable: 'Enable',
   },
   share: {
     label: 'Share',
     copy_link: 'Copy link',
     download_png: 'Download PNG',
     download_svg: 'Download SVG',
-    native: 'Share via…',
+    native: 'Share',
+    link_copied: 'Link copied',
+    link_not_copied: "Couldn't copy the link",
+    link_incomplete: 'Part of the link is unknown, defaults used',
+    png_downloaded: 'PNG downloaded',
+    svg_downloaded: 'SVG downloaded',
   },
-  scene: {
-    preview: 'trying',
-  },
-  parts: {
-    label: 'Parts',
-    unfold: 'Unfold the Parts',
-    fold: 'Fold the Parts back into their slot',
-    card: '{{part}}: {{variant}}, {{count}} variants',
+  pile: {
+    unfold: 'Unfold: {{name}}',
+    fold: 'Fold: {{name}}',
   },
   hand: {
     scroll_hint: 'Scroll or drag to see more',
     close: 'Close: {{name}}',
   },
+  parts: {
+    label: 'Appearance',
+    card_one: '{{part}}: {{variant}}, {{count}} choice',
+    card_other: '{{part}}: {{variant}}, {{count}} choices',
+  },
   variants: {
-    label: 'Variants: {{part}}',
-    random: 'Random variant',
-    random_card: {
-      title: 'Random',
-      other: 'another one',
-    },
+    label: 'Choices: {{part}}',
+    random: 'Random choice',
+    random_card: 'Random',
   },
   favorites: {
     label: 'Favorites',
     count: 'Favorites · {{count}}',
-    unfold: 'Unfold the Favorites',
-    fold: 'Fold the Favorites back into their slot',
     add: 'Add to Favorites',
     in: 'In Favorites',
     add_card: {
@@ -52,22 +62,14 @@ export const en = {
       look: 'this look',
       done: 'already added',
     },
-    current: 'worn',
+    current: 'chosen',
     default: 'default',
-    apply: 'Wear Favorite {{n}}',
-    apply_default: 'Wear the default Pierre',
-    remove: 'Remove Favorite {{n}} from Favorites',
-  },
-  toast: {
-    random_look: 'New random look',
-    link_copied: 'Link copied',
-    link_not_copied: "Couldn't copy the link",
-    link_incomplete: 'Unknown variants replaced by defaults',
-    png_downloaded: 'PNG downloaded',
-    svg_downloaded: 'SVG downloaded',
-    favorite_added: 'Added to Favorites',
-    favorite_removed: 'Removed from Favorites',
-    favorite_built_in: "This favorite can't be removed",
-    favorite_applied: 'Favorite worn',
+    apply: 'Choose Favorite {{position}}',
+    apply_default: 'Choose the default look',
+    remove: 'Remove Favorite {{position}}',
+    added: 'Added to Favorites',
+    removed: 'Removed from Favorites',
+    built_in: "This Favorite can't be removed",
+    applied: 'Favorite chosen',
   },
 } satisfies typeof fr

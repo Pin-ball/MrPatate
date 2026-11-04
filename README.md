@@ -1,4 +1,4 @@
-# 🥔 Mr Patate
+# Kayoo
 
 Compose ton personnage carte par carte : des yeux, une bouche, des bras, une cape, une couleur, un fond… puis garde tes looks préférés, partage-les par lien ou exporte-les en image.
 
@@ -25,14 +25,15 @@ Puis ouvre l'adresse affichée par Vite.
 
 ## 🧰 Scripts
 
-| Script            | Rôle                                 |
-| ----------------- | ------------------------------------ |
-| `npm run dev`     | Serveur de développement             |
-| `npm run build`   | Build de production                  |
-| `npm run check`   | Catalogue, Biome, typecheck et tests |
-| `npm run format`  | Applique les corrections Biome       |
-| `npm test`        | Tests Vitest                         |
-| `npm run catalog` | Régénère les ids typés du catalogue  |
+| Script                  | Rôle                                   |
+| ----------------------- | -------------------------------------- |
+| `npm run dev`           | Serveur de développement               |
+| `npm run build`         | Build de production                    |
+| `npm run check`         | Catalogue, Biome, typecheck et tests   |
+| `npm run format`        | Applique les corrections Biome         |
+| `npm test`              | Tests Vitest                           |
+| `npm run catalog:ids`   | Régénère les ids typés du catalogue    |
+| `npm run catalog:clean` | Nettoie un dessin et vérifie ses rôles |
 
 ## 🛠️ Stack
 
@@ -41,6 +42,8 @@ Node 24, Vite, React 19 (React Compiler), TypeScript strict, Tailwind CSS 4, Zus
 ## 🎨 Ajouter une variante
 
 Dépose un dessin dans `src/catalog/<partie>/<id>.svg` : avec `npm run dev`, la carte apparaît aussitôt dans sa Main.
+
+Un export brut (Figma, Illustrator…) se nettoie et se range avec `npm run catalog:clean -- <export.svg> --to <partie>/<id>`, ou le skill Claude Code `/catalog-svg`.
 
 - 🏷️ `id` en kebab-case. Il finit dans les liens partagés, donc on n'y touche plus.
 - 📐 `viewBox="0 0 800 1000"`, un titre par langue.

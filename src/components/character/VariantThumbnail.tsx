@@ -15,7 +15,7 @@ export function VariantThumbnail({ look, part, variant }: VariantThumbnailProps)
   const { paint } = variant
 
   return (
-    <span className="border-foreground bg-background size-[72px] shrink-0 overflow-hidden rounded-[14px] border-2">
+    <span className="border-foreground bg-background size-(--card-picture) shrink-0 overflow-hidden rounded-[14px] border-2">
       {paint?.kind === 'skin' && (
         <span className="block size-full" style={{ background: paint.color }} />
       )}

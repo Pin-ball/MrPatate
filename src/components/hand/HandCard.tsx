@@ -1,7 +1,6 @@
 import { useHandGeometry } from '@src/hooks/useLayout.ts'
 import type { CardLayout } from '@src/lib/hand/cards.ts'
 import { CARD_MOTION_DURATIONS } from '@src/lib/hand/cards.ts'
-import { cardSize } from '@src/lib/hand/geometry.ts'
 import { cn } from '@src/lib/utils.ts'
 import type { ComponentProps, ReactNode } from 'react'
 
@@ -22,15 +21,16 @@ export function HandCard({
   onPointerEnter,
   ...props
 }: HandCardProps) {
-  const { cardZoom } = useHandGeometry()
+  const { card } = useHandGeometry()
 
   return (
     <div
       style={{
         ...style,
-        ...cardSize(cardZoom),
-        borderWidth: `calc(var(--stroke) * ${cardZoom})`,
-        borderRadius: CARD_RADIUS * cardZoom,
+        width: card.width,
+        height: card.height,
+        borderRadius: CARD_RADIUS,
+        '--card-picture': `${card.picture}px`,
         '--card-duration': `${CARD_MOTION_DURATIONS[state.motion]}ms`,
         '--card-delay': `${state.delay ?? 0}ms`,
       }}
@@ -43,22 +43,23 @@ export function HandCard({
       data-removed={state.removed || undefined}
       data-just-chosen={state.justChosen || undefined}
       inert={state.removed}
-      className={cn('bg-card card-motion group absolute origin-bottom -translate-1/2', className)}
+      className={cn(
+        'border-stroke bg-card card-motion group absolute origin-bottom -translate-1/2',
+        className,
+      )}
     >
-      <div style={{ borderRadius: CARD_RADIUS, zoom: cardZoom }} className="relative size-full">
-        <button
-          type={type}
-          aria-hidden={state.inPile || undefined}
-          tabIndex={state.inPile ? -1 : undefined}
-          onFocus={state.inPile ? undefined : onFocus}
-          onPointerEnter={(event) => {
-            if (event.pointerType !== 'touch') onPointerEnter?.(event)
-          }}
-          className="flex size-full cursor-pointer flex-col items-center justify-start gap-2 rounded-[inherit] px-2 pt-2.5 pb-2 text-center leading-[1.15]"
-          {...props}
-        />
-        {corner}
-      </div>
+      <button
+        type={type}
+        aria-hidden={state.inPile || undefined}
+        tabIndex={state.inPile ? -1 : undefined}
+        onFocus={state.inPile ? undefined : onFocus}
+        onPointerEnter={(event) => {
+          if (event.pointerType !== 'touch') onPointerEnter?.(event)
+        }}
+        className="flex size-full cursor-pointer flex-col items-center justify-start gap-1.5 rounded-[inherit] px-1.5 py-2 text-center leading-[1.15]"
+        {...props}
+      />
+      {corner}
     </div>
   )
 }

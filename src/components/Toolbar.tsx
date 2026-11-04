@@ -16,7 +16,7 @@ export function Toolbar() {
 
   const randomize = () => {
     randomizeLook()
-    showToast(t('toast.random_look'), { label: t('toolbar.undo'), onClick: undo })
+    showToast(t('look.random_done'), { label: t('history.undo'), onClick: undo })
   }
 
   const toggleFavorite = () => (currentFavorite ? remove(currentFavorite) : add())
@@ -32,7 +32,7 @@ export function Toolbar() {
       <legend className="sr-only">{t('toolbar.label')}</legend>
       <IconButton
         variant="ghost"
-        label={t('toolbar.undo')}
+        label={t('history.undo')}
         hotkey="Mod+Z"
         disabled={!canUndo}
         onClick={undo}
@@ -41,7 +41,7 @@ export function Toolbar() {
       </IconButton>
       <IconButton
         variant="ghost"
-        label={t('toolbar.redo')}
+        label={t('history.redo')}
         hotkey="Mod+Shift+Z"
         disabled={!canRedo}
         onClick={redo}
@@ -49,7 +49,7 @@ export function Toolbar() {
         <Redo2 size={ICON_SIZE} />
       </IconButton>
       <span className="bg-divider mx-[5px] h-5 w-0.5 rounded-full" />
-      <IconButton variant="ghost" label={t('toolbar.random_look')} hotkey="R" onClick={randomize}>
+      <IconButton variant="ghost" label={t('look.random')} hotkey="R" onClick={randomize}>
         <Dices size={ICON_SIZE} />
       </IconButton>
       <IconButton

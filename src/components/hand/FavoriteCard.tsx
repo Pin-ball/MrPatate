@@ -6,10 +6,9 @@ import { cn } from '@src/lib/utils.ts'
 import { useTranslation } from 'react-i18next'
 import { HandCard } from './HandCard.tsx'
 
-const PORTRAIT_WIDTH = 72
-const PORTRAIT_HEIGHT = 88
 const PORTRAIT_ZOOM = 1.05
-const PORTRAIT_VIEW = frameView(PORTRAIT_ZOOM, PORTRAIT_HEIGHT / PORTRAIT_WIDTH)
+const PORTRAIT_RATIO = 11 / 9
+const PORTRAIT_VIEW = frameView(PORTRAIT_ZOOM, PORTRAIT_RATIO)
 
 type FavoriteCardProps = {
   favorite: Favorite
@@ -43,7 +42,7 @@ export function FavoriteCard({
     <HandCard
       layout={layout}
       className={cn(chosen && 'bg-accent')}
-      aria-label={isDefault ? t('favorites.apply_default') : t('favorites.apply', { n: position })}
+      aria-label={isDefault ? t('favorites.apply_default') : t('favorites.apply', { position })}
       onClick={onClick}
       onPointerEnter={onPointerEnter}
       onFocus={onFocus}
@@ -52,7 +51,7 @@ export function FavoriteCard({
         !layout.state.inPile && (
           <button
             type="button"
-            aria-label={t('favorites.remove', { n: position })}
+            aria-label={t('favorites.remove', { position })}
             onClick={onRemove}
             onFocus={onFocus}
             className="border-foreground bg-card hover:bg-primary absolute -top-[11px] -right-[11px] flex size-7 cursor-pointer items-center justify-center rounded-full border-2 text-[13px] font-bold opacity-0 transition-[opacity,background-color] duration-(--duration-short) group-hover:opacity-100 focus-visible:opacity-100"
@@ -63,12 +62,12 @@ export function FavoriteCard({
       }
     >
       <span
-        style={{ width: PORTRAIT_WIDTH, height: PORTRAIT_HEIGHT }}
-        className="border-foreground shrink-0 overflow-hidden rounded-[10px] border-2"
+        style={{ aspectRatio: 1 / PORTRAIT_RATIO }}
+        className="border-foreground w-(--card-picture) shrink-0 overflow-hidden rounded-[10px] border-2"
       >
         <CharacterImage look={favorite.look} view={PORTRAIT_VIEW} className="block size-full" />
       </span>
-      <span className="text-muted-foreground h-[1.1em] text-xs font-medium">{caption}</span>
+      <span className="text-muted-foreground h-lh text-xs font-medium">{caption}</span>
     </HandCard>
   )
 }

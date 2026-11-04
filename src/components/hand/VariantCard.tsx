@@ -38,7 +38,7 @@ export function VariantCard({
       onClick={onClick}
     >
       <VariantThumbnail look={look} part={part} variant={variant} />
-      <span className="line-clamp-2 w-full text-xs font-bold">{labelOf(variant)}</span>
+      <span className="w-full truncate text-xs font-bold">{labelOf(variant)}</span>
     </HandCard>
   )
 }

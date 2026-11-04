@@ -54,7 +54,9 @@ export function PartCard({
     >
       <VariantThumbnail look={look} part={part} variant={variant} />
       <span className="flex w-full flex-col gap-0.5">
-        <span className="text-[10px] font-bold tracking-[0.08em] uppercase">{labelOf(part)}</span>
+        <span className="truncate text-[11px] font-bold tracking-[0.08em] uppercase">
+          {labelOf(part)}
+        </span>
         <span className="text-muted-foreground truncate text-xs font-medium">
           {labelOf(variant)}
         </span>

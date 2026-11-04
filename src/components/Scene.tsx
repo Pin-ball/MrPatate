@@ -28,7 +28,7 @@ export function Scene() {
       <AnimatePresence>
         {previewing && (
           <Appear className="absolute top-1.5 left-1/2 -translate-x-1/2">
-            <Badge>{t('scene.preview')}</Badge>
+            <Badge>{t('look.preview')}</Badge>
           </Appear>
         )}
       </AnimatePresence>

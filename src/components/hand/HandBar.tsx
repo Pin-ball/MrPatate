@@ -26,7 +26,7 @@ export function HandBar({ state, firstIndex, icon: Icon, name }: HandBarProps) {
   const { position, total } = handPosition(state.offset, state.count, state.shape, firstIndex)
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-[calc(var(--safe-bottom)+24px)] flex justify-center">
+    <div className="pointer-events-none absolute inset-x-0 bottom-[calc(var(--safe-bottom)+24px)] z-25 flex justify-center">
       <AnimatePresence>
         {state.unfolded && (handWasOpen || !state.moving) && (
           <Appear

@@ -37,7 +37,7 @@ export function FavoritesPile() {
       icon={Star}
       label={t('favorites.label')}
       firstIndex={FIRST_FAVORITE_INDEX}
-      pileSlotLabel={t(unfolded ? 'favorites.fold' : 'favorites.unfold')}
+      pileSlotLabel={t(unfolded ? 'pile.fold' : 'pile.unfold', { name: t('favorites.label') })}
       pileLabel={t('favorites.count', { count: favorites.length })}
     >
       {rendered(0) && (

@@ -77,7 +77,7 @@ type CodedIdsOf<P extends PartId> = P extends keyof CodedIds ? CodedIds[P] : nev
 
 type DrawingIdsOf<P extends PartId> = P extends keyof DrawingIds ? DrawingIds[P] : never
 
-export type VariantId<P extends PartId = PartId> = CodedIdsOf<P> | DrawingIdsOf<P>
+type VariantId<P extends PartId = PartId> = CodedIdsOf<P> | DrawingIdsOf<P>
 
 export type Look = { [P in PartId]: VariantId<P> }
 

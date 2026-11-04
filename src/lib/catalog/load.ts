@@ -1,9 +1,7 @@
 import { cameraOf } from './camera.ts'
 import type { Drawing } from './svg.ts'
-import { CatalogError, parseDrawing, parseNodes } from './svg.ts'
+import { CatalogError, checkId, parseDrawing, parseNodes } from './svg.ts'
 import type { Paint, Part, PartConfig, Plane, Variant, VariantConfig } from './types.ts'
-
-const ID = /^[a-z0-9]+(-[a-z0-9]+)*$/
 
 type PlaneSource<Id extends string> = { id: string; depth: number; parts: readonly Id[] }
 
@@ -16,10 +14,6 @@ export type CatalogSources<Id extends string> = {
 }
 
 type Catalog<Id extends string> = { parts: Part<Id>[]; planes: Plane<Id>[]; partsPile: Part<Id>[] }
-
-function checkId(id: string, file: string) {
-  if (!ID.test(id)) throw new CatalogError(file, `invalid id "${id}" (kebab-case expected)`)
-}
 
 function checkPlanes(planes: readonly PlaneSource<string>[], partIds: string[]) {
   const file = 'planes.ts'

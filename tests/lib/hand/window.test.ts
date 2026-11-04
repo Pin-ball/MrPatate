@@ -13,13 +13,13 @@ import {
 } from '@src/lib/hand/window.ts'
 import { describe, expect, it } from 'vitest'
 
-const NINE = DESKTOP_GEOMETRY.handShape(1360, 24)
-const MOBILE = MOBILE_GEOMETRY.handShape(390, 24)
+const NINE = DESKTOP_GEOMETRY.handShape(1520, 24)
+const MOBILE = MOBILE_GEOMETRY.handShape(500, 24)
 
 const pile = {
   count: 24,
   offset: 10,
-  shape: DESKTOP_GEOMETRY.handShape(1280, 24),
+  shape: DESKTOP_GEOMETRY.handShape(1440, 24),
   unfolded: false,
   moving: false,
   scrolling: false,
@@ -39,7 +39,7 @@ describe('hand scrolling', () => {
   it('scrolls only as far as the last card', () => {
     expect(clampOffset(-2, offsetBounds(24, NINE))).toBe(0)
     expect(clampOffset(20, offsetBounds(24, NINE))).toBe(15)
-    const seven = DESKTOP_GEOMETRY.handShape(1280, 7)
+    const seven = DESKTOP_GEOMETRY.handShape(1440, 7)
     expect(clampOffset(3, offsetBounds(7, seven))).toBe(0)
   })
 
@@ -124,7 +124,7 @@ describe('hiddenCounts', () => {
     expect(hiddenCounts(0, 24, NINE)).toEqual({ before: 0, after: 15 })
     expect(hiddenCounts(5.4, 24, NINE)).toEqual({ before: 5, after: 10 })
     expect(hiddenCounts(15, 24, NINE)).toEqual({ before: 15, after: 0 })
-    const seven = DESKTOP_GEOMETRY.handShape(1280, 7)
+    const seven = DESKTOP_GEOMETRY.handShape(1440, 7)
     expect(hiddenCounts(0, 7, seven)).toEqual({ before: 0, after: 0 })
   })
 })

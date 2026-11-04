@@ -4,9 +4,9 @@ import { MOBILE_GEOMETRY } from '@src/lib/hand/mobile.ts'
 import type { HandState } from '@src/lib/hand/window.ts'
 import { describe, expect, it } from 'vitest'
 
-const NINE = DESKTOP_GEOMETRY.handShape(1360, 24)
-const EIGHT = DESKTOP_GEOMETRY.handShape(1280, 24)
-const MOBILE = MOBILE_GEOMETRY.handShape(390, 24)
+const NINE = DESKTOP_GEOMETRY.handShape(1520, 24)
+const EIGHT = DESKTOP_GEOMETRY.handShape(1440, 24)
+const MOBILE = MOBILE_GEOMETRY.handShape(500, 24)
 
 function handState(state: Partial<HandState> = {}): HandState {
   return {

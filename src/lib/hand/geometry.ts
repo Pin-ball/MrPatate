@@ -9,6 +9,8 @@ export type Anchor = { left: string; bottom: number }
 
 export type PlaceStyle = { left: string; top: string; rotate: string }
 
+export type CardSize = { width: number; height: number; picture: number }
+
 export type PileKind = 'parts' | 'favorites'
 
 export type Hand = { kind: 'none' } | { kind: PileKind } | { kind: 'variants'; part: PartId }
@@ -31,7 +33,7 @@ type ScrollCueStyles = {
 }
 
 export type HandGeometry = {
-  cardZoom: number
+  card: CardSize
   piles: Record<PileKind, Anchor>
   labelBelowPile: number
   lowerPiles: boolean
@@ -40,9 +42,6 @@ export type HandGeometry = {
   handShape: (width: number, count: number) => HandShape
   handTop: (width: number) => number
 }
-
-const CARD_WIDTH = 104
-const CARD_HEIGHT = 136
 
 export const PILE_SIDES: Record<PileKind, PileSide> = { parts: 'left', favorites: 'right' }
 
@@ -75,12 +74,8 @@ export function arcPoint(
   }
 }
 
-export function cardSize(zoom: number) {
-  return { width: CARD_WIDTH * zoom, height: CARD_HEIGHT * zoom }
-}
-
-export function middleCardTop(shape: HandShape, zoom: number): number {
-  return cardSize(zoom).height / 2 - shape.place((shape.slots - 1) / 2).y
+export function middleCardTop(shape: HandShape, card: CardSize): number {
+  return card.height / 2 - shape.place((shape.slots - 1) / 2).y
 }
 
 export function placeStyle({ left, bottom }: Anchor, { x, y, rotate }: Place = CENTER): PlaceStyle {

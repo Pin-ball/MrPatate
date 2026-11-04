@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 
-import { boxOf, parseDrawing, parseNodes } from '@src/lib/catalog/svg.ts'
+import { boxOf } from '@src/lib/catalog/box.ts'
+import { parseDrawing, parseNodes } from '@src/lib/catalog/svg.ts'
 import { describe, expect, it } from 'vitest'
 
 function svg(body: string, attrs = '') {

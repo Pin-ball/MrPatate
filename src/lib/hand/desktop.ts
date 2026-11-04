@@ -1,31 +1,21 @@
 import { clamp } from '@src/lib/utils.ts'
-import type { Arc, HandEnd, HandGeometry, HandShape, Place } from './geometry.ts'
-import {
-  arcPoint,
-  cardSize,
-  handStyle,
-  labelStyle,
-  middleCardTop,
-  radians,
-  slotAngle,
-} from './geometry.ts'
+import type { Arc, CardSize, HandEnd, HandGeometry, HandShape, Place } from './geometry.ts'
+import { arcPoint, handStyle, labelStyle, middleCardTop, radians, slotAngle } from './geometry.ts'
 
-const ZOOM = 1
+const CARD: CardSize = { width: 116, height: 152, picture: 80 }
 const PILE_INSET = 160
 const PILE_BOTTOM = 155
 const PILE_HAND_GAP = 48
 const LABEL_BELOW_PILE = 90
-const ARC: Arc = { radius: 700, step: 6.2 }
+const ARC: Arc = { radius: 860, step: 6.2 }
 const BASE_SLOTS = 9
 const MAX_SLOTS = 12
-const DRAG_PER_CARD = 80
+const DRAG_PER_CARD = 92
 
 const HIDDEN_COUNT_RISE = 30
 const HIDDEN_COUNT_GAP = 12
 const HIDDEN_COUNT_HALF_WIDTH = 17
 const HIDDEN_COUNT_HALF_HEIGHT = 13
-
-const CARD = cardSize(ZOOM)
 
 function desktopRoom(width: number): number {
   return width / 2 - PILE_INSET - CARD.width / 2 - PILE_HAND_GAP
@@ -86,7 +76,7 @@ function desktopHandShape(width: number, count: number): HandShape {
 }
 
 function desktopHandTop(width: number): number {
-  return middleCardTop(desktopHandShape(width, MAX_SLOTS), ZOOM)
+  return middleCardTop(desktopHandShape(width, MAX_SLOTS), CARD)
 }
 
 function hiddenCountStyle(end: HandEnd, slots: number) {
@@ -98,7 +88,7 @@ function scrollHintStyle() {
 }
 
 export const DESKTOP_GEOMETRY: HandGeometry = {
-  cardZoom: ZOOM,
+  card: CARD,
   piles: {
     parts: { left: `${PILE_INSET}px`, bottom: PILE_BOTTOM },
     favorites: { left: `calc(100% - ${PILE_INSET}px)`, bottom: PILE_BOTTOM },

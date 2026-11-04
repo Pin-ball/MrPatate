@@ -3,7 +3,7 @@ import { basename, dirname, join, relative, resolve } from 'node:path'
 
 export const CATALOG_DIR = resolve(import.meta.dirname, '../../src/catalog')
 export const OUTPUT_FILE = resolve(import.meta.dirname, '../../src/lib/catalog/ids.gen.ts')
-export const CODED_FILE = 'variants.ts'
+const CODED_FILE = 'variants.ts'
 
 export type CatalogFiles = {
   drawings: Record<string, string[]>
@@ -28,7 +28,7 @@ export function readIds(root = CATALOG_DIR): CatalogFiles {
   return files
 }
 
-export function renderIds({ drawings, coded }: CatalogFiles, root: string, output: string): string {
+function renderIds({ drawings, coded }: CatalogFiles, root: string, output: string): string {
   const quote = (value: string) => `'${value}'`
   const drawingLines = Object.entries(drawings).map(
     ([folder, ids]) => `  ${quote(folder)}: ${ids.map(quote).join(' | ')}`,
@@ -51,4 +51,8 @@ export function writeIds(root = CATALOG_DIR, output = OUTPUT_FILE): boolean {
   mkdirSync(dirname(output), { recursive: true })
   writeFileSync(output, content)
   return true
+}
+
+if (import.meta.main) {
+  console.log(`${basename(OUTPUT_FILE)} ${writeIds() ? 'written' : 'up to date'}`)
 }

@@ -2,20 +2,20 @@ import { defaultLook, findVariant, partById, partIds } from '@src/lib/catalog/in
 import { readLook } from '@src/lib/catalog/look.ts'
 import type { Look } from '@src/lib/catalog/types.ts'
 
-const SHARE_VERSION = '1'
-const VERSION_PARAM = 'v'
+const SHARE_VERSION = 'v1'
+const VERSION = /^v\d+$/
 
 type SharedLook = { look: Look; complete: boolean }
 
 export function encodeLook(look: Look): string {
-  const params = new URLSearchParams({ [VERSION_PARAM]: SHARE_VERSION })
+  const params = new URLSearchParams()
   for (const id of partIds) if (look[id] !== defaultLook[id]) params.set(id, look[id])
-  return params.toString()
+  return [SHARE_VERSION, params.toString()].filter(Boolean).join('&')
 }
 
 export function decodeLook(search: string): SharedLook | null {
   const values: Record<string, string> = Object.fromEntries(new URLSearchParams(search))
-  const version = values[VERSION_PARAM]
+  const version = Object.keys(values).find((key) => VERSION.test(key))
   if (version === undefined) return null
 
   const known = partIds.every((id) => {
@@ -34,6 +34,7 @@ export function shareUrl(look: Look, page: string): string {
 
 export function withoutLook(page: string): string {
   const url = new URL(page)
-  for (const key of [VERSION_PARAM, ...partIds]) url.searchParams.delete(key)
+  const versions = [...url.searchParams.keys()].filter((key) => VERSION.test(key))
+  for (const key of [...versions, ...partIds]) url.searchParams.delete(key)
   return url.href
 }

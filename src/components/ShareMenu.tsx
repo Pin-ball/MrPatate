@@ -19,21 +19,21 @@ export function ShareMenu() {
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(link())
-      showToast(t('toast.link_copied'))
+      showToast(t('share.link_copied'))
     } catch {
-      showToast(t('toast.link_not_copied'))
+      showToast(t('share.link_not_copied'))
     }
   }
 
   const downloadPng = async () => {
-    download(await characterPng(look, t('app.character')), 'mr-patate.png')
-    showToast(t('toast.png_downloaded'))
+    download(await characterPng(look, t('app.character')), 'kayoo.png')
+    showToast(t('share.png_downloaded'))
   }
 
   const downloadSvg = async () => {
     const svg = await characterSvg(look, t('app.character'))
-    download(new Blob([svg], { type: 'image/svg+xml' }), 'mr-patate.svg')
-    showToast(t('toast.svg_downloaded'))
+    download(new Blob([svg], { type: 'image/svg+xml' }), 'kayoo.svg')
+    showToast(t('share.svg_downloaded'))
   }
 
   const shareNatively = () =>
@@ -50,6 +50,11 @@ export function ShareMenu() {
         </>
       }
     >
+      {canShareNatively && (
+        <MenuItem icon={Share} onClick={() => void shareNatively()}>
+          {t('share.native')}
+        </MenuItem>
+      )}
       <MenuItem icon={Link} onClick={() => void copyLink()}>
         {t('share.copy_link')}
       </MenuItem>
@@ -59,11 +64,6 @@ export function ShareMenu() {
       <MenuItem icon={FileDown} onClick={() => void downloadSvg()}>
         {t('share.download_svg')}
       </MenuItem>
-      {canShareNatively && (
-        <MenuItem icon={Share} onClick={() => void shareNatively()}>
-          {t('share.native')}
-        </MenuItem>
-      )}
     </Menu>
   )
 }

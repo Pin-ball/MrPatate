@@ -37,7 +37,7 @@ export function PartsPile() {
       pile={pile}
       icon={Layers}
       label={t('parts.label')}
-      pileSlotLabel={t(unfolded ? 'parts.fold' : 'parts.unfold')}
+      pileSlotLabel={t(unfolded ? 'pile.fold' : 'pile.unfold', { name: t('parts.label') })}
       pileLabel={t('parts.label')}
     >
       {partsPile.map(

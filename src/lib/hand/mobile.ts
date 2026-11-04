@@ -1,18 +1,16 @@
-import type { Arc, HandGeometry, HandShape, Place } from './geometry.ts'
-import { arcPoint, cardSize, degrees, middleCardTop, slotAngle } from './geometry.ts'
+import type { Arc, CardSize, HandGeometry, HandShape, Place } from './geometry.ts'
+import { arcPoint, degrees, middleCardTop, slotAngle } from './geometry.ts'
 
-const ZOOM = 0.75
-const PILE_BOTTOM = 95
-const LABEL_BELOW_PILE = 62
+const CARD: CardSize = { width: 96, height: 128, picture: 62 }
+const PILE_BOTTOM = 108
+const LABEL_BELOW_PILE = 75
 const HAND_BOTTOM = 178
 const ARC_RADIUS = 620
-const MIN_STEP = 52
-const MAX_STEP = 64
+const MIN_STEP = 76
+const MAX_STEP = 84
 const SCREEN_MARGIN = 8
 const CUT_CARDS_PER_SIDE = 1
 const DRAG_AREA_ABOVE = 16
-
-const CARD = cardSize(ZOOM)
 
 function mobileRoom(width: number): number {
   const room = width / 2 - SCREEN_MARGIN - CARD.width / 2
@@ -54,11 +52,11 @@ function mobileHandShape(width: number): HandShape {
 }
 
 function mobileHandTop(width: number): number {
-  return middleCardTop(mobileHandShape(width), ZOOM)
+  return middleCardTop(mobileHandShape(width), CARD)
 }
 
 export const MOBILE_GEOMETRY: HandGeometry = {
-  cardZoom: ZOOM,
+  card: CARD,
   piles: {
     parts: { left: '25%', bottom: PILE_BOTTOM },
     favorites: { left: '75%', bottom: PILE_BOTTOM },
