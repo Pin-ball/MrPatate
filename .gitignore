@@ -25,7 +25,16 @@ dist-ssr
 *.sln
 *.sw?
 
+# Development certificates
+certs/
+
+# Generated
+src/lib/catalog/ids.gen.ts
+
 # Local scratch
 .untracked/
 *.untracked
 *.untracked.*
+
+# Claude Code runtime
+.claude/scheduled_tasks.lock

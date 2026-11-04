@@ -1,0 +1,69 @@
+import { characterPng, characterSvg } from '@src/components/character/export.ts'
+import { download } from '@src/lib/download.ts'
+import { shareUrl } from '@src/lib/share.ts'
+import { useEditor } from '@src/stores/editor.ts'
+import { showToast } from '@src/stores/toast.ts'
+import { Menu } from '@src/ui/Menu.tsx'
+import { MenuItem } from '@src/ui/MenuItem.tsx'
+import { FileDown, ImageDown, Link, Share, Share2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+
+const canShareNatively = 'share' in navigator
+
+export function ShareMenu() {
+  const { t } = useTranslation()
+  const look = useEditor((state) => state.look)
+
+  const link = () => shareUrl(look, location.href)
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(link())
+      showToast(t('share.link_copied'))
+    } catch {
+      showToast(t('share.link_not_copied'))
+    }
+  }
+
+  const downloadPng = async () => {
+    download(await characterPng(look, t('app.character')), 'kayoo.png')
+    showToast(t('share.png_downloaded'))
+  }
+
+  const downloadSvg = async () => {
+    const svg = await characterSvg(look, t('app.character'))
+    download(new Blob([svg], { type: 'image/svg+xml' }), 'kayoo.svg')
+    showToast(t('share.svg_downloaded'))
+  }
+
+  const shareNatively = () =>
+    navigator.share({ title: t('app.title'), url: link() }).catch(() => undefined)
+
+  return (
+    <Menu
+      variant="primary"
+      className="desktop:w-auto desktop:px-5 size-12 px-0"
+      trigger={
+        <>
+          <Share2 size={18} strokeWidth={2.5} />
+          <span className="desktop:not-sr-only sr-only">{t('share.label')}</span>
+        </>
+      }
+    >
+      {canShareNatively && (
+        <MenuItem icon={Share} onClick={() => void shareNatively()}>
+          {t('share.native')}
+        </MenuItem>
+      )}
+      <MenuItem icon={Link} onClick={() => void copyLink()}>
+        {t('share.copy_link')}
+      </MenuItem>
+      <MenuItem icon={ImageDown} onClick={() => void downloadPng()}>
+        {t('share.download_png')}
+      </MenuItem>
+      <MenuItem icon={FileDown} onClick={() => void downloadSvg()}>
+        {t('share.download_svg')}
+      </MenuItem>
+    </Menu>
+  )
+}

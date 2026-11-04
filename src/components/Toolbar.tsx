@@ -1,52 +1,66 @@
-import { DownloadPopover } from '@src/components/DownloadPopover.tsx'
-import { FavoritesPopover } from '@src/components/FavoritesPopover.tsx'
-import { SharePopover } from '@src/components/SharePopover.tsx'
-import { useOutsideClick } from '@src/hooks/useOutsideClick.ts'
+import { useFavoriteActions } from '@src/hooks/useFavoriteActions.ts'
+import { cn } from '@src/lib/utils.ts'
+import { randomizeLook, redo, undo, useHistory } from '@src/stores/editor.ts'
+import { showToast } from '@src/stores/toast.ts'
 import { IconButton } from '@src/ui/IconButton.tsx'
-import type { LucideIcon } from 'lucide-react'
-import { Download, Share2, Star } from 'lucide-react'
-import type { ComponentType } from 'react'
-import { useRef, useState } from 'react'
+import { useHotkey } from '@tanstack/react-hotkeys'
+import { Dices, Redo2, Star, Undo2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
-type ToolbarActionId = 'favorites' | 'download' | 'share'
-
-type ToolbarAction = {
-  id: ToolbarActionId
-  label: string
-  icon: LucideIcon
-  Popover: ComponentType
-}
-
-const toolbarActions: ToolbarAction[] = [
-  { id: 'favorites', label: 'Favoris', icon: Star, Popover: FavoritesPopover },
-  { id: 'download', label: 'Télécharger', icon: Download, Popover: DownloadPopover },
-  { id: 'share', label: 'Partager', icon: Share2, Popover: SharePopover },
-]
+const ICON_SIZE = 22
 
 export function Toolbar() {
-  const toolbarRef = useRef<HTMLDivElement>(null)
-  const [openActionId, setOpenActionId] = useState<ToolbarActionId | null>(null)
+  const { t } = useTranslation()
+  const { canUndo, canRedo } = useHistory()
+  const { currentFavorite, add, remove } = useFavoriteActions()
 
-  useOutsideClick(toolbarRef, () => setOpenActionId(null))
+  const randomize = () => {
+    randomizeLook()
+    showToast(t('look.random_done'), { label: t('history.undo'), onClick: undo })
+  }
 
-  const OpenPopover = toolbarActions.find((action) => action.id === openActionId)?.Popover
+  const toggleFavorite = () => (currentFavorite ? remove(currentFavorite) : add())
+
+  useHotkey('Mod+Z', undo)
+  useHotkey('Mod+Shift+Z', redo)
+  useHotkey('Mod+Y', redo)
+  useHotkey('R', randomize)
+  useHotkey('F', toggleFavorite)
 
   return (
-    <div
-      ref={toolbarRef}
-      className="border-border bg-surface relative ml-auto flex gap-2 rounded-lg border px-4 py-2.5"
-    >
-      {toolbarActions.map(({ id, label, icon }) => (
-        <IconButton
-          key={id}
-          icon={icon}
-          label={label}
-          active={openActionId === id}
-          onClick={() => setOpenActionId((current) => (current === id ? null : id))}
-        />
-      ))}
-
-      {OpenPopover && <OpenPopover />}
-    </div>
+    <fieldset className="border-stroke bg-card shadow-hard flex h-12 items-center gap-1 rounded-full px-[5px]">
+      <legend className="sr-only">{t('toolbar.label')}</legend>
+      <IconButton
+        variant="ghost"
+        label={t('history.undo')}
+        hotkey="Mod+Z"
+        disabled={!canUndo}
+        onClick={undo}
+      >
+        <Undo2 size={ICON_SIZE} />
+      </IconButton>
+      <IconButton
+        variant="ghost"
+        label={t('history.redo')}
+        hotkey="Mod+Shift+Z"
+        disabled={!canRedo}
+        onClick={redo}
+      >
+        <Redo2 size={ICON_SIZE} />
+      </IconButton>
+      <span className="bg-divider mx-[5px] h-5 w-0.5 rounded-full" />
+      <IconButton variant="ghost" label={t('look.random')} hotkey="R" onClick={randomize}>
+        <Dices size={ICON_SIZE} />
+      </IconButton>
+      <IconButton
+        variant="ghost"
+        label={t(currentFavorite ? 'favorites.in' : 'favorites.add')}
+        hotkey="F"
+        aria-pressed={Boolean(currentFavorite)}
+        onClick={toggleFavorite}
+      >
+        <Star size={ICON_SIZE} className={cn(currentFavorite && 'fill-accent')} />
+      </IconButton>
+    </fieldset>
   )
 }

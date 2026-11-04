@@ -1,26 +1,46 @@
-import clsx from 'clsx'
-import type { LucideIcon } from 'lucide-react'
+import { cn } from '@src/lib/utils.ts'
+import { Tooltip } from '@src/ui/Tooltip.tsx'
+import type { HotkeyChord } from '@tanstack/react-hotkeys'
+import { formatForDisplay, formatHotkey, parseHotkey } from '@tanstack/react-hotkeys'
+import type { VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
+import type { ComponentProps } from 'react'
 
-type IconButtonProps = {
-  icon: LucideIcon
-  label: string
-  active?: boolean
-  onClick: () => void
-}
+const iconButtonVariants = cva(
+  'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-30',
+  {
+    variants: {
+      variant: {
+        outline: 'border-stroke bg-secondary text-secondary-foreground pressable size-11',
+        primary: 'border-stroke bg-primary text-primary-foreground pressable size-11',
+        ghost:
+          'hover:bg-background pressable-scale relative size-[34px] before:absolute before:-inset-[5px] focus-visible:outline-offset-2 disabled:bg-transparent',
+      },
+    },
+    defaultVariants: { variant: 'outline' },
+  },
+)
 
-export function IconButton({ icon: Icon, label, active = false, onClick }: IconButtonProps) {
+type IconButtonProps = Omit<ComponentProps<'button'>, 'aria-label' | 'title'> &
+  VariantProps<typeof iconButtonVariants> & { label: string; hotkey?: HotkeyChord }
+
+export function IconButton({
+  label,
+  hotkey,
+  variant,
+  className,
+  type = 'button',
+  ...props
+}: IconButtonProps) {
   return (
-    <button
-      type="button"
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      className={clsx(
-        'cursor-pointer rounded-full p-2 transition-all active:scale-90',
-        active ? 'bg-accent' : 'bg-surface-raised hover:bg-accent',
-      )}
-    >
-      <Icon aria-hidden="true" className="size-5" />
-    </button>
+    <Tooltip label={label} keys={hotkey && formatForDisplay(hotkey, { parts: true })}>
+      <button
+        type={type}
+        aria-label={label}
+        aria-keyshortcuts={hotkey && formatHotkey(parseHotkey(hotkey))}
+        className={cn(iconButtonVariants({ variant }), className)}
+        {...props}
+      />
+    </Tooltip>
   )
 }

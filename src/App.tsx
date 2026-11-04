@@ -1,22 +1,37 @@
-import { CharacterView } from '@src/components/CharacterView.tsx'
-import { MobileUnsupported } from '@src/components/MobileUnsupported.tsx'
-import { Sidebar } from '@src/components/Sidebar.tsx'
-import { Toolbar } from '@src/components/Toolbar.tsx'
-import { useMediaQuery } from '@src/hooks/useMediaQuery.ts'
+import { Background } from '@src/components/Background.tsx'
+import { Header } from '@src/components/Header.tsx'
+import { FavoritesPile } from '@src/components/hand/FavoritesPile.tsx'
+import { PartsPile } from '@src/components/hand/PartsPile.tsx'
+import { VariantsHand } from '@src/components/hand/VariantsHand.tsx'
+import { Scene } from '@src/components/Scene.tsx'
+import { Toaster } from '@src/components/Toaster.tsx'
+import { useCloseHandOnEscape } from '@src/hooks/useCloseHandOnEscape.ts'
+import { useOrientationPermission } from '@src/hooks/useOrientationPermission.ts'
+import { useSharedLink } from '@src/hooks/useSharedLink.ts'
+import { backgroundOf } from '@src/lib/catalog/layers.ts'
+import { MOTION_VARIABLES } from '@src/lib/motion.ts'
+import { useShownLook } from '@src/stores/editor.ts'
 
 export function App() {
-  const isMobile = useMediaQuery('(max-width: 800px)')
-  if (isMobile) return <MobileUnsupported />
+  useSharedLink()
+  useCloseHandOnEscape()
+  useOrientationPermission()
+  const look = useShownLook()
+  const background = backgroundOf(look)
 
   return (
-    <div className="flex h-screen p-7">
-      <nav className="w-1/3 min-w-[390px]">
-        <Sidebar />
-      </nav>
-      <main className="flex grow flex-col">
-        <Toolbar />
-        <CharacterView />
-      </main>
-    </div>
+    <main
+      style={MOTION_VARIABLES}
+      data-background={background.dark ? 'dark' : 'light'}
+      className="relative flex h-dvh flex-col overflow-hidden pt-(--safe-top) pb-(--safe-bottom)"
+    >
+      <Background paint={background} />
+      <Header />
+      <Scene />
+      <VariantsHand />
+      <PartsPile />
+      <FavoritesPile />
+      <Toaster />
+    </main>
   )
 }
