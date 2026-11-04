@@ -36,7 +36,6 @@ export function FavoriteCard({
   onRemove,
 }: FavoriteCardProps) {
   const { t } = useTranslation()
-  const caption = chosen ? t('favorites.current') : isDefault ? t('favorites.default') : ''
 
   return (
     <HandCard
@@ -67,7 +66,9 @@ export function FavoriteCard({
       >
         <CharacterImage look={favorite.look} view={PORTRAIT_VIEW} className="block size-full" />
       </span>
-      <span className="text-muted-foreground h-lh text-xs font-medium">{caption}</span>
+      <span className="text-muted-foreground h-lh w-full truncate text-xs font-medium">
+        {favorite.name}
+      </span>
     </HandCard>
   )
 }

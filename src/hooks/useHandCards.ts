@@ -16,7 +16,7 @@ export function useHandCards<T extends { id: string }>(
   { chosenId, firstIndex }: HandCardsOptions,
 ) {
   const { entries, added } = useListChanges(items, CHANGE_DURATION)
-  const justChosenId = useRecentChange(chosenId, DURATIONS.bounce)
+  const justChosenId = useRecentChange(chosenId, DURATIONS.bounce)?.value
   const indexOf = (id: string | undefined) => items.findIndex((item) => item.id === id)
   const chosenIndex = indexOf(chosenId)
   const changes: HandChanges = {

@@ -23,7 +23,7 @@ export function PileSlot({ anchor, icon: Icon, label, type = 'button', ...props 
         width: card.width + PILE_SLOT_MARGIN,
         height: card.height + PILE_SLOT_MARGIN,
       }}
-      className="border-stroke border-slot text-muted-foreground hover:text-foreground on-dark:border-background/50 on-dark:text-background/75 on-dark:hover:text-background pile-slot-motion absolute flex -translate-1/2 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-dashed backdrop-blur-sm"
+      className="border-stroke border-slot text-muted-foreground hover:text-foreground on-dark:border-background/50 on-dark:text-background/75 on-dark:hover:text-background pile-slot-motion absolute flex -translate-1/2 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-dashed"
       {...props}
     >
       <Icon size={22} strokeWidth={2.25} />

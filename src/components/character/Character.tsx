@@ -1,7 +1,10 @@
 import { pivotDepth } from '@src/catalog/planes.ts'
 import { useParallax } from '@src/hooks/useParallax.ts'
+import { useRecentChange } from '@src/hooks/useRecentChange.ts'
 import { FRAME, FRAME_RATIO, viewBoxOf } from '@src/lib/catalog/camera.ts'
 import { layersOf, skinOf } from '@src/lib/catalog/layers.ts'
+import { bouncingParts } from '@src/lib/catalog/look.ts'
+import type { PartId } from '@src/lib/catalog/types.ts'
 import { DURATIONS, seconds } from '@src/lib/motion.ts'
 import { cn } from '@src/lib/utils.ts'
 import { useEditor, useShownLook } from '@src/stores/editor.ts'
@@ -47,6 +50,8 @@ export function Character({ label, className }: CharacterProps) {
   useParallax(ref)
   const look = useShownLook()
   const chosenLook = useEditor((state) => state.look)
+  const choice = useRecentChange(chosenLook, DURATIONS.bounce)
+  const bouncing = choice ? bouncingParts(choice.previous, choice.value, look) : new Set<PartId>()
   const skin = skinOf(look)
   const planeLayers = layersOf(look)
 
@@ -66,7 +71,7 @@ export function Character({ label, className }: CharacterProps) {
                 <motion.g
                   key={`${layer.part}:${chosenLook[layer.part]}`}
                   style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-                  {...(layer.part !== 'background' && { animate: BOUNCE })}
+                  {...(bouncing.has(layer.part) && { animate: BOUNCE })}
                 >
                   <PartLayer layer={layer} skin={skin} />
                 </motion.g>

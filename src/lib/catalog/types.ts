@@ -83,5 +83,6 @@ export type Look = { [P in PartId]: VariantId<P> }
 
 export type Preset = {
   id: string
+  name: string
   look: Partial<Look>
 }

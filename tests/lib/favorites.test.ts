@@ -1,10 +1,12 @@
 // @vitest-environment happy-dom
 import { defaultLook } from '@src/lib/catalog/index.ts'
 import type { Look } from '@src/lib/catalog/types.ts'
+import type { Favorite } from '@src/lib/favorites.ts'
 import {
   builtInFavorites,
   createFavoriteId,
   findFavorite,
+  pickFavoriteName,
   readFavorites,
 } from '@src/lib/favorites.ts'
 import { describe, expect, it } from 'vitest'
@@ -36,14 +38,31 @@ describe('readFavorites', () => {
   it('completes looks and skips invalid entries', () => {
     const favorites = readFavorites({
       favorites: [
-        { id: 'a', createdAt: 1, name: 'Pierre', look: { eyes: 'six', mouth: 'gone' } },
+        { id: 'a', createdAt: 1, name: 'Ploumi', look: { eyes: 'six', mouth: 'gone' } },
+        { id: 'c', createdAt: 2, name: 3, look: sixEyes },
         { id: 'b', look: sixEyes },
         'junk',
       ],
     })
-    expect(favorites).toEqual([{ id: 'a', createdAt: 1, name: 'Pierre', look: sixEyes }])
+    expect(favorites).toEqual([
+      { id: 'a', createdAt: 1, name: 'Ploumi', look: sixEyes },
+      { id: 'c', createdAt: 2, look: sixEyes },
+    ])
     expect(readFavorites(null)).toEqual([])
     expect(readFavorites({ favorites: 'junk' })).toEqual([])
+  })
+})
+
+describe('favorite names', () => {
+  it('picks a name no other favorite uses', () => {
+    const used: Favorite = { id: 'a', name: 'Zigouigoui', createdAt: 1, look: sixEyes }
+    expect(pickFavoriteName([used], () => 0)).toBe('Choupinou')
+  })
+
+  it('names built-in favorites after their preset and keeps those names out of the draw', () => {
+    expect(builtInFavorites.map(({ name }) => name)).toEqual(['Silex', 'Captain', 'Original'])
+    const draws = Array.from({ length: 60 }, (_, i) => pickFavoriteName([], () => i / 60))
+    expect(draws).not.toContain('Silex')
   })
 })
 

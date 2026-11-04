@@ -60,8 +60,6 @@ export const fr = {
       look: 'ce look',
       done: 'déjà ajouté',
     },
-    current: 'choisi',
-    default: 'par défaut',
     apply: 'Choisir le Favori {{position}}',
     apply_default: 'Choisir le look par défaut',
     remove: 'Retirer le Favori {{position}}',

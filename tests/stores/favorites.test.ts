@@ -29,6 +29,9 @@ describe('favorites', () => {
     expect(addFavorite(sixEyes)).toBeNull()
     expect(addFavorite(defaultLook)).toBeNull()
     expect(state().favorites.map(({ look }) => look)).toEqual([sadMouth, sixEyes])
+    const [first, second] = state().favorites
+    expect(first?.name).toBeDefined()
+    expect(first?.name).not.toBe(second?.name)
   })
 
   it('restores a removed favorite at its place', () => {

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 
-type RecentChange<T> = { value: T; changed: boolean }
+export type Change<T> = { value: T; previous: T }
 
-export function useRecentChange<T>(value: T, duration: number): T | null {
-  const [state, setState] = useState<RecentChange<T>>({ value, changed: false })
+type RecentChange<T> = Change<T> & { changed: boolean }
 
-  if (state.value !== value) setState({ value, changed: true })
+export function useRecentChange<T>(value: T, duration: number): Change<T> | null {
+  const [state, setState] = useState<RecentChange<T>>({ value, previous: value, changed: false })
+
+  if (state.value !== value) setState({ value, previous: state.value, changed: true })
 
   useEffect(() => {
     if (!state.changed) return
@@ -16,5 +18,5 @@ export function useRecentChange<T>(value: T, duration: number): T | null {
     return () => clearTimeout(timer)
   }, [state, duration])
 
-  return state.changed ? state.value : null
+  return state.changed ? { value: state.value, previous: state.previous } : null
 }

@@ -12,6 +12,15 @@ export function lookEquals(a: Look, b: Look): boolean {
   return partIds.every((id) => a[id] === b[id])
 }
 
+export function bouncingParts(previous: Look, chosen: Look, shown: Look): Set<PartId> {
+  return new Set(
+    partIds.filter(
+      (part) =>
+        part !== 'background' && previous[part] !== chosen[part] && shown[part] === chosen[part],
+    ),
+  )
+}
+
 export function randomVariantId(part: Part, current: string, random: Random = Math.random): string {
   const others = visibleVariants(part).filter((variant) => variant.id !== current)
   return pick(others, random)?.id ?? current

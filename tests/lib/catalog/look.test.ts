@@ -1,12 +1,28 @@
 // @vitest-environment happy-dom
 import { defaultLook, partById, partIds, visibleVariants } from '@src/lib/catalog/index.ts'
-import { lookEquals, randomLook, randomVariantId, readLook } from '@src/lib/catalog/look.ts'
+import {
+  bouncingParts,
+  lookEquals,
+  randomLook,
+  randomVariantId,
+  readLook,
+} from '@src/lib/catalog/look.ts'
+import type { Look } from '@src/lib/catalog/types.ts'
 import { describe, expect, it } from 'vitest'
 
 function sequence(...values: number[]) {
   let i = 0
   return () => values[i++ % values.length] ?? 0
 }
+
+describe('bouncingParts', () => {
+  it('bounces the parts whose chosen variant changed and is shown, never the background', () => {
+    const chosen: Look = { ...defaultLook, eyes: 'six', arms: 'club', background: 'mountain' }
+    const shown: Look = { ...chosen, arms: 'basic' }
+    expect(bouncingParts(defaultLook, chosen, shown)).toEqual(new Set(['eyes']))
+    expect(bouncingParts(chosen, chosen, chosen)).toEqual(new Set())
+  })
+})
 
 describe('randomVariant', () => {
   it('never returns the current variant', () => {

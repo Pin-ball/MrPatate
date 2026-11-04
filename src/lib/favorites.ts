@@ -1,3 +1,4 @@
+import { favoriteNames } from '@src/catalog/names.ts'
 import { presets } from '@src/catalog/presets.ts'
 import { defaultLook } from '@src/lib/catalog/index.ts'
 import { lookEquals, readLook } from '@src/lib/catalog/look.ts'
@@ -11,12 +12,27 @@ export type Favorite = {
   look: Look
 }
 
+type Random = () => number
+
 export const DEFAULT_FAVORITE_ID = 'default'
 
-export const builtInFavorites: Favorite[] = [
-  ...presets.map(({ id, look }) => ({ id, createdAt: 0, look: { ...defaultLook, ...look } })),
-  { id: DEFAULT_FAVORITE_ID, createdAt: 0, look: defaultLook },
-]
+export const builtInFavorites: Favorite[] = presets.map(({ id, name, look }) => ({
+  id,
+  name,
+  createdAt: 0,
+  look: { ...defaultLook, ...look },
+}))
+
+const FAVORITE_NAMES = favoriteNames.filter(
+  (name) => !presets.some((preset) => preset.name === name),
+)
+
+export function pickFavoriteName(favorites: Favorite[], random: Random = Math.random): string {
+  const used = new Set(favorites.map(({ name }) => name))
+  const free = FAVORITE_NAMES.filter((name) => !used.has(name))
+  const pool = free.length ? free : FAVORITE_NAMES
+  return pool[Math.floor(random() * pool.length)] ?? 'blank'
+}
 
 export function createFavoriteId(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16))

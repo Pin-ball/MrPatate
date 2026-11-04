@@ -62,8 +62,6 @@ export const en = {
       look: 'this look',
       done: 'already added',
     },
-    current: 'chosen',
-    default: 'default',
     apply: 'Choose Favorite {{position}}',
     apply_default: 'Choose the default look',
     remove: 'Remove Favorite {{position}}',
