@@ -2,10 +2,10 @@ import type { VariantConfig } from '@src/lib/catalog/types.ts'
 
 export default [
   {
-    id: 'pierre',
+    id: 'green',
     label: {
-      fr: 'Vert Pierre',
-      en: 'Pierre green',
+      fr: 'Vert',
+      en: 'Green',
     },
     skin: '#21C488',
     shadow: '#20A069',

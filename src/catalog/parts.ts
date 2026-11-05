@@ -19,7 +19,7 @@ export const partConfigs = {
   },
   skin: {
     label: { fr: 'Couleur', en: 'Color' },
-    default: 'pierre',
+    default: 'green',
   },
   arms: {
     label: { fr: 'Bras', en: 'Arms' },
