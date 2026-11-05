@@ -31,7 +31,7 @@ export function HandBar({ state, firstIndex, icon: Icon, name }: HandBarProps) {
         {state.unfolded && (handWasOpen || !state.moving) && (
           <Appear
             layoutId="hand-bar"
-            {...(handWasOpen && { initial: false })}
+            initial={handWasOpen ? false : undefined}
             style={{ borderRadius: 999 }}
             className="border-stroke bg-card pressable pointer-events-auto"
           >

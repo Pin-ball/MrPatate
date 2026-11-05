@@ -6,8 +6,8 @@ import { useMotionValueEvent, useSpring } from 'motion/react'
 import type { MouseEvent, PointerEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
 
+export const DRAG_THRESHOLD = 8
 const WHEEL_PER_CARD = 100
-const DRAG_THRESHOLD = 8
 const SNAP_DELAY = 140
 const MAX_CARDS_PER_MS = 0.05
 const MAX_ELAPSED = 100

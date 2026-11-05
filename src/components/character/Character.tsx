@@ -71,7 +71,7 @@ export function Character({ label, className }: CharacterProps) {
                 <motion.g
                   key={`${layer.part}:${chosenLook[layer.part]}`}
                   style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-                  {...(bouncing.has(layer.part) && { animate: BOUNCE })}
+                  animate={bouncing.has(layer.part) ? BOUNCE : undefined}
                 >
                   <PartLayer layer={layer} skin={skin} />
                 </motion.g>

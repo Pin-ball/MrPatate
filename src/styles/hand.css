@@ -10,7 +10,7 @@
     margin-top: -220px;
     opacity: 0;
     scale: 0.85;
-    animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
+    animation-timing-function: var(--ease-in-strong);
   }
 
   10% {
@@ -20,7 +20,7 @@
   45% {
     margin-top: 0;
     scale: 1;
-    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation-timing-function: var(--ease-out-strong);
   }
 
   60% {
@@ -70,14 +70,59 @@
   }
 }
 
+@keyframes card-wiggle {
+  from {
+    transform: translateY(-50%) rotate(-1.5deg) translateY(50%);
+  }
+
+  to {
+    transform: translateY(-50%) rotate(1.5deg) translateY(50%);
+  }
+}
+
+@utility card-wiggle {
+  animation: card-wiggle var(--duration-wiggle) ease-in-out infinite alternate;
+}
+
+@utility card-remove {
+  scale: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    scale var(--duration-short) var(--ease-in-strong),
+    opacity var(--duration-short) var(--ease-in-strong),
+    background-color 0s var(--duration-short);
+
+  &:focus-visible {
+    @apply card-remove-shown;
+  }
+
+  @variant group-hover {
+    @apply card-remove-shown;
+  }
+}
+
+@utility card-remove-shown {
+  scale: 1;
+  opacity: 1;
+  pointer-events: inherit;
+  transition:
+    scale var(--duration-lift) var(--ease-overshoot-md),
+    opacity var(--duration-short) linear,
+    background-color var(--duration-short) ease;
+}
+
 @utility card-motion {
   --card-ease: var(--ease-overshoot-sm);
+  --card-scale-duration: var(--duration-short);
+  --card-scale-ease: linear;
+  --card-scale-delay: var(--card-delay);
   box-shadow: var(--shadow-hard);
   transition:
     left var(--card-duration) var(--card-ease) var(--card-delay),
     top var(--card-duration) var(--card-ease) var(--card-delay),
     rotate var(--card-duration) var(--card-ease) var(--card-delay),
-    scale var(--duration-short) linear var(--card-delay),
+    scale var(--card-scale-duration) var(--card-scale-ease) var(--card-scale-delay),
     opacity var(--duration-short) linear var(--card-delay),
     margin-top var(--duration-lift) var(--ease-overshoot-lg),
     background-color var(--duration-short) ease;
@@ -98,6 +143,13 @@
 
   &[data-in-pile] {
     box-shadow: var(--shadow-hard-sm);
+  }
+
+  &[data-pressing] {
+    --card-scale-delay: var(--duration-long-press-grow-delay);
+    --card-scale-duration: calc(var(--duration-long-press) - var(--duration-long-press-grow-delay));
+    --card-scale-ease: var(--ease-in-expo);
+    scale: 1.06;
   }
 
   &[data-ignore-pointer] {

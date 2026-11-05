@@ -22,6 +22,6 @@ function shown(delay: number): TargetAndTransition {
   }
 }
 
-export function Appear({ delay = 0, ...props }: AppearProps) {
-  return <motion.div initial={HIDDEN} animate={shown(delay)} exit={EXIT} {...props} />
+export function Appear({ delay = 0, initial = HIDDEN, ...props }: AppearProps) {
+  return <motion.div initial={initial} animate={shown(delay)} exit={EXIT} {...props} />
 }

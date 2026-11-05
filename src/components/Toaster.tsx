@@ -13,15 +13,15 @@ export function Toaster() {
           <Appear key={toast.id} className="pointer-events-auto">
             <Toast
               message={toast.message}
-              {...(toast.action && {
-                action: {
+              action={
+                toast.action && {
                   label: toast.action.label,
                   onClick: () => {
                     hideToast()
                     toast.action?.onClick()
                   },
-                },
-              })}
+                }
+              }
             />
           </Appear>
         )}

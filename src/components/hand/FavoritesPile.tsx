@@ -6,6 +6,7 @@ import { allFavorites, builtInFavorites, DEFAULT_FAVORITE_ID } from '@src/lib/fa
 import { setHand, setPreview, useEditor } from '@src/stores/editor.ts'
 import { useFavorites } from '@src/stores/favorites.ts'
 import { Star } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AddCard } from './AddCard.tsx'
 import { FavoriteCard } from './FavoriteCard.tsx'
@@ -26,6 +27,19 @@ export function FavoritesPile() {
   const count = favorites.length + 1
   const pile = usePile('favorites', { count, openingIndex: chosenIndex, events })
   const { unfolded, held, layoutOf, rendered, reveal, spreadPile } = pile
+  const [removeMode, setRemoveMode] = useState(false)
+  if (removeMode && (!unfolded || userFavorites.length === 0)) setRemoveMode(false)
+
+  useEffect(() => {
+    if (!removeMode) return
+    const onClick = (event: MouseEvent) => {
+      if (event.target instanceof Element && event.target.closest('[data-favorite]')) return
+      setRemoveMode(false)
+    }
+    const listeners = new AbortController()
+    addEventListener('click', onClick, listeners)
+    return () => listeners.abort()
+  }, [removeMode])
 
   const unfold = () => {
     setHand({ kind: 'favorites' })
@@ -64,6 +78,7 @@ export function FavoritesPile() {
             chosen={chosen}
             isDefault={favorite.id === DEFAULT_FAVORITE_ID}
             removable={!builtInFavorites.includes(favorite)}
+            removeMode={removeMode}
             layout={layoutOf(index, {
               zIndex: count - index + 1,
               onTop: index === Math.max(held.first, 1),
@@ -76,6 +91,8 @@ export function FavoritesPile() {
               showPreview()
             }}
             onRemove={() => remove(favorite)}
+            onEnterRemoveMode={() => setRemoveMode(true)}
+            onExitRemoveMode={() => setRemoveMode(false)}
           />
         )
       })}

@@ -1,4 +1,5 @@
 import { useHandGeometry } from '@src/hooks/useLayout.ts'
+import { useLongPress } from '@src/hooks/useLongPress.ts'
 import type { CardLayout } from '@src/lib/hand/cards.ts'
 import { CARD_MOTION_DURATIONS } from '@src/lib/hand/cards.ts'
 import { cn } from '@src/lib/utils.ts'
@@ -7,6 +8,7 @@ import type { ComponentProps, ReactNode } from 'react'
 type HandCardProps = Omit<ComponentProps<'button'>, 'style' | 'className'> & {
   layout: CardLayout
   corner?: ReactNode
+  onLongPress?: () => void
   className?: string
 }
 
@@ -18,10 +20,12 @@ export function HandCard({
   className,
   type = 'button',
   onFocus,
+  onLongPress,
   onPointerEnter,
   ...props
 }: HandCardProps) {
   const { card } = useHandGeometry()
+  const { pressing, handlers } = useLongPress(onLongPress)
 
   return (
     <div
@@ -42,6 +46,7 @@ export function HandCard({
       data-other-added={state.otherAdded || undefined}
       data-removed={state.removed || undefined}
       data-just-chosen={state.justChosen || undefined}
+      data-pressing={pressing || undefined}
       inert={state.removed}
       className={cn(
         'border-stroke bg-card card-motion group absolute origin-bottom -translate-1/2',
@@ -56,7 +61,8 @@ export function HandCard({
         onPointerEnter={(event) => {
           if (event.pointerType !== 'touch') onPointerEnter?.(event)
         }}
-        className="flex size-full cursor-pointer flex-col items-center justify-start gap-1.5 rounded-[inherit] px-1.5 py-2 text-center leading-[1.15]"
+        className="flex size-full cursor-pointer flex-col items-center justify-start gap-1.5 rounded-[inherit] px-1.5 py-2 text-center leading-[1.15] [-webkit-touch-callout:none]"
+        {...handlers}
         {...props}
       />
       {corner}

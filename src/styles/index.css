@@ -108,6 +108,11 @@
     @apply border-border;
   }
 
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
   body {
     @apply bg-background font-sans text-foreground;
   }

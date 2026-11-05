@@ -13,7 +13,7 @@ type PartCardProps = {
   open: boolean
   showCount: boolean
   onClick: () => void
-  onPointerEnter?: (() => void) | undefined
+  onPointerEnter?: () => void
   onFocus: () => void
 }
 

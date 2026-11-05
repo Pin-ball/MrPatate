@@ -31,7 +31,6 @@ export type HandChanges = {
 }
 
 export const CHANGE_DURATION = 1200
-const WAVE_STAGGER = 45
 
 export const CARD_MOTION_DURATIONS: Record<CardMotion, number> = {
   move: DURATIONS.move,
@@ -43,7 +42,7 @@ export const CARD_MOTION_DURATIONS: Record<CardMotion, number> = {
 
 function waveDelay(index: number, { count, offset, shape }: HandState, pileSide: PileSide) {
   const { first, last } = visibleCards(offset, count, shape)
-  return (pileSide === 'left' ? last - index : index - first) * WAVE_STAGGER
+  return (pileSide === 'left' ? last - index : index - first) * DURATIONS.waveStagger
 }
 
 export function moveMotion(index: number, { offset, shape, moving }: HandState): CardMotion {
@@ -79,12 +78,12 @@ export function enteringLayout(
   const { first } = visibleCards(openingOffset, count, shape)
   return {
     style: { ...style, '--from-left': left, '--from-top': top },
-    state: { ...state, motion: 'enter', delay: (index - first) * WAVE_STAGGER },
+    state: { ...state, motion: 'enter', delay: (index - first) * DURATIONS.waveStagger },
   }
 }
 
 export function waveDuration(duration: number, cardCount: number): number {
-  return duration + (cardCount - 1) * WAVE_STAGGER
+  return duration + (cardCount - 1) * DURATIONS.waveStagger
 }
 
 export function withState({ style, state }: CardLayout, changes: Partial<CardState>): CardLayout {

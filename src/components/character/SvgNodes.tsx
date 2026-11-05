@@ -5,8 +5,8 @@ import { createElement, Fragment } from 'react'
 
 type SvgNodesProps = {
   nodes: SvgNode[]
-  skin?: SkinPaint | undefined
-  shadowClip?: string | undefined
+  skin?: SkinPaint
+  shadowClip?: string
 }
 
 function fillOf({ attrs }: SvgNode, skin?: SkinPaint): string | undefined {

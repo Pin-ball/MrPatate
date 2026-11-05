@@ -9,6 +9,11 @@ import { HandCard } from './HandCard.tsx'
 const PORTRAIT_ZOOM = 1.05
 const PORTRAIT_RATIO = 11 / 9
 const PORTRAIT_VIEW = frameView(PORTRAIT_ZOOM, PORTRAIT_RATIO)
+const WIGGLE_PHASES = [
+  '[animation-delay:0ms]',
+  '[animation-delay:calc(var(--duration-wiggle)*-0.67)]',
+  '[animation-delay:calc(var(--duration-wiggle)*-1.33)]',
+]
 
 type FavoriteCardProps = {
   favorite: Favorite
@@ -16,11 +21,14 @@ type FavoriteCardProps = {
   chosen: boolean
   isDefault: boolean
   removable: boolean
+  removeMode: boolean
   layout: CardLayout
   onClick: () => void
   onPointerEnter: () => void
   onFocus: () => void
   onRemove: () => void
+  onEnterRemoveMode: () => void
+  onExitRemoveMode: () => void
 }
 
 export function FavoriteCard({
@@ -29,42 +37,52 @@ export function FavoriteCard({
   chosen,
   isDefault,
   removable,
+  removeMode,
   layout,
   onClick,
   onPointerEnter,
   onFocus,
   onRemove,
+  onEnterRemoveMode,
+  onExitRemoveMode,
 }: FavoriteCardProps) {
   const { t } = useTranslation()
+  const removableInHand = removable && !layout.state.inPile
+  const wiggling = removeMode && removableInHand
 
   return (
     <HandCard
+      data-favorite
       layout={layout}
-      className={cn(chosen && 'bg-accent')}
+      className={cn(
+        chosen && 'bg-accent',
+        wiggling && ['card-wiggle', WIGGLE_PHASES[position % WIGGLE_PHASES.length]],
+      )}
       aria-label={isDefault ? t('favorites.apply_default') : t('favorites.apply', { position })}
-      onClick={onClick}
+      onClick={removeMode ? onExitRemoveMode : onClick}
       onPointerEnter={onPointerEnter}
       onFocus={onFocus}
+      onLongPress={removableInHand ? onEnterRemoveMode : undefined}
       corner={
-        removable &&
-        !layout.state.inPile && (
+        removableInHand && (
           <button
+            data-favorite
             type="button"
             aria-label={t('favorites.remove', { position })}
             onClick={onRemove}
             onFocus={onFocus}
-            className="border-foreground bg-card hover:bg-primary absolute -top-[11px] -right-[11px] flex size-7 cursor-pointer items-center justify-center rounded-full border-2 text-[13px] font-bold opacity-0 transition-[opacity,background-color] duration-(--duration-short) group-hover:opacity-100 focus-visible:opacity-100"
+            className={cn(
+              'border-foreground bg-card hover:bg-primary card-remove absolute -top-[11px] -right-[11px] flex size-7 cursor-pointer items-center justify-center rounded-full border-2 text-[13px] font-bold',
+              removeMode && 'card-remove-shown bg-primary',
+            )}
           >
             ✕
           </button>
         )
       }
     >
-      <span
-        style={{ aspectRatio: 1 / PORTRAIT_RATIO }}
-        className="border-foreground w-(--card-picture) shrink-0 overflow-hidden rounded-[10px] border-2"
-      >
-        <CharacterImage look={favorite.look} view={PORTRAIT_VIEW} className="block size-full" />
+      <span className="border-foreground w-(--card-picture) shrink-0 overflow-hidden rounded-[10px] border-2">
+        <CharacterImage look={favorite.look} view={PORTRAIT_VIEW} className="block h-auto w-full" />
       </span>
       <span className="text-muted-foreground h-lh w-full truncate text-xs font-medium">
         {favorite.name}
